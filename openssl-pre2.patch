@@ -150,21 +150,19 @@ diff -urN 1/ssl/s3_lib.c 2/ssl/s3_lib.c
  
          /*
           * Since TLS 1.3 ciphersuites can be used with any auth or
-@@ -4211,16 +4191,24 @@
-             }
- #endif
+@@ -4214,13 +4194,22 @@
+             alg_k = c->algorithm_mkey;
+             alg_a = c->algorithm_auth;
  
 +            /* Skip 3DES over TLS v1.0 */
 +            if (c->algorithm_enc == SSL_3DES &&
-+               	(s->version != TLS1_VERSION &&
++                (s->version != TLS1_VERSION &&
 +                 s->version != DTLS1_VERSION))
 +                ok = 0;
 +            /* not use ECDSA under TLS v1.2 */
 +            // if ((alg_a & SSL_aECDSA) && s->version != TLS1_2_VERSION) ok = 0;
++            if ((alg_a & SSL_aRSA) && (alg_k & SSL_kRSA) && s->version == TLS1_2_VERSION) ok = 0;
 +
-             alg_k = c->algorithm_mkey;
-             alg_a = c->algorithm_auth;
- 
  #ifndef OPENSSL_NO_PSK
              /* with PSK there must be server callback set */
              if ((alg_k & SSL_PSK) && s->psk_server_callback == NULL)
