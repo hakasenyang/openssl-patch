@@ -1,3 +1,28 @@
+diff -urN 1/doc/man1/ciphers.pod 2/doc/man1/ciphers.pod
+--- 1/doc/man1/ciphers.pod	2018-04-09 02:53:14.337756676 +0900
++++ 2/doc/man1/ciphers.pod	2018-04-09 02:53:03.060663965 +0900
+@@ -405,6 +405,21 @@
+ 
+ =back
+ 
++=head1 EQUAL PREFERENCE GROUPS
++
++If configuring a server, one may also configure equal-preference groups to
++partially respect the client's preferences when
++B<SSL_OP_CIPHER_SERVER_PREFERENCE> is enabled. Ciphers in an equal-preference
++group have equal priority and use the client order. This may be used to
++enforce that AEADs are preferred but select AES-GCM vs. ChaCha20-Poly1305
++based on client preferences. An equal-preference is specified with square
++brackets, combining multiple selectors separated by |. For example:
++
++ [ECDHE-ECDSA-CHACHA20-POLY1305|ECDHE-ECDSA-AES128-GCM-SHA256]
++ 
++ Once an equal-preference group is used, future directives must be
++ opcode-less.
++
+ =head1 CIPHER SUITE NAMES
+ 
+ The following lists give the SSL or TLS cipher suites names from the
 diff -urN 1/include/openssl/sslerr.h 2/include/openssl/sslerr.h
 --- 1/include/openssl/sslerr.h	2018-04-07 06:10:31.896696119 +0900
 +++ 2/include/openssl/sslerr.h	2018-04-07 04:56:20.000000000 +0900
