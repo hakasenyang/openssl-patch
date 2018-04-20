@@ -1,7 +1,7 @@
 diff -urN 1/doc/man1/ciphers.pod 2/doc/man1/ciphers.pod
 --- 1/doc/man1/ciphers.pod	2018-04-09 02:53:14.337756676 +0900
 +++ 2/doc/man1/ciphers.pod	2018-04-09 02:53:03.060663965 +0900
-@@ -417,6 +417,21 @@
+@@ -418,6 +418,21 @@
  
  =back
  
@@ -101,7 +101,7 @@ diff -urN 1/ssl/s3_lib.c 2/ssl/s3_lib.c
 -    STACK_OF(SSL_CIPHER) *prio, *allow;
 -    int i, ii, ok;
 +    STACK_OF(SSL_CIPHER) *srvr = server_pref->ciphers, *prio, *allow;
-+    int i, ii, ok, safari_ec, use_chacha = 0;
++    int i, ii, ok, safari_ec = 0, use_chacha = 0;
      unsigned long alg_k = 0, alg_a = 0, mask_k = 0, mask_a = 0;
 -#ifndef OPENSSL_NO_CHACHA
 -    STACK_OF(SSL_CIPHER) *prio_chacha = NULL;
