@@ -292,7 +292,7 @@ index 6193269..5a330d6 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 9011e42..147a11c 100644
+index 9011e42..48d38d4 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -621,7 +621,7 @@ index 9011e42..147a11c 100644
      }
      ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
                                 disabled_mkey, disabled_auth, disabled_enc,
-@@ -1583,27 +1643,30 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1583,27 +1643,26 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
  
      OPENSSL_free(ca_list);      /* Not needed anymore */
  
@@ -650,17 +650,17 @@ index 9011e42..147a11c 100644
      /* Add TLSv1.3 ciphers first - we always prefer those if possible */
      for (i = 0; i < sk_SSL_CIPHER_num(tls13_ciphersuites); i++) {
          if (!sk_SSL_CIPHER_push(cipherstack,
-                                 sk_SSL_CIPHER_value(tls13_ciphersuites, i))) {
-             sk_SSL_CIPHER_free(cipherstack);
-+            in_group_flags[num_in_group_flags++] = 1;
-             return NULL;
-         }
-+        else
-+            in_group_flags[num_in_group_flags++] = 0;
+-                                sk_SSL_CIPHER_value(tls13_ciphersuites, i))) {
+-            sk_SSL_CIPHER_free(cipherstack);
+-            return NULL;
+-        }
++                                sk_SSL_CIPHER_value(tls13_ciphersuites, i)))
++            goto err;
++        in_group_flags[num_in_group_flags++] = 1;
      }
  
      /*
-@@ -1612,26 +1675,66 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1612,26 +1671,66 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       */
      for (curr = head; curr != NULL; curr = curr->next) {
          if (curr->active) {
