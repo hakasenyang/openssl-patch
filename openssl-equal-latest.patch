@@ -25,7 +25,7 @@ index 3786e9a..8dd0d2c 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 4b45ae7..01391d8 100644
+index 4b45ae7..2193601 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -174,12 +174,12 @@ extern "C" {
@@ -35,9 +35,9 @@ index 4b45ae7..01391d8 100644
 -#  define TLS_DEFAULT_CIPHERSUITES "TLS_AES_256_GCM_SHA384:" \
 -                                   "TLS_CHACHA20_POLY1305_SHA256:" \
 -                                   "TLS_AES_128_GCM_SHA256"
-+#  define TLS_DEFAULT_CIPHERSUITES "TLS_CHACHA20_POLY1305_SHA256:" \
-+                                   "TLS_AES_128_GCM_SHA256:" \
-+                                   "TLS_AES_256_GCM_SHA384"
++#  define TLS_DEFAULT_CIPHERSUITES "TLS_AES_128_GCM_SHA256:" \
++                                   "TLS_AES_256_GCM_SHA384:" \
++                                   "TLS_CHACHA20_POLY1305_SHA256"
  # else
 -#  define TLS_DEFAULT_CIPHERSUITES "TLS_AES_256_GCM_SHA384:" \
 -                                   "TLS_AES_128_GCM_SHA256"
@@ -72,7 +72,7 @@ index 5c6718f..d079e32 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 6193269..26c6243 100644
+index 6193269..5a330d6 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -4095,6 +4095,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
@@ -105,7 +105,7 @@ index 6193269..26c6243 100644
 -    STACK_OF(SSL_CIPHER) *prio, *allow;
 -    int i, ii, ok;
 +    STACK_OF(SSL_CIPHER) *srvr = server_pref->ciphers, *prio, *allow;
-+    int i, ii, ok, safari_ec = 0, use_chacha = 0;
++    int i, ii, ok, safari_ec = 0;
      unsigned long alg_k = 0, alg_a = 0, mask_k = 0, mask_a = 0;
 -#ifndef OPENSSL_NO_CHACHA
 -    STACK_OF(SSL_CIPHER) *prio_chacha = NULL;
@@ -123,26 +123,24 @@ index 6193269..26c6243 100644
  
      /* Let's see which ciphers we can support */
  
-@@ -4139,55 +4158,21 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4139,54 +4158,13 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  #endif
  
      /* SUITE-B takes precedence over server preference and ChaCha priortiy */
 -    if (tls1_suiteb(s)) {
--        prio = srvr;
--        allow = clnt;
--    } else if (s->options & SSL_OP_CIPHER_SERVER_PREFERENCE) {
 +    if (s->options & SSL_OP_CIPHER_SERVER_PREFERENCE || tls1_suiteb(s)) {
          prio = srvr;
++        in_group_flags = server_pref->in_group_flags;
+         allow = clnt;
+-    } else if (s->options & SSL_OP_CIPHER_SERVER_PREFERENCE) {
+-        prio = srvr;
 -        allow = clnt;
 -#ifndef OPENSSL_NO_CHACHA
 -        /* If ChaCha20 is at the top of the client preference list,
 -           and there are ChaCha20 ciphers in the server list, then
 -           temporarily prioritize all ChaCha20 ciphers in the servers list. */
 -        if (s->options & SSL_OP_PRIORITIZE_CHACHA && sk_SSL_CIPHER_num(clnt) > 0) {
-+        in_group_flags = server_pref->in_group_flags;
-+        /* Use ChaCha20+Poly1305 if it's client's most preferred cipher suite */
-+        if (sk_SSL_CIPHER_num(clnt) > 0 && SSL_IS_TLS13(s)) {
-             c = sk_SSL_CIPHER_value(clnt, 0);
+-            c = sk_SSL_CIPHER_value(clnt, 0);
 -            if (c->algorithm_enc == SSL_CHACHA20POLY1305) {
 -                /* ChaCha20 is client preferred, check server... */
 -                int num = sk_SSL_CIPHER_num(srvr);
@@ -175,20 +173,15 @@ index 6193269..26c6243 100644
 -                    }
 -                }
 -            }
-+            if (c->algorithm_enc == SSL_CHACHA20POLY1305)
-+                use_chacha = 1;
-         }
+-        }
 -# endif
-+        allow = clnt;
      } else {
          prio = clnt;
 +        in_group_flags = NULL;
          allow = srvr;
-+        use_chacha = 1;
      }
  
-     if (!SSL_IS_TLS13(s)) {
-@@ -4198,15 +4183,21 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4198,14 +4176,16 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
      for (i = 0; i < sk_SSL_CIPHER_num(prio); i++) {
          c = sk_SSL_CIPHER_value(prio, i);
  
@@ -205,14 +198,9 @@ index 6193269..26c6243 100644
 -            continue;
 +            ok = 0;
  
-+        /* Skip ChaCha unless top client priority */
-+        if (c->algorithm_enc == SSL_CHACHA20POLY1305 && !use_chacha && SSL_IS_TLS13(s))
-+            continue;
-+        
          /*
           * Since TLS 1.3 ciphersuites can be used with any auth or
-          * key exchange scheme skip tests.
-@@ -4224,13 +4215,23 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4224,13 +4204,25 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
              alg_k = c->algorithm_mkey;
              alg_a = c->algorithm_auth;
  
@@ -224,7 +212,9 @@ index 6193269..26c6243 100644
 +
 +            /* not use ECDSA under TLS v1.2 */    
 +            // if ((alg_a & SSL_aECDSA) && s->version != TLS1_2_VERSION) ok = 0;
-+            if ((alg_a & SSL_aRSA) && (alg_k & SSL_kRSA) && s->version == TLS1_2_VERSION) ok = 0;
++            if ((alg_a & SSL_aRSA) &&
++                (alg_k & SSL_kRSA) &&
++                (s->version != TLS1_VERSION)) ok = 0;
 +
  #ifndef OPENSSL_NO_PSK
              /* with PSK there must be server callback set */
@@ -238,7 +228,7 @@ index 6193269..26c6243 100644
  #ifdef CIPHER_DEBUG
              fprintf(stderr, "%d:[%08lX:%08lX:%08lX:%08lX]%p:%s\n", ok, alg_k,
                      alg_a, mask_k, mask_a, (void *)c, c->name);
-@@ -4247,6 +4248,14 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4247,6 +4239,14 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  
              if (!ok)
                  continue;
@@ -253,7 +243,7 @@ index 6193269..26c6243 100644
          }
          ii = sk_SSL_CIPHER_find(allow, c);
          if (ii >= 0) {
-@@ -4254,21 +4263,38 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4254,21 +4254,38 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
              if (!ssl_security(s, SSL_SECOP_CIPHER_SHARED,
                                c->strength_bits, 0, (void *)c))
                  continue;
@@ -302,7 +292,7 @@ index 6193269..26c6243 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 9011e42..6e9216d 100644
+index 9011e42..147a11c 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -631,7 +621,7 @@ index 9011e42..6e9216d 100644
      }
      ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
                                 disabled_mkey, disabled_auth, disabled_enc,
-@@ -1583,19 +1643,19 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1583,27 +1643,30 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
  
      OPENSSL_free(ca_list);      /* Not needed anymore */
  
@@ -659,16 +649,18 @@ index 9011e42..6e9216d 100644
  
      /* Add TLSv1.3 ciphers first - we always prefer those if possible */
      for (i = 0; i < sk_SSL_CIPHER_num(tls13_ciphersuites); i++) {
-@@ -1604,6 +1664,8 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+         if (!sk_SSL_CIPHER_push(cipherstack,
+                                 sk_SSL_CIPHER_value(tls13_ciphersuites, i))) {
              sk_SSL_CIPHER_free(cipherstack);
++            in_group_flags[num_in_group_flags++] = 1;
              return NULL;
          }
 +        else
-+            num_in_group_flags++;
++            in_group_flags[num_in_group_flags++] = 0;
      }
  
      /*
-@@ -1612,26 +1674,66 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1612,26 +1675,66 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       */
      for (curr = head; curr != NULL; curr = curr->next) {
          if (curr->active) {
