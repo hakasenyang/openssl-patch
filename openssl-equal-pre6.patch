@@ -71,25 +71,9 @@ index 5c6718f..d079e32 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 6193269..0206266 100644
+index 6193269..8c10b90 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
-@@ -37,12 +37,12 @@ static SSL_CIPHER tls13_ciphers[] = {
-         TLS1_3_RFC_AES_128_GCM_SHA256,
-         TLS1_3_RFC_AES_128_GCM_SHA256,
-         TLS1_3_CK_AES_128_GCM_SHA256,
--        0, 0,
-+        SSL_kANY,
-+        SSL_aANY,
-         SSL_AES128GCM,
-         SSL_AEAD,
-         TLS1_3_VERSION, TLS1_3_VERSION,
--        SSL_kANY,
--        SSL_aANY,
-+        0, 0,
-         SSL_HIGH,
-         SSL_HANDSHAKE_MAC_SHA256,
-         128,
 @@ -4095,6 +4095,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
      return 1;
  }
@@ -143,13 +127,13 @@ index 6193269..0206266 100644
  
      /* SUITE-B takes precedence over server preference and ChaCha priortiy */
 -    if (tls1_suiteb(s)) {
--        prio = srvr;
--        allow = clnt;
--    } else if (s->options & SSL_OP_CIPHER_SERVER_PREFERENCE) {
 +    if (s->options & SSL_OP_CIPHER_SERVER_PREFERENCE || tls1_suiteb(s)) {
          prio = srvr;
 +        in_group_flags = server_pref->in_group_flags;
          allow = clnt;
+-    } else if (s->options & SSL_OP_CIPHER_SERVER_PREFERENCE) {
+-        prio = srvr;
+-        allow = clnt;
 -#ifndef OPENSSL_NO_CHACHA
 -        /* If ChaCha20 is at the top of the client preference list,
 -           and there are ChaCha20 ciphers in the server list, then
