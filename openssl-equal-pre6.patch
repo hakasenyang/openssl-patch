@@ -291,7 +291,7 @@ index 6193269..5a330d6 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 9011e42..22181a7 100644
+index 9011e42..9fd70b6 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -477,15 +477,7 @@ index 9011e42..22181a7 100644
      return retval;
  }
  
-@@ -1346,6 +1404,7 @@ static int update_cipher_list(STACK_OF(SSL_CIPHER) **cipher_list,
-                               STACK_OF(SSL_CIPHER) *tls13_ciphersuites)
- {
-     int i;
-+    //STACK_OF(SSL_CIPHER) *tmp_cipher_list = sk_SSL_CIPHER_dup( (STACK_OF(SSL_CIPHER) *)cipher_list );
-     STACK_OF(SSL_CIPHER) *tmp_cipher_list = sk_SSL_CIPHER_dup(*cipher_list);
- 
-     if (tmp_cipher_list == NULL)
-@@ -1380,7 +1439,7 @@ int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+@@ -1380,7 +1438,7 @@ int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
  
      if (ret && ctx->cipher_list != NULL) {
          /* We already have a cipher_list, so we need to update it */
@@ -494,7 +486,7 @@ index 9011e42..22181a7 100644
                                    ctx->tls13_ciphersuites);
      }
  
-@@ -1393,7 +1452,7 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
+@@ -1393,7 +1451,7 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
  
      if (ret && s->cipher_list != NULL) {
          /* We already have a cipher_list, so we need to update it */
@@ -503,7 +495,7 @@ index 9011e42..22181a7 100644
                                    s->tls13_ciphersuites);
      }
  
-@@ -1402,17 +1461,20 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
+@@ -1402,17 +1460,20 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
  
  STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
                                               STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
@@ -527,7 +519,7 @@ index 9011e42..22181a7 100644
  
      /*
       * Return with error if nothing to do.
-@@ -1461,16 +1523,16 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1461,16 +1522,16 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       * preference).
       */
      ssl_cipher_apply_rule(0, SSL_kECDHE, SSL_aECDSA, 0, 0, 0, 0, CIPHER_ADD,
@@ -551,7 +543,7 @@ index 9011e42..22181a7 100644
                            &head, &tail);
  
      /*
-@@ -1479,13 +1541,13 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1479,13 +1540,13 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       * strength.
       */
      ssl_cipher_apply_rule(0, 0, 0, SSL_AES ^ SSL_AESGCM, 0, 0, 0, CIPHER_ADD,
@@ -568,7 +560,7 @@ index 9011e42..22181a7 100644
                            &tail);
  
      /*
-@@ -1493,16 +1555,16 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1493,16 +1554,16 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       * disabled. (For applications that allow them, they aren't too bad, but
       * we prefer authenticated ciphers.)
       */
@@ -589,7 +581,7 @@ index 9011e42..22181a7 100644
                            &tail);
  
      /*
-@@ -1518,7 +1580,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1518,7 +1579,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       * Partially overrule strength sort to prefer TLS 1.2 ciphers/PRFs.
       * TODO(openssl-team): is there an easier way to accomplish all this?
       */
@@ -598,7 +590,7 @@ index 9011e42..22181a7 100644
                            &head, &tail);
  
      /*
-@@ -1534,15 +1596,15 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1534,15 +1595,15 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       * Because we now bump ciphers to the top of the list, we proceed in
       * reverse order of preference.
       */
@@ -618,7 +610,7 @@ index 9011e42..22181a7 100644
  
      /*
       * We also need cipher aliases for selecting based on the rule_str.
-@@ -1556,9 +1618,8 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1556,9 +1617,8 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
      num_of_alias_max = num_of_ciphers + num_of_group_aliases + 1;
      ca_list = OPENSSL_malloc(sizeof(*ca_list) * num_of_alias_max);
      if (ca_list == NULL) {
@@ -629,7 +621,7 @@ index 9011e42..22181a7 100644
      }
      ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
                                 disabled_mkey, disabled_auth, disabled_enc,
-@@ -1583,27 +1644,30 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1583,27 +1643,30 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
  
      OPENSSL_free(ca_list);      /* Not needed anymore */
  
@@ -672,7 +664,7 @@ index 9011e42..22181a7 100644
      }
  
      /*
-@@ -1612,26 +1676,66 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1612,26 +1675,66 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       */
      for (curr = head; curr != NULL; curr = curr->next) {
          if (curr->active) {
