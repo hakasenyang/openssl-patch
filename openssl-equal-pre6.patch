@@ -307,7 +307,7 @@ index 6193269..8f9262f 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 9011e42..9fd70b6 100644
+index 9011e42..113a728 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -633,7 +633,7 @@ index 9011e42..9fd70b6 100644
 -        OPENSSL_free(co_list);
          SSLerr(SSL_F_SSL_CREATE_CIPHER_LIST, ERR_R_MALLOC_FAILURE);
 -        return NULL;          /* Failure */
-+        goto err; /* Failure */
++        goto err;               /* Failure */
      }
      ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
                                 disabled_mkey, disabled_auth, disabled_enc,
@@ -646,7 +646,7 @@ index 9011e42..9fd70b6 100644
 -        return NULL;
 -    }
 +    if (!ok)
-+        goto err; /* Rule processing failure */
++        goto err;               /* Rule processing failure */
  
      /*
       * Allocate new "cipherstack" for the result, return with error
