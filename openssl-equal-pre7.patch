@@ -291,7 +291,7 @@ index f797497..0206266 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 9011e42..7da2f1b 100644
+index 9011e42..4ad79b3 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -505,7 +505,8 @@ index 9011e42..7da2f1b 100644
                                               const char *rule_str,
                                               CERT *c)
  {
-     int ok, num_of_ciphers, num_of_alias_max, num_of_group_aliases, i;
+-    int ok, num_of_ciphers, num_of_alias_max, num_of_group_aliases, i;
++    int ok, num_of_ciphers, num_of_alias_max, num_of_group_aliases, i, tls13_len;
      uint32_t disabled_mkey, disabled_auth, disabled_enc, disabled_mac;
 -    STACK_OF(SSL_CIPHER) *cipherstack;
 +    STACK_OF(SSL_CIPHER) *cipherstack = NULL, *tmp_cipher_list = NULL;
@@ -621,7 +622,7 @@ index 9011e42..7da2f1b 100644
      }
      ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
                                 disabled_mkey, disabled_auth, disabled_enc,
-@@ -1583,27 +1643,36 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1583,27 +1643,37 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
  
      OPENSSL_free(ca_list);      /* Not needed anymore */
  
@@ -648,7 +649,9 @@ index 9011e42..7da2f1b 100644
 +        goto err;
  
      /* Add TLSv1.3 ciphers first - we always prefer those if possible */
-     for (i = 0; i < sk_SSL_CIPHER_num(tls13_ciphersuites); i++) {
+-    for (i = 0; i < sk_SSL_CIPHER_num(tls13_ciphersuites); i++) {
++    tls13_len = sk_SSL_CIPHER_num(tls13_ciphersuites);
++    for (i = 0; i < tls13_len; i++) {
 +        tmp = sk_SSL_CIPHER_value(tls13_ciphersuites, i);
          if (!sk_SSL_CIPHER_push(cipherstack,
 -                                sk_SSL_CIPHER_value(tls13_ciphersuites, i))) {
@@ -657,7 +660,7 @@ index 9011e42..7da2f1b 100644
 +                                tmp))
 +            goto err;
 +        if (tmp->algorithm_enc == SSL_AES128GCM &&
-+            i + 1 < sk_SSL_CIPHER_num(tls13_ciphersuites)) {
++            tls13_len > (i + 1)) {
 +            tmp = sk_SSL_CIPHER_value(tls13_ciphersuites, i + 1);
 +            if (tmp->algorithm_enc == SSL_CHACHA20POLY1305)
 +                in_group_flags[num_in_group_flags++] = 1;
@@ -669,7 +672,7 @@ index 9011e42..7da2f1b 100644
      }
  
      /*
-@@ -1612,26 +1681,67 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1612,26 +1682,67 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
       */
      for (curr = head; curr != NULL; curr = curr->next) {
          if (curr->active) {
