@@ -25,7 +25,7 @@ index 3786e9a..8dd0d2c 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 4b45ae7..7567b18 100644
+index 4bd53fc..a480863 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -174,12 +174,12 @@ extern "C" {
@@ -780,7 +780,7 @@ index bce2036..31b5599 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 2a57831..43251eb 100644
+index 3aefa34..64f553c 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1106,6 +1106,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -888,7 +888,7 @@ index 2a57831..43251eb 100644
      return NULL;
  }
  
-@@ -2917,7 +2983,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+@@ -2926,7 +2992,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
                                  ret->tls13_ciphersuites,
                                  &ret->cipher_list, &ret->cipher_list_by_id,
                                  SSL_DEFAULT_CIPHER_LIST, ret->cert)
@@ -897,7 +897,7 @@ index 2a57831..43251eb 100644
          SSLerr(SSL_F_SSL_CTX_NEW, SSL_R_LIBRARY_HAS_NO_CIPHERS);
          goto err2;
      }
-@@ -3077,7 +3143,7 @@ void SSL_CTX_free(SSL_CTX *a)
+@@ -3086,7 +3152,7 @@ void SSL_CTX_free(SSL_CTX *a)
  #ifndef OPENSSL_NO_CT
      CTLOG_STORE_free(a->ctlog_store);
  #endif
@@ -906,7 +906,7 @@ index 2a57831..43251eb 100644
      sk_SSL_CIPHER_free(a->cipher_list_by_id);
      sk_SSL_CIPHER_free(a->tls13_ciphersuites);
      ssl_cert_free(a->cert);
-@@ -3709,13 +3775,15 @@ SSL *SSL_dup(SSL *s)
+@@ -3718,13 +3784,15 @@ SSL *SSL_dup(SSL *s)
  
      /* dup the cipher_list and cipher_list_by_id stacks */
      if (s->cipher_list != NULL) {
@@ -927,7 +927,7 @@ index 2a57831..43251eb 100644
      /* Dup the client_CA list */
      if (s->ca_names != NULL) {
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index d881458..f1dcc37 100644
+index b32b23b..b0ea64b 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -741,9 +741,46 @@ typedef struct ssl_ctx_ext_secure_st {
