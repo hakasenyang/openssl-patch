@@ -1,5 +1,5 @@
 diff --git a/doc/man1/ciphers.pod b/doc/man1/ciphers.pod
-index 3786e9a..8dd0d2c 100644
+index 3786e9a028..8dd0d2c028 100644
 --- a/doc/man1/ciphers.pod
 +++ b/doc/man1/ciphers.pod
 @@ -418,6 +418,21 @@ permissible.
@@ -25,7 +25,7 @@ index 3786e9a..8dd0d2c 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 4bd53fc..a480863 100644
+index 4bd53fc24c..a480863755 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -174,12 +174,12 @@ extern "C" {
@@ -46,7 +46,7 @@ index 4bd53fc..a480863 100644
  /*
   * As of OpenSSL 1.0.0, ssl_create_cipher_list() in ssl/ssl_ciph.c always
 diff --git a/include/openssl/sslerr.h b/include/openssl/sslerr.h
-index 8e395cd..700d7b7 100644
+index 8e395cdd2d..700d7b7b4e 100644
 --- a/include/openssl/sslerr.h
 +++ b/include/openssl/sslerr.h
 @@ -591,6 +591,8 @@ int ERR_load_SSL_strings(void);
@@ -71,7 +71,7 @@ index 8e395cd..700d7b7 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index f797497..0206266 100644
+index f79749724f..020626606f 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -4095,6 +4095,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
@@ -291,7 +291,7 @@ index f797497..0206266 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 9011e42..4ad79b3 100644
+index 9011e42fa8..4ad79b3ebe 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -751,7 +751,7 @@ index 9011e42..4ad79b3 100644
  
  char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
 diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
-index bce2036..31b5599 100644
+index bce203654a..31b55997a2 100644
 --- a/ssl/ssl_err.c
 +++ b/ssl/ssl_err.c
 @@ -956,6 +956,9 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
@@ -780,7 +780,7 @@ index bce2036..31b5599 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 3aefa34..64f553c 100644
+index 3aefa34ab2..64f553ce35 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1106,6 +1106,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -927,7 +927,7 @@ index 3aefa34..64f553c 100644
      /* Dup the client_CA list */
      if (s->ca_names != NULL) {
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index b32b23b..b0ea64b 100644
+index b32b23bedf..b0ea64b523 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -741,9 +741,46 @@ typedef struct ssl_ctx_ext_secure_st {
@@ -1022,10 +1022,10 @@ index b32b23b..b0ea64b 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index aa38fad..4a32fb1 100644
+index 018daaa0da..cd222e4641 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
-@@ -1676,7 +1676,7 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1690,7 +1690,7 @@ static int tls_early_post_process_client_hello(SSL *s)
      /* For TLSv1.3 we must select the ciphersuite *before* session resumption */
      if (SSL_IS_TLS13(s)) {
          const SSL_CIPHER *cipher =
@@ -1034,7 +1034,7 @@ index aa38fad..4a32fb1 100644
  
          if (cipher == NULL) {
              SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
-@@ -1857,7 +1857,7 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1871,7 +1871,7 @@ static int tls_early_post_process_client_hello(SSL *s)
              /* check if some cipher was preferred by call back */
              if (pref_cipher == NULL)
                  pref_cipher = ssl3_choose_cipher(s, s->session->ciphers,
@@ -1043,7 +1043,7 @@ index aa38fad..4a32fb1 100644
              if (pref_cipher == NULL) {
                  SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
                           SSL_F_TLS_EARLY_POST_PROCESS_CLIENT_HELLO,
-@@ -1866,8 +1866,9 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1880,8 +1880,9 @@ static int tls_early_post_process_client_hello(SSL *s)
              }
  
              s->session->cipher = pref_cipher;
@@ -1055,7 +1055,7 @@ index aa38fad..4a32fb1 100644
              sk_SSL_CIPHER_free(s->cipher_list_by_id);
              s->cipher_list_by_id = sk_SSL_CIPHER_dup(s->session->ciphers);
          }
-@@ -2179,7 +2180,7 @@ WORK_STATE tls_post_process_client_hello(SSL *s, WORK_STATE wst)
+@@ -2193,7 +2194,7 @@ WORK_STATE tls_post_process_client_hello(SSL *s, WORK_STATE wst)
              /* In TLSv1.3 we selected the ciphersuite before resumption */
              if (!SSL_IS_TLS13(s)) {
                  cipher =
