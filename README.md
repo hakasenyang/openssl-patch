@@ -4,6 +4,8 @@
 
 [Original source](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [CentminMod](https://centminmod.com/)
 
+OpenSSL 1.1.0 patch is [here](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
+
 ### OpenSSL-1.1.1-pre2 ciphers (draft 23)
 `[TLS13-AES-128-GCM-SHA256|TLS13-CHACHA20-POLY1305-SHA256]:TLS13-AES-256-GCM-SHA384:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES`
 
