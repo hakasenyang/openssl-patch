@@ -922,7 +922,7 @@ index 41574c4bf2..6be6ffc648 100644
      /* Dup the client_CA list */
      if (s->ca_names != NULL) {
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index c066e14b70..cd001e6371 100644
+index e02f5a1839..c5ad96afd7 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -741,9 +741,46 @@ typedef struct ssl_ctx_ext_secure_st {
@@ -973,7 +973,7 @@ index c066e14b70..cd001e6371 100644
      /* same as above but sorted for lookup */
      STACK_OF(SSL_CIPHER) *cipher_list_by_id;
      /* TLSv1.3 specific ciphersuites */
-@@ -1115,7 +1152,7 @@ struct ssl_st {
+@@ -1117,7 +1154,7 @@ struct ssl_st {
      /* Per connection DANE state */
      SSL_DANE dane;
      /* crypto */
@@ -982,7 +982,7 @@ index c066e14b70..cd001e6371 100644
      STACK_OF(SSL_CIPHER) *cipher_list_by_id;
      /* TLSv1.3 specific ciphersuites */
      STACK_OF(SSL_CIPHER) *tls13_ciphersuites;
-@@ -2213,7 +2250,7 @@ __owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
+@@ -2215,7 +2252,7 @@ __owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
  __owur int set_ciphersuites(STACK_OF(SSL_CIPHER) **currciphers, const char *str);
  __owur STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
                                                      STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
@@ -991,7 +991,7 @@ index c066e14b70..cd001e6371 100644
                                                      STACK_OF(SSL_CIPHER) **cipher_list_by_id,
                                                      const char *rule_str,
                                                      CERT *c);
-@@ -2223,6 +2260,13 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
+@@ -2225,6 +2262,13 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
                                  STACK_OF(SSL_CIPHER) **scsvs, int sslv2format,
                                  int fatal);
  void ssl_update_cache(SSL *s, int mode);
@@ -1005,7 +1005,7 @@ index c066e14b70..cd001e6371 100644
  __owur int ssl_cipher_get_evp(const SSL_SESSION *s, const EVP_CIPHER **enc,
                                const EVP_MD **md, int *mac_pkey_type,
                                size_t *mac_secret_size, SSL_COMP **comp,
-@@ -2304,8 +2348,8 @@ void ssl3_free_digest_list(SSL *s);
+@@ -2306,8 +2350,8 @@ void ssl3_free_digest_list(SSL *s);
  __owur unsigned long ssl3_output_cert_chain(SSL *s, WPACKET *pkt,
                                              CERT_PKEY *cpk);
  __owur const SSL_CIPHER *ssl3_choose_cipher(SSL *ssl,
