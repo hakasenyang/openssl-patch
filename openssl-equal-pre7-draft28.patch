@@ -775,7 +775,7 @@ index bce203654a..31b55997a2 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index c38fc58a5d..550049bf44 100644
+index 1dd355d0da..66c645be22 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1108,6 +1108,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -901,7 +901,7 @@ index c38fc58a5d..550049bf44 100644
      sk_SSL_CIPHER_free(a->cipher_list_by_id);
      sk_SSL_CIPHER_free(a->tls13_ciphersuites);
      ssl_cert_free(a->cert);
-@@ -3726,13 +3792,15 @@ SSL *SSL_dup(SSL *s)
+@@ -3746,13 +3812,15 @@ SSL *SSL_dup(SSL *s)
  
      /* dup the cipher_list and cipher_list_by_id stacks */
      if (s->cipher_list != NULL) {
