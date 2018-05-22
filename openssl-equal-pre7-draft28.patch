@@ -775,7 +775,7 @@ index bce203654a..31b55997a2 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 1dd355d0da..66c645be22 100644
+index 22f729c284..c57c56e39a 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1108,6 +1108,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -883,7 +883,7 @@ index 1dd355d0da..66c645be22 100644
      return NULL;
  }
  
-@@ -2931,7 +2997,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+@@ -2932,7 +2998,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
                                  ret->tls13_ciphersuites,
                                  &ret->cipher_list, &ret->cipher_list_by_id,
                                  SSL_DEFAULT_CIPHER_LIST, ret->cert)
@@ -892,7 +892,7 @@ index 1dd355d0da..66c645be22 100644
          SSLerr(SSL_F_SSL_CTX_NEW, SSL_R_LIBRARY_HAS_NO_CIPHERS);
          goto err2;
      }
-@@ -3094,7 +3160,7 @@ void SSL_CTX_free(SSL_CTX *a)
+@@ -3095,7 +3161,7 @@ void SSL_CTX_free(SSL_CTX *a)
  #ifndef OPENSSL_NO_CT
      CTLOG_STORE_free(a->ctlog_store);
  #endif
@@ -901,7 +901,7 @@ index 1dd355d0da..66c645be22 100644
      sk_SSL_CIPHER_free(a->cipher_list_by_id);
      sk_SSL_CIPHER_free(a->tls13_ciphersuites);
      ssl_cert_free(a->cert);
-@@ -3746,13 +3812,15 @@ SSL *SSL_dup(SSL *s)
+@@ -3747,13 +3813,15 @@ SSL *SSL_dup(SSL *s)
  
      /* dup the cipher_list and cipher_list_by_id stacks */
      if (s->cipher_list != NULL) {
