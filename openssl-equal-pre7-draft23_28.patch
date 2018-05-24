@@ -71,23 +71,21 @@ index 8e395cdd2d..700d7b7b4e 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index 37bdc7da43..d8dc34a8a0 100644
+index 37bdc7da43..894801bb4a 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
-@@ -31,11 +31,9 @@ extern "C" {
+@@ -31,9 +31,11 @@ extern "C" {
  # define TLS_MAX_VERSION                 TLS1_3_VERSION
  
  /* TODO(TLS1.3) REMOVE ME: Version indicators for draft version */
--# define TLS1_3_VERSION_DRAFT_26         0x7f1a
--# define TLS1_3_VERSION_DRAFT_27         0x7f1b
 +# define TLS1_3_VERSION_DRAFT_23         0x7f17
+ # define TLS1_3_VERSION_DRAFT_26         0x7f1a
+ # define TLS1_3_VERSION_DRAFT_27         0x7f1b
  # define TLS1_3_VERSION_DRAFT            0x7f1c
--# define TLS1_3_VERSION_DRAFT_TXT_26     "TLS 1.3 (draft 26)"
--# define TLS1_3_VERSION_DRAFT_TXT_27     "TLS 1.3 (draft 27)"
 +# define TLS1_3_VERSION_DRAFT_TXT_23     "TLS 1.3 (draft 23)"
+ # define TLS1_3_VERSION_DRAFT_TXT_26     "TLS 1.3 (draft 26)"
+ # define TLS1_3_VERSION_DRAFT_TXT_27     "TLS 1.3 (draft 27)"
  # define TLS1_3_VERSION_DRAFT_TXT        "TLS 1.3 (draft 28)"
- 
- /* Special value for method supporting multiple versions */
 diff --git a/ssl/record/ssl3_record_tls13.c b/ssl/record/ssl3_record_tls13.c
 index 8822ca25c3..63ecafe373 100644
 --- a/ssl/record/ssl3_record_tls13.c
@@ -1034,25 +1032,25 @@ index 4aec810179..d251ee178f 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
-index cc4563b357..05681cd399 100644
+index cc4563b357..4fb02935e9 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -539,8 +539,7 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
-         /* TODO(TLS1.3): Remove this first if clause prior to release!! */
+@@ -540,7 +540,8 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
          if (currv == TLS1_3_VERSION) {
              if (!WPACKET_put_bytes_u16(pkt, TLS1_3_VERSION_DRAFT)
--                    || !WPACKET_put_bytes_u16(pkt, TLS1_3_VERSION_DRAFT_27)
+                     || !WPACKET_put_bytes_u16(pkt, TLS1_3_VERSION_DRAFT_27)
 -                    || !WPACKET_put_bytes_u16(pkt, TLS1_3_VERSION_DRAFT_26)) {
++                    || !WPACKET_put_bytes_u16(pkt, TLS1_3_VERSION_DRAFT_26)
 +                    || !WPACKET_put_bytes_u16(pkt, TLS1_3_VERSION_DRAFT_23)) {
                  SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                           SSL_F_TLS_CONSTRUCT_CTOS_SUPPORTED_VERSIONS,
                           ERR_R_INTERNAL_ERROR);
-@@ -1792,9 +1791,10 @@ int tls_parse_stoc_supported_versions(SSL *s, PACKET *pkt, unsigned int context,
- 
+@@ -1793,8 +1794,11 @@ int tls_parse_stoc_supported_versions(SSL *s, PACKET *pkt, unsigned int context,
      /* TODO(TLS1.3): Remove this before release */
      if (version == TLS1_3_VERSION_DRAFT
--            || version == TLS1_3_VERSION_DRAFT_27
+             || version == TLS1_3_VERSION_DRAFT_27
 -            || version == TLS1_3_VERSION_DRAFT_26)
++            || version == TLS1_3_VERSION_DRAFT_26
 +            || version == TLS1_3_VERSION_DRAFT_23) {
 +        s->version_draft = version;
          version = TLS1_3_VERSION;
@@ -1118,26 +1116,22 @@ index ce8cec185a..1a12a9c1a0 100644
                  if (cipher == NULL) {
                      SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
 diff --git a/ssl/t1_trce.c b/ssl/t1_trce.c
-index 4d052d0705..b6abd6d9d7 100644
+index 4d052d0705..15f7f76e6e 100644
 --- a/ssl/t1_trce.c
 +++ b/ssl/t1_trce.c
-@@ -66,8 +66,7 @@ static const ssl_trace_tbl ssl_version_tbl[] = {
+@@ -66,6 +66,7 @@ static const ssl_trace_tbl ssl_version_tbl[] = {
      {TLS1_2_VERSION, "TLS 1.2"},
      {TLS1_3_VERSION, "TLS 1.3"},
      /* TODO(TLS1.3): Remove these lines before release */
--    {TLS1_3_VERSION_DRAFT_26, TLS1_3_VERSION_DRAFT_TXT_26},
--    {TLS1_3_VERSION_DRAFT_27, TLS1_3_VERSION_DRAFT_TXT_27},
 +    {TLS1_3_VERSION_DRAFT_23, TLS1_3_VERSION_DRAFT_TXT_23},
+     {TLS1_3_VERSION_DRAFT_26, TLS1_3_VERSION_DRAFT_TXT_26},
+     {TLS1_3_VERSION_DRAFT_27, TLS1_3_VERSION_DRAFT_TXT_27},
      {TLS1_3_VERSION_DRAFT, TLS1_3_VERSION_DRAFT_TXT},
-     {DTLS1_VERSION, "DTLS 1.0"},
-     {DTLS1_2_VERSION, "DTLS 1.2"},
-@@ -645,8 +644,8 @@ static int ssl_print_version(BIO *bio, int indent, const char *name,
+@@ -645,6 +646,7 @@ static int ssl_print_version(BIO *bio, int indent, const char *name,
      if (version != NULL) {
          /* TODO(TLS1.3): Remove the draft conditional here before release */
          switch(vers) {
 +        case TLS1_3_VERSION_DRAFT_23:
          case TLS1_3_VERSION_DRAFT_26:
--        case TLS1_3_VERSION_DRAFT_27:
+         case TLS1_3_VERSION_DRAFT_27:
          case TLS1_3_VERSION_DRAFT:
-             *version = TLS1_3_VERSION;
-             break;
