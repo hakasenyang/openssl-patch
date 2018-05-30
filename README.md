@@ -6,9 +6,9 @@
 
 **If you link site to a browser that supports draft 23 or 28, you'll see a TLS 1.3 message.**
 
-**Latest patch : openssl-equal-pre8.patch**
+**Latest patch : openssl-equal-pre8.patch, openssl-equal-pre8_ciphers.patch**
 
-[View Tree (OpenSSL)](https://github.com/openssl/openssl/tree/02a7e0a9f63ec97e9671fec2bb8ce7c289fb4d66)
+[View Tree (OpenSSL)](https://github.com/openssl/openssl/tree/f3a246c63eefc1e5da434df5dc7f48795a12c38b)
 
 [Original source](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [CentminMod](https://centminmod.com/)
 
