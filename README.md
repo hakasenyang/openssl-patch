@@ -8,6 +8,8 @@
 - [Result check testssl.sh](https://ssl.hakase.io/ssltest/hakase.io.html)
 - **If you link site to a browser that supports draft 23 or 28, you'll see a TLS 1.3 message.**
 
+**Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
+
 **Latest patch : openssl-equal-pre8.patch, openssl-equal-pre8_ciphers.patch**
 
 [View Tree (OpenSSL)](https://github.com/openssl/openssl/tree/5eb774324a14b03835020bb3ae2e1c6c92515db0)
