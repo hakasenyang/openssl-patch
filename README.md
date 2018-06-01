@@ -10,12 +10,11 @@
 
 **Latest patch : openssl-equal-pre8.patch, openssl-equal-pre8_ciphers.patch**
 
-[View Tree (OpenSSL)](https://github.com/openssl/openssl/tree/a133883752af41ae20bcee8153bc52e8a4b522c8)
+[View Tree (OpenSSL)](https://github.com/openssl/openssl/tree/5eb774324a14b03835020bb3ae2e1c6c92515db0)
 
-[Original source](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [CentminMod](https://centminmod.com/)
+[Original source](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [buik](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
 OpenSSL 1.1.0h patch is [here](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
-
 
 ## pre6, pre7 Patch files
 
@@ -30,7 +29,7 @@ OpenSSL 1.1.0h patch is [here](https://gitlab.com/buik/openssl/blob/openssl-patc
 
 ## pre8 Patch files
 
-Here is the basic patch content
+Here is the basic patch content.
 - Support TLS 1.3 draft 23 + 28
     - Server: draft 23 + 28
     - Client: draft 23 + 26 + 27 + 28
@@ -41,12 +40,12 @@ Here is the basic patch content
 | openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 
-Support set TLS 1.3 cipher in nginx
+**The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
+
+Example of setting TLS 1.3 cipher in nginx:
 - ex 1. TLS13+AESGCM+AES128:TLS13+AESGCM+AES256:TLS13+CHACHA20
 - ex 2. TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
 - ex 3. TLS13+AESGCM+AES128:EECDH+AES128 (TLS 1.3 + TLS 1.2 ciphers)
-
-**The _ciphers patch file is a temporary change to the TLS 1.3 configuration.**
 
 ## nginx Configuration (ssl_ciphers)
 
@@ -73,8 +72,7 @@ ssl_prefer_server_ciphers on;
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA
 ```
 
-### OpenSSL-1.1.1-pre8_ciphers ciphers (draft 23, 28)
+### OpenSSL-1.1.1-pre8_ciphers ciphers (Latest, draft 23, 28)
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA
 ```
-
