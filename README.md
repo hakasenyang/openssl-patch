@@ -24,9 +24,9 @@ OpenSSL 1.1.0h patch is [here](https://gitlab.com/buik/openssl/blob/openssl-patc
 
 | Patch file name | Patch list |
 | :--- |  :--- |
-| openssl-equal-pre6.patch | _Support_ **draft 23**, _Not support_ **draft 28** |
-| openssl-equal-pre7.patch | [Patch files prior to this patch](https://github.com/openssl/openssl/commit/73cc84a132a08a02253ae168600fc4d16cd400d8), _Not support_ **draft 28** |
-| openssl-equal-pre7-draft28.patch | [Patch files after this patch](https://github.com/openssl/openssl/commit/73cc84a132a08a02253ae168600fc4d16cd400d8), _Not support_ **draft 23** |
+| openssl-equal-pre6.patch | _Support_ **draft 26**, _Not support_ **draft 28** |
+| openssl-equal-pre7.patch | [Patch files prior to this patch](https://github.com/openssl/openssl/commit/73cc84a132a08a02253ae168600fc4d16cd400d8), _Support_ **draft 26** |
+| openssl-equal-pre7-draft28.patch | [Patch files after this patch](https://github.com/openssl/openssl/commit/73cc84a132a08a02253ae168600fc4d16cd400d8), _Support_ **draft 26~28** |
 | openssl-equal-pre7-draft23_28.patch | Final (pre7 release), _Support_ **draft 23, 28** |
 
 ## pre8 Patch files
