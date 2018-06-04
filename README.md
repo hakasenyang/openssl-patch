@@ -18,27 +18,19 @@
 
 OpenSSL 1.1.0h patch is [here](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
-## pre6, pre7 Patch files
-
-**Patches for BoringSSL's Equal Preference Patch are included by default.**
-
-| Patch file name | Patch list |
-| :--- |  :--- |
-| openssl-equal-pre6.patch | _Support_ **draft 26**, _Not support_ **draft 28** |
-| openssl-equal-pre7.patch | [Patch files prior to this patch](https://github.com/openssl/openssl/commit/73cc84a132a08a02253ae168600fc4d16cd400d8), _Support_ **draft 26** |
-| openssl-equal-pre7-draft28.patch | [Patch files after this patch](https://github.com/openssl/openssl/commit/73cc84a132a08a02253ae168600fc4d16cd400d8), _Support_ **draft 26~28** |
-| openssl-equal-pre7-draft23_28.patch | Final (pre7 release), _Support_ **draft 23, 28** |
-
-## pre8 Patch files
+## Patch files
 
 Here is the basic patch content.
 - Support TLS 1.3 draft 23 + 28
     - Server: draft 23 + 28
     - Client: draft 23 + 26 + 27 + 28
 - BoringSSL's Equal Preference Patch
+- Weak 3DES and not using ECDHE ciphers is not used in TLSv1.1 or later.
 
 | Patch file name | Patch list |
 | :--- |  :--- |
+| openssl-equal-pre7.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-pre7_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 | openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 
@@ -59,22 +51,12 @@ ssl_ecdh_curve X25519:P-256:P-384;
 ssl_prefer_server_ciphers on;
 ```
 
-### OpenSSL-1.1.1-pre2 ciphers (draft 23)
-```
-[TLS13-AES-128-GCM-SHA256|TLS13-CHACHA20-POLY1305-SHA256]:TLS13-AES-256-GCM-SHA384:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
-```
-
-### OpenSSL-1.1.1-pre6~pre7 ciphers (draft 26 ~ 28)
+### OpenSSL-1.1.1-pre7, pre8 ciphers (draft 23, 28)
 ```
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1-pre7-draft23_28, pre8 ciphers (draft 23, 28)
+### OpenSSL-1.1.1-pre7_ciphers, pre8_ciphers ciphers (draft 23, 28)
 ```
-[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA
-```
-
-### OpenSSL-1.1.1-pre8_ciphers ciphers (Latest, draft 23, 28)
-```
-[TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA
+[TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
