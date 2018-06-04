@@ -21,14 +21,15 @@ OpenSSL 1.1.0h patch is [here](https://gitlab.com/buik/openssl/blob/openssl-patc
 ## Patch files
 
 Here is the basic patch content.
-- Support TLS 1.3 draft 23 + 28
+- Support TLS 1.3 draft 23 + 28 (Not support pre2)
     - Server: draft 23 + 28
     - Client: draft 23 + 26 + 27 + 28
 - BoringSSL's Equal Preference Patch
 - Weak 3DES and not using ECDHE ciphers is not used in TLSv1.1 or later.
 
 | Patch file name | Patch list |
-| :--- |  :--- |
+| :--- | :--- |
+| openssl-equal-pre2.patch | **_Not support_** draft **28**. |
 | openssl-equal-pre7.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-pre7_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 | openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
@@ -36,7 +37,7 @@ Here is the basic patch content.
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
-Example of setting TLS 1.3 cipher in nginx:
+Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 - ex 1. TLS13+AESGCM+AES128:TLS13+AESGCM+AES256:TLS13+CHACHA20
 - ex 2. TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
 - ex 3. TLS13+AESGCM+AES128:EECDH+AES128 (TLS 1.3 + TLS 1.2 ciphers)
@@ -49,6 +50,11 @@ ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
 ssl_ciphers [Copy it from below and paste it here.];
 ssl_ecdh_curve X25519:P-256:P-384;
 ssl_prefer_server_ciphers on;
+```
+
+### OpenSSL-1.1.1-pre2 ciphers (draft 23)
+```
+[TLS13-AES-128-GCM-SHA256|TLS13-AES-256-GCM-SHA384|TLS13-CHACHA20-POLY1305-SHA256]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
 ### OpenSSL-1.1.1-pre7, pre8 ciphers (draft 23, 28)
