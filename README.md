@@ -31,10 +31,8 @@ Here is the basic patch content.
 | Patch file name | Patch list |
 | :--- | :--- |
 | openssl-equal-pre2.patch | **_Not support_** draft **28**. |
-| openssl-equal-pre7.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-pre7_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl-equal-pre7.patch<br />openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
