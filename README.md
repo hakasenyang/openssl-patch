@@ -5,7 +5,8 @@
 ### This file is not an official OpenSSL patch. Problems can arise and this is your responsibility.
 
 - [Test Page - (TLS 1.3 draft 23, 28)](https://ssl.hakase.io/)
-- [Result check testssl.sh](https://ssl.hakase.io/ssltest/hakase.io.html)
+- [SSL Test Result - testssl.sh](https://ssl.hakase.io/ssltest/hakase.io.html)
+- [SSL Test Result - dev.ssllabs.com](https://dev.ssllabs.com/ssltest/analyze.html?d=hakase.io)
 - **If you link site to a browser that supports draft 23 or 28, you'll see a TLS 1.3 message.**
 
 **Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
