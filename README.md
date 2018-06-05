@@ -33,8 +33,6 @@ Here is the basic patch content.
 | openssl-equal-pre2.patch | **_Not support_** draft **28**. |
 | openssl-equal-pre7.patch<br />openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| nginx_hpack_push.patch | _Patch both_ the HPACK patch and the **PUSH ERROR**. |
-| nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
@@ -42,6 +40,13 @@ Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 - ex 1. TLS13+AESGCM+AES128:TLS13+AESGCM+AES256:TLS13+CHACHA20
 - ex 2. TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
 - ex 3. TLS13+AESGCM+AES128:EECDH+AES128 (TLS 1.3 + TLS 1.2 ciphers)
+
+## Not OpenSSL patch files
+
+| Patch file name | Patch list |
+| :--- | :--- |
+| nginx_hpack_push.patch | _Patch both_ the HPACK patch and the **PUSH ERROR**. |
+| nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 
 ## nginx Configuration (ssl_ciphers)
 
