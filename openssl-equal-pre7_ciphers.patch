@@ -82,16 +82,18 @@ index 8822ca25c3..63ecafe373 100644
                                  (unsigned int)rec->length) <= 0
              || EVP_CipherFinal_ex(ctx, rec->data + lenu, &lenf) <= 0
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 354769b0c1..f90634d600 100644
+index 354769b0c1..e22bf6212b 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
-@@ -31,7 +31,23 @@ const unsigned char tls12downgrade[] = {
+@@ -31,7 +31,25 @@ const unsigned char tls12downgrade[] = {
  };
  
  /* The list of available TLSv1.3 ciphers */
 +/* Since nginx can not set the TLS 1.3 cipher, remove it temporarily. */
  static SSL_CIPHER tls13_ciphers[] = {
-+
++    {
++        0,
++    }
 +};
 +
 +/*
@@ -109,7 +111,7 @@ index 354769b0c1..f90634d600 100644
      {
          1,
          TLS1_3_RFC_AES_128_GCM_SHA256,
-@@ -111,20 +127,8 @@ static SSL_CIPHER tls13_ciphers[] = {
+@@ -111,20 +129,8 @@ static SSL_CIPHER tls13_ciphers[] = {
          SSL_HANDSHAKE_MAC_SHA256,
          128,
          128,
@@ -132,7 +134,7 @@ index 354769b0c1..f90634d600 100644
      {
       1,
       SSL3_TXT_RSA_NULL_MD5,
-@@ -167,7 +171,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
+@@ -167,7 +173,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
       SSL_aRSA,
       SSL_3DES,
       SSL_SHA1,
@@ -141,7 +143,7 @@ index 354769b0c1..f90634d600 100644
       DTLS1_BAD_VER, DTLS1_2_VERSION,
       SSL_NOT_DEFAULT | SSL_MEDIUM | SSL_FIPS,
       SSL_HANDSHAKE_MAC_DEFAULT | TLS1_PRF,
-@@ -232,7 +236,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
+@@ -232,7 +238,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
       SSL_aRSA,
       SSL_AES128,
       SSL_SHA1,
@@ -150,7 +152,7 @@ index 354769b0c1..f90634d600 100644
       DTLS1_BAD_VER, DTLS1_2_VERSION,
       SSL_HIGH | SSL_FIPS,
       SSL_HANDSHAKE_MAC_DEFAULT | TLS1_PRF,
-@@ -296,7 +300,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
+@@ -296,7 +302,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
       SSL_aRSA,
       SSL_AES256,
       SSL_SHA1,
@@ -159,7 +161,7 @@ index 354769b0c1..f90634d600 100644
       DTLS1_BAD_VER, DTLS1_2_VERSION,
       SSL_HIGH | SSL_FIPS,
       SSL_HANDSHAKE_MAC_DEFAULT | TLS1_PRF,
-@@ -4095,6 +4099,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
+@@ -4095,6 +4101,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
      return 1;
  }
  
@@ -177,7 +179,7 @@ index 354769b0c1..f90634d600 100644
  /*
   * ssl3_choose_cipher - choose a cipher from those offered by the client
   * @s: SSL connection
-@@ -4104,16 +4119,24 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
+@@ -4104,16 +4121,24 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
   * Returns the selected cipher or NULL when no common ciphers.
   */
  const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
@@ -208,7 +210,7 @@ index 354769b0c1..f90634d600 100644
  
      /* Let's see which ciphers we can support */
  
-@@ -4140,54 +4163,13 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4140,54 +4165,13 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  #endif
  
      /* SUITE-B takes precedence over server preference and ChaCha priortiy */
@@ -266,7 +268,7 @@ index 354769b0c1..f90634d600 100644
          allow = srvr;
      }
  
-@@ -4218,14 +4200,16 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4218,14 +4202,16 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
      for (i = 0; i < sk_SSL_CIPHER_num(prio); i++) {
          c = sk_SSL_CIPHER_value(prio, i);
  
@@ -285,7 +287,7 @@ index 354769b0c1..f90634d600 100644
  
          /*
           * Since TLS 1.3 ciphersuites can be used with any auth or
-@@ -4247,10 +4231,10 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4247,10 +4233,10 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  #ifndef OPENSSL_NO_PSK
              /* with PSK there must be server callback set */
              if ((alg_k & SSL_PSK) && s->psk_server_callback == NULL)
@@ -298,7 +300,7 @@ index 354769b0c1..f90634d600 100644
  #ifdef CIPHER_DEBUG
              fprintf(stderr, "%d:[%08lX:%08lX:%08lX:%08lX]%p:%s\n", ok, alg_k,
                      alg_a, mask_k, mask_a, (void *)c, c->name);
-@@ -4267,6 +4251,14 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4267,6 +4253,14 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  
              if (!ok)
                  continue;
@@ -313,7 +315,7 @@ index 354769b0c1..f90634d600 100644
          }
          ii = sk_SSL_CIPHER_find(allow, c);
          if (ii >= 0) {
-@@ -4274,14 +4266,7 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4274,14 +4268,7 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
              if (!ssl_security(s, SSL_SECOP_CIPHER_SHARED,
                                c->strength_bits, 0, (void *)c))
                  continue;
@@ -329,7 +331,7 @@ index 354769b0c1..f90634d600 100644
              if (prefer_sha256) {
                  const SSL_CIPHER *tmp = sk_SSL_CIPHER_value(allow, ii);
  
-@@ -4293,13 +4278,38 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4293,13 +4280,38 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
                      ret = tmp;
                  continue;
              }
