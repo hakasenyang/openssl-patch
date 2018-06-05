@@ -1,0 +1,81 @@
+diff --git a/src/http/v2/ngx_http_v2_filter_module.c b/src/http/v2/ngx_http_v2_filter_module.c
+index 6a210d4..8a59424 100644
+--- a/src/http/v2/ngx_http_v2_filter_module.c
++++ b/src/http/v2/ngx_http_v2_filter_module.c
+@@ -59,6 +59,17 @@
+ #define NGX_HTTP_V2_NO_TRAILERS           (ngx_http_v2_out_frame_t *) -1
+ 
+ 
++static const struct {
++    u_char        *name;
++    u_char const   len;
++} push_header[] = {
++    { (u_char*)":authority"      , 10 },
++    { (u_char*)"accept-encoding" , 15 },
++    { (u_char*)"accept-language" , 15 },
++    { (u_char*)"user-agent"      , 10 }
++};
++
++
+ typedef struct {
+     ngx_str_t      name;
+     u_char         index;
+@@ -955,6 +966,7 @@ ngx_http_v2_push_resource(ngx_http_request_t *r, ngx_str_t *path,
+ 
+     for (i = 0; i < NGX_HTTP_V2_PUSH_HEADERS; i++) {
+         len += binary[i].len;
++        len += push_header[i].len + 1;
+     }
+ 
+     pos = ngx_pnalloc(r->pool, len);
+@@ -964,12 +976,17 @@ ngx_http_v2_push_resource(ngx_http_request_t *r, ngx_str_t *path,
+ 
+     start = pos;
+ 
+-    if (h2c->table_update) {
+-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, fc->log, 0,
+-                       "http2 table size update: 0");
+-        *pos++ = (1 << 5) | 0;
+-        h2c->table_update = 0;
+-    }
++    h2c = r->stream->connection;
++
++    if (h2c->indicate_resize) {
++        *pos = 32;
++        pos = ngx_http_v2_write_int(pos, ngx_http_v2_prefix(5),
++                                    h2c->max_hpack_table_size);
++        h2c->indicate_resize = 0;
++#if (NGX_HTTP_V2_HPACK_ENC)
++        ngx_http_v2_table_resize(h2c);
++#endif
++     }
+ 
+     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, fc->log, 0,
+                    "http2 push header: \":method: GET\"");
+@@ -979,8 +996,7 @@ ngx_http_v2_push_resource(ngx_http_request_t *r, ngx_str_t *path,
+     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, fc->log, 0,
+                    "http2 push header: \":path: %V\"", path);
+ 
+-    *pos++ = ngx_http_v2_inc_indexed(NGX_HTTP_V2_PATH_INDEX);
+-    pos = ngx_http_v2_write_value(pos, path->data, path->len, tmp);
++    pos = ngx_http_v2_write_header_pot(":path", path);
+ 
+ #if (NGX_HTTP_SSL)
+     if (fc->ssl) {
+@@ -1003,11 +1019,15 @@ ngx_http_v2_push_resource(ngx_http_request_t *r, ngx_str_t *path,
+             continue;
+         }
+ 
++        value = &(*h)->value;
++
+         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, fc->log, 0,
+                        "http2 push header: \"%V: %V\"",
+                        &ph[i].name, &(*h)->value);
+ 
+-        pos = ngx_cpymem(pos, binary[i].data, binary[i].len);
++        pos = ngx_http_v2_write_header(h2c, pos,
++                  push_header[i].name, push_header[i].len, value->data, value->len,
++                  tmp);
+     }
+ 
+     frame = ngx_http_v2_create_push_frame(r, start, pos);
