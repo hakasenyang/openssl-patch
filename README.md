@@ -8,8 +8,6 @@
 - [OpenSSL Equal Preference Patch](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [buik](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1)
 - [HPACK Patch](https://github.com/cloudflare/sslconfig/blob/master/patches/nginx_1.13.1_http2_hpack.patch) by [Cloudflare](https://github.com/cloudflare/sslconfig)
 
-You can find the _OpenSSL 1.1.0h patch_ is [here.](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
-
 ## Information
 
 - [Test Page - (TLS 1.3 draft 23, 28)](https://ssl.hakase.io/)
@@ -22,6 +20,8 @@ You can find the _OpenSSL 1.1.0h patch_ is [here.](https://gitlab.com/buik/opens
 [Compatible OpenSSL-1.1.1-pre8-dev (OpenSSL, 22330 commits)](https://github.com/openssl/openssl/tree/55fc247a699be33153f27c06d304e6e60eeff980)
 
 ## Patch files
+
+You can find the _OpenSSL 1.1.0h_ patch is [here.](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
 Here is the basic patch content.
 - Support TLS 1.3 draft 23 + 28 (Not support pre2)
