@@ -50,9 +50,13 @@ Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 | nginx_hpack_push.patch | _Patch both_ the HPACK patch and the **PUSH ERROR**. |
 | nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 
-## nginx Configuration (ssl_ciphers)
+## nginx Configuration
 
-### Default settings
+### HPACK Patch
+
+Add configure option : ``--with-http_v2_hpack_enc``
+
+### SSL Setting
 ```
 ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
 ssl_ciphers [Copy it from below and paste it here.];
