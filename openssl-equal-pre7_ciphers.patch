@@ -1121,15 +1121,16 @@ index cc4563b357..4fb02935e9 100644
      /*
       * The only protocol version we support which is valid in this extension in
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 91d304e2b4..1f2eecad0b 100644
+index 91d304e2b4..38a1684793 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
-@@ -1708,8 +1708,7 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1708,8 +1708,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
          while (PACKET_get_net_2(&versionslist, &candidate_vers)) {
              /* TODO(TLS1.3): Remove this before release */
              if (candidate_vers == TLS1_3_VERSION_DRAFT
 -                    || candidate_vers == TLS1_3_VERSION_DRAFT_27
 -                    || candidate_vers == TLS1_3_VERSION_DRAFT_26) {
++                    || candidate_vers == TLS1_3_VERSION_DRAFT_26
 +                    || candidate_vers == TLS1_3_VERSION_DRAFT_23) {
                  if (best_vers == TLS1_3_VERSION
                          && orig_candidate > candidate_vers)
