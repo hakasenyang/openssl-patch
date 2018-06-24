@@ -47,6 +47,14 @@ Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 | Fullname Cipher | TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256 |
 | TLS 1.3 + 1.2 ciphers | TLS13+AESGCM+AES128:EECDH+AES128 |
 
+## Not OpenSSL patch files
+
+| Patch file name | Patch list |
+| :--- | :--- |
+| nginx_hpack_push.patch | _Patch both_ the HPACK patch and the **PUSH ERROR**. |
+| nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
+| remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
+
 ## nginx Configuration
 
 ### HPACK Patch
