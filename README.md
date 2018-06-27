@@ -17,7 +17,7 @@
 
 **Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
 
-[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22417 commits)](https://github.com/openssl/openssl/tree/eaf39a9fe6f55feb5251e235069e02f7f50d9a49)
+[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22436 commits)](https://github.com/openssl/openssl/tree/c7504aeb640a88949dfe3146f7e0f275f517464c)
 
 ## Patch files
 
@@ -33,9 +33,8 @@ Here is the basic patch content.
 | Patch file name | Patch list |
 | :--- | :--- |
 | openssl-equal-pre2.patch | **_Not support_** draft **26, 28**. |
-| openssl-equal-pre7.patch<br />openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| openssl-equal-pre8.patch<br />openssl-equal-pre8_ciphers.patch | **Support OpenSSL-1.1.1-pre9-dev** |
+| openssl-equal-pre7.patch<br />openssl-equal-pre8.patch<br />openssl-equal-pre9.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch<br />openssl-equal-pre9_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
