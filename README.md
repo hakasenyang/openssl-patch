@@ -54,11 +54,44 @@ Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 | nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
 
+## How To Use?
+
+### OpenSSL Patch
+
+```
+git clone https://github.com/openssl/openssl.git
+git clone https://github.com/hakasenyang/openssl-patch.git
+cd openssl
+patch -p1 < ../openssl-patch/openssl-equal-pre9_ciphers.patch
+```
+
+And then use --with-openssl in nginx or build after ./config.
+
+### nginx HPACK Patch
+
+Run it from the nginx directory.
+
+If you **have a** PUSH patch, use it as follows.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_hpack_push_fix.patch | patch -p1 ``
+
+If you **did not** patch PUSH, use it as follows.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_hpack_push.patch | patch -p1``
+
+And then check the nginx configuration below.
+
+### nginx Remove Server Header Patch
+
+Run it from the nginx directory.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/remove_nginx_server_header.patch | patch -p1``
+
 ## nginx Configuration
 
 ### HPACK Patch
 
-Add configure option : ``--with-http_v2_hpack_enc``
+Add configure arguments : ``--with-http_v2_hpack_enc``
 
 ### SSL Setting
 ```
