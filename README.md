@@ -17,7 +17,7 @@
 
 **Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
 
-[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22444 commits)](https://github.com/openssl/openssl/tree/a091e212fc55244fe03a4c7db7d8978c5b5014cb)
+[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22461 commits)](https://github.com/openssl/openssl/tree/a9f3f1ccbbf84f4ef804ede82d4b072492b54c03)
 
 ## Patch files
 
