@@ -10,31 +10,35 @@
 
 ## Information
 
-- [Test Page - (TLS 1.3 draft 23, 26, 28)](https://ssl.hakase.io/)
+- [Test Page - (TLS 1.3 draft 23, 26, 28, final)](https://ssl.hakase.io/)
 - [SSL Test Result - testssl.sh](https://ssl.hakase.io/ssltest/hakase.io.html)
 - [SSL Test Result - dev.ssllabs.com](https://dev.ssllabs.com/ssltest/analyze.html?d=hakase.io)
-- **If you link site to a browser that supports draft 23 or 26 or 28, you'll see a TLS 1.3 message.**
+- **If you link site to a browser that supports draft 23 or 26 or 28 or final, you'll see a TLS 1.3 message.**
 
 **Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
 
-[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22476 commits)](https://github.com/openssl/openssl/tree/74bfb980377f43367035959a2c0afb5ec501c033)
+[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22642 commits)](https://github.com/openssl/openssl/tree/86ed2e1cb04158371385047e0e7832c34273022c)
 
 ## Patch files
 
 You can find the _OpenSSL 1.1.0h_ patch is [here.](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
 Here is the basic patch content.
-- Support TLS 1.3 draft 23 + 26 + 28 (Not support pre2)
+- Support TLS 1.3 draft 23 + 26 + 28 **(Pre9) + final** (Not support pre2 - 26, 28, final)
     - Server: draft 23 + 26 + 28
     - Client: draft 23 + 26 + 27 + 28
+    - (pre9)Server: draft 23 + 26 + 28 + final
+    - (pre9)Client: draft 23 + 26 + 27 + 28 + final
 - BoringSSL's Equal Preference Patch
 - Weak 3DES and not using ECDHE ciphers is not used in TLSv1.1 or later.
 
 | Patch file name | Patch list |
 | :--- | :--- |
 | openssl-equal-pre2.patch | **_Not support_** draft **26, 28**. |
-| openssl-equal-pre7.patch<br />openssl-equal-pre8.patch<br />openssl-equal-pre9.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch<br />openssl-equal-pre9_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl-equal-pre7.patch<br />openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl-equal-pre9.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-pre9_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
@@ -106,12 +110,12 @@ ssl_prefer_server_ciphers on;
 [TLS13-AES-128-GCM-SHA256|TLS13-AES-256-GCM-SHA384|TLS13-CHACHA20-POLY1305-SHA256]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1-pre7~9 ciphers (draft 23, 26, 28)
+### OpenSSL-1.1.1-pre7~9 ciphers (draft 23, 26, 28, **(pre9) - final**)
 ```
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1-pre7~9_ciphers ciphers (draft 23, 26, 28)
+### OpenSSL-1.1.1-pre7~9_ciphers ciphers (draft 23, 26, 28, **(pre9) - final**)
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
