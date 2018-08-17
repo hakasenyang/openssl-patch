@@ -18,6 +18,7 @@
 **Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
 
 Displays TLSv1.3 support for large sites.
+
 Default support is in bold type.
 - Baidu(China) : **TLSv1.2**
 - Naver(Korea) : **TLSv1.2**
