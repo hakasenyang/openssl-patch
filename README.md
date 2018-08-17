@@ -17,7 +17,17 @@
 
 **Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
 
-[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22642 commits)](https://github.com/openssl/openssl/tree/86ed2e1cb04158371385047e0e7832c34273022c)
+Displays TLSv1.3 support for large sites.
+Default support is in bold type.
+- Baidu(China) : **TLSv1.2**
+- Naver(Korea) : **TLSv1.2**
+- Twitter : **TLSv1.2**
+- **My Site** : _TLSv1.3_ draft 23, 26, 28, **final**
+- Facebook : _TLSv1.3_ draft 23, 26, 28, **final**
+- Google(Gmail) : _TLSv1.3_ draft 23, **28**
+- Cloudflare : _TLSv1.3_ draft **23**, 28
+
+[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22644 commits)](https://github.com/openssl/openssl/tree/2805ee1e095a78f596dc7adf778441e2edb9f15c)
 
 ## Patch files
 
