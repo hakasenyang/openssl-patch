@@ -20,13 +20,14 @@
 Displays TLSv1.3 support for large sites.
 
 Default support is in bold type.
-- Baidu(China) : **TLSv1.2**
-- Naver(Korea) : **TLSv1.2**
-- Twitter : **TLSv1.2**
-- **My Site** : _TLSv1.3_ draft 23, 26, 28, **final**
-- Facebook : _TLSv1.3_ draft 23, 26, 28, **final**
-- Cloudflare : _TLSv1.3_ draft 23, 28, **final**
-- Google(Gmail) : _TLSv1.3_ draft 23, **28**
+- [Baidu(China)](https://baidu.cn/) : **TLSv1.2**
+- [Naver(Korea)](https://naver.com/) : **TLSv1.2**
+- [Twitter](https://twitter.com/) : **TLSv1.2**
+- [**My Site**](https://hakase.io/) : _TLSv1.3_ draft 23, 26, 28, **final**
+- [Facebook](https://facebook.com/) : _TLSv1.3_ draft 23, 26, 28, **final**
+- [Cloudflare](https://cloudflare.com/) : _TLSv1.3_ draft 23, 28, **final**
+- [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ draft 23, **28**
+- [NSS TLS 1.3(Mozilla)](https://tls13.crypto.mozilla.org/) : _TLSv1.3_ draft **28**
 
 [Compatible OpenSSL-1.1.1-pre10-dev (OpenSSL, 22668 commits)](https://github.com/openssl/openssl/tree/2fe3e2b68272e803a6e35259a49919d57205418b)
 
