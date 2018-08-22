@@ -25,21 +25,21 @@ Default support is in bold type.
 - Twitter : **TLSv1.2**
 - **My Site** : _TLSv1.3_ draft 23, 26, 28, **final**
 - Facebook : _TLSv1.3_ draft 23, 26, 28, **final**
+- Cloudflare : _TLSv1.3_ draft 23, 28, **final**
 - Google(Gmail) : _TLSv1.3_ draft 23, **28**
-- Cloudflare : _TLSv1.3_ draft **23**, 28
 
-[Compatible OpenSSL-1.1.1-pre9-dev (OpenSSL, 22644 commits)](https://github.com/openssl/openssl/tree/2805ee1e095a78f596dc7adf778441e2edb9f15c)
+[Compatible OpenSSL-1.1.1-pre10-dev (OpenSSL, 22668 commits)](https://github.com/openssl/openssl/tree/2fe3e2b68272e803a6e35259a49919d57205418b)
 
 ## Patch files
 
 You can find the _OpenSSL 1.1.0h_ patch is [here.](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
 Here is the basic patch content.
-- Support TLS 1.3 draft 23 + 26 + 28 **(Pre9) + final** (Not support pre2 - 26, 28, final)
+- Support TLS 1.3 draft 23 + 26 + 28 **(Pre9~10) + final** (Not support pre2 - 26, 28, final)
     - Server: draft 23 + 26 + 28
     - Client: draft 23 + 26 + 27 + 28
-    - (pre9)Server: draft 23 + 26 + 28 + final
-    - (pre9)Client: draft 23 + 26 + 27 + 28 + final
+    - (pre9~10)Server: draft 23 + 26 + 28 + final
+    - (pre9~10)Client: draft 23 + 26 + 27 + 28 + final
 - BoringSSL's Equal Preference Patch
 - Weak 3DES and not using ECDHE ciphers is not used in TLSv1.1 or later.
 
@@ -48,8 +48,8 @@ Here is the basic patch content.
 | openssl-equal-pre2.patch | **_Not support_** draft **26, 28**. |
 | openssl-equal-pre7.patch<br />openssl-equal-pre8.patch | TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-pre7_ciphers.patch<br />openssl-equal-pre8_ciphers.patch | TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| openssl-equal-pre9.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-pre9_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl-equal-pre9.patch<br />openssl-equal-pre10.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-pre9_ciphers.patch<br />openssl-equal-pre10_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
@@ -77,7 +77,7 @@ Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 git clone https://github.com/openssl/openssl.git
 git clone https://github.com/hakasenyang/openssl-patch.git
 cd openssl
-patch -p1 < ../openssl-patch/openssl-equal-pre9_ciphers.patch
+patch -p1 < ../openssl-patch/openssl-equal-pre10_ciphers.patch
 ```
 
 And then use --with-openssl in nginx or build after ./config.
@@ -121,12 +121,12 @@ ssl_prefer_server_ciphers on;
 [TLS13-AES-128-GCM-SHA256|TLS13-AES-256-GCM-SHA384|TLS13-CHACHA20-POLY1305-SHA256]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1-pre7~9 ciphers (draft 23, 26, 28, **(pre9) - final**)
+### OpenSSL-1.1.1-pre7~10 ciphers (draft 23, 26, 28, **(pre9~10) - final**)
 ```
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1-pre7~9_ciphers ciphers (draft 23, 26, 28, **(pre9) - final**)
+### OpenSSL-1.1.1-pre7~10_ciphers ciphers (draft 23, 26, 28, **(pre9~10) - final**)
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
