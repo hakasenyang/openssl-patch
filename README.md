@@ -69,6 +69,7 @@ Example of setting TLS 1.3 cipher in nginx (pre7 or higher):
 | nginx_hpack_push.patch | _Patch both_ the HPACK patch and the **PUSH ERROR**. |
 | nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
+| nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
 
 ## How To Use?
 
