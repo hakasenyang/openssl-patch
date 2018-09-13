@@ -74,7 +74,7 @@ Example of setting TLS 1.3 cipher in nginx:
 git clone https://github.com/openssl/openssl.git
 git clone https://github.com/hakasenyang/openssl-patch.git
 cd openssl
-patch -p1 < ../openssl-patch/openssl-equal-pre10_ciphers.patch
+patch -p1 < ../openssl-patch/openssl-equal-1.1.1_ciphers.patch
 ```
 
 And then use --with-openssl in nginx or build after ./config.
