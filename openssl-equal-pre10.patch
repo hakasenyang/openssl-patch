@@ -25,7 +25,7 @@ index 3aea982384..3c93eba0bf 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index eb689c1c36..3191b68efe 100644
+index 0a18a43544..c31597584b 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -173,12 +173,12 @@ extern "C" {
@@ -108,7 +108,7 @@ index a11ed483e6..4fd583dd03 100644
                                  (unsigned int)rec->length) <= 0
              || EVP_CipherFinal_ex(ctx, rec->data + lenu, &lenf) <= 0
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 5ecbc3c554..55c9a7510a 100644
+index 7713f767b2..5a3f9e2c27 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -167,7 +167,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
@@ -824,7 +824,7 @@ index 11331ce41f..cfc770b8d6 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 7e8093bcfd..8f50d6d343 100644
+index d75158e30c..926a7a04c5 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1113,6 +1113,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -932,7 +932,7 @@ index 7e8093bcfd..8f50d6d343 100644
      return NULL;
  }
  
-@@ -2934,7 +3000,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+@@ -2930,7 +2996,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
                                  ret->tls13_ciphersuites,
                                  &ret->cipher_list, &ret->cipher_list_by_id,
                                  SSL_DEFAULT_CIPHER_LIST, ret->cert)
@@ -941,7 +941,7 @@ index 7e8093bcfd..8f50d6d343 100644
          SSLerr(SSL_F_SSL_CTX_NEW, SSL_R_LIBRARY_HAS_NO_CIPHERS);
          goto err2;
      }
-@@ -3107,7 +3173,7 @@ void SSL_CTX_free(SSL_CTX *a)
+@@ -3103,7 +3169,7 @@ void SSL_CTX_free(SSL_CTX *a)
  #ifndef OPENSSL_NO_CT
      CTLOG_STORE_free(a->ctlog_store);
  #endif
@@ -950,7 +950,7 @@ index 7e8093bcfd..8f50d6d343 100644
      sk_SSL_CIPHER_free(a->cipher_list_by_id);
      sk_SSL_CIPHER_free(a->tls13_ciphersuites);
      ssl_cert_free(a->cert);
-@@ -3762,13 +3828,15 @@ SSL *SSL_dup(SSL *s)
+@@ -3752,13 +3818,15 @@ SSL *SSL_dup(SSL *s)
  
      /* dup the cipher_list and cipher_list_by_id stacks */
      if (s->cipher_list != NULL) {
@@ -1120,7 +1120,7 @@ index 4b5e6fe2b8..99981c9e37 100644
       * The only protocol version we support which is valid in this extension in
       * a ServerHello is TLSv1.3 therefore we shouldn't be getting anything else.
 diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
-index 295d3e7ee5..00c0ec9c09 100644
+index 0f2b22392b..6c1ce9813f 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
 @@ -897,7 +897,8 @@ int tls_parse_ctos_cookie(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
@@ -1133,7 +1133,7 @@ index 295d3e7ee5..00c0ec9c09 100644
              || !WPACKET_close(&hrrpkt)) {
          WPACKET_cleanup(&hrrpkt);
          SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PARSE_CTOS_COOKIE,
-@@ -1650,7 +1651,8 @@ EXT_RETURN tls_construct_stoc_supported_versions(SSL *s, WPACKET *pkt,
+@@ -1652,7 +1653,8 @@ EXT_RETURN tls_construct_stoc_supported_versions(SSL *s, WPACKET *pkt,
  
      if (!WPACKET_put_bytes_u16(pkt, TLSEXT_TYPE_supported_versions)
              || !WPACKET_start_sub_packet_u16(pkt)
@@ -1144,10 +1144,10 @@ index 295d3e7ee5..00c0ec9c09 100644
          SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                   SSL_F_TLS_CONSTRUCT_STOC_SUPPORTED_VERSIONS,
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 3961c14719..47c0b0a58e 100644
+index 508bb88767..ee927baf64 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
-@@ -1749,6 +1749,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1753,6 +1753,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
          unsigned int best_vers = 0;
          const SSL_METHOD *best_method = NULL;
          PACKET versionslist;
@@ -1156,7 +1156,7 @@ index 3961c14719..47c0b0a58e 100644
  
          suppversions->parsed = 1;
  
-@@ -1770,6 +1772,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1774,6 +1776,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              return SSL_R_BAD_LEGACY_VERSION;
  
          while (PACKET_get_net_2(&versionslist, &candidate_vers)) {
@@ -1180,7 +1180,7 @@ index 3961c14719..47c0b0a58e 100644
              if (version_cmp(s, candidate_vers, best_vers) <= 0)
                  continue;
              if (ssl_version_supported(s, candidate_vers, &best_method))
-@@ -1792,6 +1811,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1796,6 +1815,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              }
              check_for_downgrade(s, best_vers, dgrd);
              s->version = best_vers;
@@ -1191,10 +1191,10 @@ index 3961c14719..47c0b0a58e 100644
              return 0;
          }
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index db5aafe3be..d2912756fe 100644
+index 346b1e3989..0a747f39ce 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
-@@ -1711,7 +1711,7 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1742,7 +1742,7 @@ static int tls_early_post_process_client_hello(SSL *s)
      /* For TLSv1.3 we must select the ciphersuite *before* session resumption */
      if (SSL_IS_TLS13(s)) {
          const SSL_CIPHER *cipher =
@@ -1203,7 +1203,7 @@ index db5aafe3be..d2912756fe 100644
  
          if (cipher == NULL) {
              SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
-@@ -1892,7 +1892,7 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1923,7 +1923,7 @@ static int tls_early_post_process_client_hello(SSL *s)
              /* check if some cipher was preferred by call back */
              if (pref_cipher == NULL)
                  pref_cipher = ssl3_choose_cipher(s, s->session->ciphers,
@@ -1212,7 +1212,7 @@ index db5aafe3be..d2912756fe 100644
              if (pref_cipher == NULL) {
                  SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
                           SSL_F_TLS_EARLY_POST_PROCESS_CLIENT_HELLO,
-@@ -1901,8 +1901,9 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1932,8 +1932,9 @@ static int tls_early_post_process_client_hello(SSL *s)
              }
  
              s->session->cipher = pref_cipher;
@@ -1224,7 +1224,7 @@ index db5aafe3be..d2912756fe 100644
              sk_SSL_CIPHER_free(s->cipher_list_by_id);
              s->cipher_list_by_id = sk_SSL_CIPHER_dup(s->session->ciphers);
          }
-@@ -2214,7 +2215,7 @@ WORK_STATE tls_post_process_client_hello(SSL *s, WORK_STATE wst)
+@@ -2245,7 +2246,7 @@ WORK_STATE tls_post_process_client_hello(SSL *s, WORK_STATE wst)
              /* In TLSv1.3 we selected the ciphersuite before resumption */
              if (!SSL_IS_TLS13(s)) {
                  cipher =
@@ -1234,7 +1234,7 @@ index db5aafe3be..d2912756fe 100644
                  if (cipher == NULL) {
                      SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
 diff --git a/ssl/t1_trce.c b/ssl/t1_trce.c
-index b79c776f2d..15f7f76e6e 100644
+index be3039af38..99c4ddcb41 100644
 --- a/ssl/t1_trce.c
 +++ b/ssl/t1_trce.c
 @@ -65,6 +65,11 @@ static const ssl_trace_tbl ssl_version_tbl[] = {
