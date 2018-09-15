@@ -46,7 +46,7 @@ Here is the basic patch content.
 | :--- | :--- |
 | openssl-equal-1.1.1.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-1.1.1_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| openssl_ignore_log_strict-sni.patch | When using nginx_strict-sni.patch, nginx ignores the error in error.log. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421594901) |
+| openssl-ignore_log_strict-sni.patch | When using nginx_strict-sni.patch, nginx ignores the error in error.log. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421594901) |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
