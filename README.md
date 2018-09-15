@@ -46,6 +46,7 @@ Here is the basic patch content.
 | :--- | :--- |
 | openssl-equal-1.1.1.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-1.1.1_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl_ignore_log_strict-sni.patch | When using nginx_strict-sni.patch, nginx ignores the error in error.log. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421594901) |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
@@ -65,6 +66,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
 | nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
+| nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks @JemmyLoveJenny. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
 
 ## How To Use?
 
@@ -98,6 +100,20 @@ And then check the nginx configuration below.
 Run it from the nginx directory.
 
 ``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/remove_nginx_server_header.patch | patch -p1``
+
+### nginx strict-sni patch
+
+Run it from the nginx directory.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_strict-sni.patch | patch -p1``
+
+And then run it from the openssl directory.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl_ignore_log_strict-sni.patch | patch -p1``
+
+Finally, build nginx.
+
+Example patch is [here](https://github.com/hakasenyang/nginx-build/blob/master/strict-sni-example.patch). (nginx)
 
 ## nginx Configuration
 
