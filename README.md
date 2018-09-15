@@ -7,6 +7,7 @@
 ## Original Sources
 - [OpenSSL Equal Preference Patch](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [buik](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1)
 - [HPACK Patch](https://github.com/cloudflare/sslconfig/blob/master/patches/nginx_1.13.1_http2_hpack.patch) by [Cloudflare](https://github.com/cloudflare/sslconfig)
+- [nginx Strict-SNI Patch](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
 
 ## Information
 
@@ -66,7 +67,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | nginx_hpack_push_fix.patch | _Patch only_ the **PUSH ERROR** of the hpack patch. (If the HPACK patch has already been completed) |
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
 | nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
-| nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks @JemmyLoveJenny. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
+| nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny). [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
 
 ## How To Use?
 
