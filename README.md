@@ -45,8 +45,8 @@ Here is the basic patch content.
 
 | Patch file name | Patch list |
 | :--- | :--- |
-| openssl-equal-1.1.1.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-1.1.1_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl-equal-1.1.1.patch<br>openssl-equal-1.1.2-dev.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-1.1.1_ciphers.patch<br>openssl-equal-1.1.2-dev_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 | openssl-ignore_log_strict-sni.patch | When using nginx_strict-sni.patch, nginx ignores the error in error.log. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421594901) |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
@@ -68,6 +68,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
 | nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
 | nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny). [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
+| nginx_openssl-1.1.x_renegotiation_bugfix.patch | Bugfix **Secure Client-Initiated Renegotiation**. (Check testssl.sh) OpenSSL >= 1.1.1 |
 
 ## How To Use?
 
@@ -77,7 +78,7 @@ Example of setting TLS 1.3 cipher in nginx:
 git clone https://github.com/openssl/openssl.git
 git clone https://github.com/hakasenyang/openssl-patch.git
 cd openssl
-patch -p1 < ../openssl-patch/openssl-equal-1.1.1_ciphers.patch
+patch -p1 < ../openssl-patch/openssl-equal-1.1.2-dev_ciphers.patch
 ```
 
 And then use --with-openssl in nginx or build after ./config.
@@ -116,6 +117,12 @@ Finally, build nginx.
 
 Example patch is [here](https://github.com/hakasenyang/nginx-build/blob/master/strict-sni-example.patch). (nginx)
 
+### nginx OpenSSL-1.1.x Renegotiation Bugfix
+
+Run it from the nginx directory.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_openssl-1.1.x_renegotiation_bugfix.patch | patch -p1``
+
 ## nginx Configuration
 
 ### HPACK Patch
@@ -130,12 +137,12 @@ ssl_ecdh_curve X25519:P-256:P-384;
 ssl_prefer_server_ciphers on;
 ```
 
-### OpenSSL-1.1.1 ciphers (draft 23, 26, 28, final)
+### OpenSSL-1.1.x (> 1.1.1) ciphers (draft 23, 26, 28, final)
 ```
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1_ciphers ciphers (draft 23, 26, 28, final)
+### OpenSSL-1.1.x_ciphers (> 1.1.1) ciphers (draft 23, 26, 28, final)
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
