@@ -27,8 +27,8 @@ Default support is in bold type.
 - [**My Site**](https://hakase.io/) : _TLSv1.3_ draft 23, 26, 28, **final**
 - [Facebook](https://facebook.com/) : _TLSv1.3_ draft 23, 26, 28, **final**
 - [Cloudflare](https://cloudflare.com/) : _TLSv1.3_ draft 23, 28, **final**
-- [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ draft 23, **28**
-- [NSS TLS 1.3(Mozilla)](https://tls13.crypto.mozilla.org/) : _TLSv1.3_ draft **28**
+- [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ draft 23, 28, **final**
+- [NSS TLS 1.3(Mozilla)](https://tls13.crypto.mozilla.org/) : _TLSv1.3_ **final**
 
 [Compatible OpenSSL-1.1.1 (OpenSSL, 22764 commits)](https://github.com/openssl/openssl/tree/1708e3e85b4a86bae26860aa5d2913fc8eff6086)
 
@@ -68,7 +68,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
 | nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
 | nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny). [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
-| nginx_openssl-1.1.x_renegotiation_bugfix.patch | Bugfix **Secure Client-Initiated Renegotiation**. (Check testssl.sh) OpenSSL >= 1.1.1 |
+| nginx_openssl-1.1.x_renegotiation_bugfix.patch | Bugfix **Secure Client-Initiated Renegotiation**. (Check testssl.sh) OpenSSL >= 1.1.x, nginx = 1.15.4 |
 
 ## How To Use?
 
