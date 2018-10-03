@@ -1,25 +1,23 @@
-diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
-index 3a0e150d..f080b2d7 100644
---- a/src/event/ngx_event_openssl.c
-+++ b/src/event/ngx_event_openssl.c
-@@ -350,6 +350,10 @@ ngx_ssl_create(ngx_ssl_t *ssl, ngx_uint_t protocols, void *data)
-     SSL_CTX_set_max_proto_version(ssl->ctx, TLS1_3_VERSION);
- #endif
+diff --git a/src/http/ngx_http_request.c b/src/http/ngx_http_request.c
+--- a/src/http/ngx_http_request.c
++++ b/src/http/ngx_http_request.c
+@@ -854,7 +854,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *
  
-+#ifdef SSL_OP_NO_RENEGOTIATION
-+    SSL_CTX_set_options(ssl->ctx, SSL_OP_NO_RENEGOTIATION);
-+#endif
-+
- #ifdef SSL_OP_NO_COMPRESSION
-     SSL_CTX_set_options(ssl->ctx, SSL_OP_NO_COMPRESSION);
- #endif
-@@ -1294,9 +1298,6 @@ ngx_ssl_create_connection(ngx_ssl_t *ssl, ngx_connection_t *c, ngx_uint_t flags)
-     } else {
-         SSL_set_accept_state(sc->connection);
+     c = ngx_ssl_get_connection(ssl_conn);
  
--#ifdef SSL_OP_NO_RENEGOTIATION
--        SSL_set_options(sc->connection, SSL_OP_NO_RENEGOTIATION);
--#endif
+-    if (c->ssl->renegotiation) {
++    if (c->ssl->handshaked) {
+         return SSL_TLSEXT_ERR_NOACK;
      }
  
-     if (SSL_set_ex_data(sc->connection, ngx_ssl_connection_index, c) == 0) {
+@@ -919,6 +919,10 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *
+ #endif
+ 
+         SSL_set_options(ssl_conn, SSL_CTX_get_options(sscf->ssl.ctx));
++
++#ifdef SSL_OP_NO_RENEGOTIATION
++        SSL_set_options(ssl_conn, SSL_OP_NO_RENEGOTIATION);
++#endif
+     }
+ 
+     return SSL_TLSEXT_ERR_OK;
