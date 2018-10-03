@@ -68,6 +68,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | remove_nginx_server_header.patch | Remove nginx server header. (http2, http1.1) |
 | nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
 | nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny). [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
+| nginx_openssl-1.1.x_renegotiation_bugfix.patch | Bugfix **Secure Client-Initiated Renegotiation**. (Check testssl.sh) OpenSSL >= 1.1.1 |
 
 ## How To Use?
 
@@ -115,6 +116,12 @@ And then run it from the openssl directory.
 Finally, build nginx.
 
 Example patch is [here](https://github.com/hakasenyang/nginx-build/blob/master/strict-sni-example.patch). (nginx)
+
+### nginx OpenSSL-1.1.x Renegotiation Bugfix
+
+Run it from the nginx directory.
+
+``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_openssl-1.1.x_renegotiation_bugfix.patch | patch -p1``
 
 ## nginx Configuration
 
