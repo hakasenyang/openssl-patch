@@ -109,13 +109,7 @@ Run it from the nginx directory.
 
 ``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_strict-sni.patch | patch -p1``
 
-And then run it from the openssl directory.
-
-``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/openssl_ignore_log_strict-sni.patch | patch -p1``
-
-Finally, build nginx.
-
-Example patch is [here](https://github.com/hakasenyang/nginx-build/blob/master/strict-sni-example.patch). (nginx)
+Thanks [@JemmyLoveJenny](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319)!
 
 ### nginx OpenSSL-1.1.x Renegotiation Bugfix
 

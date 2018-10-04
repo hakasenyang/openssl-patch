@@ -1,8 +1,7 @@
 diff --git a/src/http/ngx_http_request.c b/src/http/ngx_http_request.c
-index 98cc8c7..0810526 100644
---- a/src/http/ngx_http_request.c
-+++ b/src/http/ngx_http_request.c
-@@ -849,7 +849,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+--- a/src/http/ngx_http_request.c	2018-09-15 10:02:36.520076032 +0000
++++ b/src/http/ngx_http_request.c	2018-09-15 10:26:32.826874950 +0000
+@@ -882,7 +882,7 @@
      servername = SSL_get_servername(ssl_conn, TLSEXT_NAMETYPE_host_name);
  
      if (servername == NULL) {
@@ -11,7 +10,7 @@ index 98cc8c7..0810526 100644
      }
  
      c = ngx_ssl_get_connection(ssl_conn);
-@@ -864,7 +864,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+@@ -897,7 +897,7 @@
      host.len = ngx_strlen(servername);
  
      if (host.len == 0) {
@@ -19,8 +18,9 @@ index 98cc8c7..0810526 100644
 +        return SSL_TLSEXT_ERR_ALERT_FATAL;
      }
  
+
      host.data = (u_char *) servername;
-@@ -879,7 +879,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+@@ -912,7 +912,7 @@
                                       NULL, &cscf)
          != NGX_OK)
      {
@@ -29,3 +29,21 @@ index 98cc8c7..0810526 100644
      }
  
      hc->ssl_servername = ngx_palloc(c->pool, sizeof(ngx_str_t));
+
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+--- a/src/event/ngx_event_openssl.c    2018-10-02 15:13:36.414143028 +0000
++++ b/src/event/ngx_event_openssl.c    2018-10-04 13:58:28.756873433 +0000
+@@ -1456,6 +1456,13 @@ ngx_ssl_handshake(ngx_connection_t *c)
+
+     c->read->error = 1;
+
++
++    if (sslerr == SSL_ERROR_SSL) {
++        ERR_peek_error();
++        ERR_clear_error();
++        return NGX_ERROR;
++    }
++
+     ngx_ssl_connection_error(c, sslerr, err, "SSL_do_handshake() failed");
+
+     return NGX_ERROR;
