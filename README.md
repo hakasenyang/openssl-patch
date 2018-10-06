@@ -47,7 +47,7 @@ Here is the basic patch content.
 | :--- | :--- |
 | openssl-equal-1.1.1.patch<br>openssl-equal-1.1.2-dev.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-1.1.1_ciphers.patch<br>openssl-equal-1.1.2-dev_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| openssl-ignore_log_strict-sni.patch | When using nginx_strict-sni.patch, nginx ignores the error in error.log. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421594901) |
+| openssl-1.1.1-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
@@ -82,6 +82,19 @@ patch -p1 < ../openssl-patch/openssl-equal-1.1.2-dev_ciphers.patch
 ```
 
 And then use --with-openssl in nginx or build after ./config.
+
+### OpenSSL CHACHA20-POLY1305-OLD Patch
+
+Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)!
+
+[View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) / [Original Source](https://github.com/JemmyLoveJenny/ngx_ossl_patches/blob/master/ossl_enable_chacha20-poly1305-draft.patch)
+
+```
+git clone https://github.com/openssl/openssl.git
+git clone https://github.com/hakasenyang/openssl-patch.git
+cd openssl
+patch -p1 < ../openssl-patch/openssl-1.1.1-chacha_draft.patch
+```
 
 ### nginx HPACK Patch
 
