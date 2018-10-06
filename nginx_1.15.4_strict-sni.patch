@@ -1,0 +1,52 @@
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+index 75129134..fd4d3bb1 100644
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -1455,6 +1455,12 @@ ngx_ssl_handshake(ngx_connection_t *c)
+ 
+     c->read->error = 1;
+ 
++    if (sslerr == SSL_ERROR_SSL) {
++        ERR_peek_error();
++        ERR_clear_error();
++        return NGX_ERROR;
++    }
++
+     ngx_ssl_connection_error(c, sslerr, err, "SSL_do_handshake() failed");
+ 
+     return NGX_ERROR;
+@@ -1568,6 +1574,12 @@ ngx_ssl_try_early_data(ngx_connection_t *c)
+ 
+     c->read->error = 1;
+ 
++    if (sslerr == SSL_ERROR_SSL) {
++        ERR_peek_error();
++        ERR_clear_error();
++        return NGX_ERROR;
++    }
++
+     ngx_ssl_connection_error(c, sslerr, err, "SSL_read_early_data() failed");
+ 
+     return NGX_ERROR;
+diff --git a/src/http/ngx_http_request.c b/src/http/ngx_http_request.c
+index 7dd28b8c..aacc600a 100644
+--- a/src/http/ngx_http_request.c
++++ b/src/http/ngx_http_request.c
+@@ -849,7 +849,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+     servername = SSL_get_servername(ssl_conn, TLSEXT_NAMETYPE_host_name);
+ 
+     if (servername == NULL) {
+-        return SSL_TLSEXT_ERR_NOACK;
++        return SSL_TLSEXT_ERR_ALERT_FATAL;
+     }
+ 
+     c = ngx_ssl_get_connection(ssl_conn);
+@@ -864,7 +864,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+     host.len = ngx_strlen(servername);
+ 
+     if (host.len == 0) {
+-        return SSL_TLSEXT_ERR_NOACK;
++        return SSL_TLSEXT_ERR_ALERT_FATAL;
+     }
+ 
+     host.data = (u_char *) servername;
