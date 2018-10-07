@@ -122,6 +122,13 @@ Run it from the nginx directory.
 
 ``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_strict-sni.patch | patch -p1``
 
+This is a condition for using strict sni.
+
+- Strict SNI requires at least two ssl server (fake) settings (se
+rver { listen 443 ssl }).
+- It does not matter what kind of certificate or duplicate
+.
+
 Thanks [@JemmyLoveJenny](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319)!
 
 ### nginx OpenSSL-1.1.x Renegotiation Bugfix
