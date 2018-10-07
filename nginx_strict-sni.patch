@@ -1,5 +1,5 @@
 diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
-index 75129134..d0b926fe 100644
+index 75129134..4b4821bd 100644
 --- a/src/event/ngx_event_openssl.c
 +++ b/src/event/ngx_event_openssl.c
 @@ -2547,6 +2547,7 @@ ngx_ssl_connection_error(ngx_connection_t *c, int sslerr, ngx_err_t err,
@@ -10,24 +10,25 @@ index 75129134..d0b926fe 100644
      ngx_uint_t  level;
  
      level = NGX_LOG_CRIT;
-@@ -2582,6 +2583,17 @@ ngx_ssl_connection_error(ngx_connection_t *c, int sslerr, ngx_err_t err,
-     } else if (sslerr == SSL_ERROR_SSL) {
+@@ -2583,6 +2584,18 @@ ngx_ssl_connection_error(ngx_connection_t *c, int sslerr, ngx_err_t err,
  
          n = ERR_GET_REASON(ERR_peek_error());
-+        f = ERR_GET_FUNC(ERR_peek_error());
-+
+ 
 +        /* Strict SNI Error Patch
 +         * https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319
 +         */
-+        if (n == SSL_R_CALLBACK_FAILED
-+            && f == SSL_F_FINAL_SERVER_NAME) {
-+            ERR_peek_error();
-+            ERR_clear_error();
-+            return;
++        if (n == SSL_R_CALLBACK_FAILED) {
++            f = ERR_GET_FUNC(ERR_peek_error());
++            if (f == SSL_F_FINAL_SERVER_NAME) {
++                ERR_peek_error();
++                ERR_clear_error();
++                return;
++            }
 +        }
- 
++
              /* handshake failures */
          if (n == SSL_R_BAD_CHANGE_CIPHER_SPEC                        /*  103 */
+ #ifdef SSL_R_NO_SUITABLE_KEY_SHARE
 diff --git a/src/http/ngx_http_request.c b/src/http/ngx_http_request.c
 index 7dd28b8c..5e5bbed1 100644
 --- a/src/http/ngx_http_request.c
@@ -59,4 +60,3 @@ index 7dd28b8c..5e5bbed1 100644
      }
  
      hc->ssl_servername = ngx_palloc(c->pool, sizeof(ngx_str_t));
-
