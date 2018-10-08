@@ -124,10 +124,8 @@ Run it from the nginx directory.
 
 This is a condition for using strict sni. [View issue.](https://github.com/hakasenyang/openssl-patch/issues/7#issuecomment-427664716)
 
-- Strict SNI requires at least two ssl server (fake) settings (se
-rver { listen 443 ssl }).
-- It does not matter what kind of certificate or duplicate
-.
+- Strict SNI requires at least two ssl server (fake) settings (server { listen 443 ssl }).
+- It does not matter what kind of certificate or duplicate.
 
 Thanks [@JemmyLoveJenny](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319)!
 
