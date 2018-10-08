@@ -124,10 +124,14 @@ Run it from the nginx directory.
 
 This is a condition for using strict sni. [View issue.](https://github.com/hakasenyang/openssl-patch/issues/7#issuecomment-427664716)
 
-- Strict SNI requires at least two ssl server (fake) settings (server { listen 443 ssl }).
-- It does not matter what kind of certificate or duplicate.
+- How to use nginx strict-sni?
+    - **ONLY USE IN http { }**
+    - strict_sni : nginx strict-sni ON/OFF toggle option.
+    - strict_sni_header : if you do not want to respond to invalid headers. (**only with strict_sni**)
+    - Strict SNI requires at least two ssl server (fake) settings (server { listen 443 ssl }).
+    - It does not matter what kind of certificate or duplicate.
 
-Thanks [@JemmyLoveJenny](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319)!
+Thanks [@JemmyLoveJenny](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319), [@NewBugger](https://github.com/hakasenyang/openssl-patch/issues/7#issuecomment-427831677)!
 
 ### nginx OpenSSL-1.1.x Renegotiation Bugfix
 
