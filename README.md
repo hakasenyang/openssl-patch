@@ -8,6 +8,7 @@
 - [OpenSSL Equal Preference Patch](https://boringssl.googlesource.com/boringssl/+/858a88daf27975f67d9f63e18f95645be2886bfb%5E%21) by [BoringSSL](https://github.com/google/boringssl) & [buik](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1)
 - [HPACK Patch](https://github.com/cloudflare/sslconfig/blob/master/patches/nginx_1.13.1_http2_hpack.patch) by [Cloudflare](https://github.com/cloudflare/sslconfig)
 - [nginx Strict-SNI Patch](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
+- [OpenSSL OLD-CHACH20-POLY1305](https://github.com/JemmyLoveJenny/ngx_ossl_patches) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
 
 ## Information
 
