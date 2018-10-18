@@ -25,7 +25,7 @@ index 3aea982384..3c93eba0bf 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 0a18a43544..c31597584b 100644
+index ffe158388d..6f2c726dea 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -173,12 +173,12 @@ extern "C" {
@@ -824,10 +824,10 @@ index 11331ce41f..cfc770b8d6 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index ec5b1554f7..a80c81ac9e 100644
+index 846b856af4..bcf98bdee9 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
-@@ -1117,6 +1117,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
+@@ -1115,6 +1115,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
      return X509_VERIFY_PARAM_set1(ssl->param, vpm);
  }
  
@@ -899,7 +899,7 @@ index ec5b1554f7..a80c81ac9e 100644
  X509_VERIFY_PARAM *SSL_CTX_get0_param(SSL_CTX *ctx)
  {
      return ctx->param;
-@@ -1157,7 +1222,8 @@ void SSL_free(SSL *s)
+@@ -1155,7 +1220,8 @@ void SSL_free(SSL *s)
      BUF_MEM_free(s->init_buf);
  
      /* add extra stuff */
@@ -909,7 +909,7 @@ index ec5b1554f7..a80c81ac9e 100644
      sk_SSL_CIPHER_free(s->cipher_list_by_id);
      sk_SSL_CIPHER_free(s->tls13_ciphersuites);
  
-@@ -2426,9 +2492,9 @@ STACK_OF(SSL_CIPHER) *SSL_get_ciphers(const SSL *s)
+@@ -2424,9 +2490,9 @@ STACK_OF(SSL_CIPHER) *SSL_get_ciphers(const SSL *s)
  {
      if (s != NULL) {
          if (s->cipher_list != NULL) {
@@ -921,7 +921,7 @@ index ec5b1554f7..a80c81ac9e 100644
          }
      }
      return NULL;
-@@ -2502,8 +2568,8 @@ const char *SSL_get_cipher_list(const SSL *s, int n)
+@@ -2500,8 +2566,8 @@ const char *SSL_get_cipher_list(const SSL *s, int n)
   * preference */
  STACK_OF(SSL_CIPHER) *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
  {
@@ -932,7 +932,7 @@ index ec5b1554f7..a80c81ac9e 100644
      return NULL;
  }
  
-@@ -2934,7 +3000,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+@@ -2932,7 +2998,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
                                  ret->tls13_ciphersuites,
                                  &ret->cipher_list, &ret->cipher_list_by_id,
                                  SSL_DEFAULT_CIPHER_LIST, ret->cert)
@@ -941,7 +941,7 @@ index ec5b1554f7..a80c81ac9e 100644
          SSLerr(SSL_F_SSL_CTX_NEW, SSL_R_LIBRARY_HAS_NO_CIPHERS);
          goto err2;
      }
-@@ -3107,7 +3173,7 @@ void SSL_CTX_free(SSL_CTX *a)
+@@ -3105,7 +3171,7 @@ void SSL_CTX_free(SSL_CTX *a)
  #ifndef OPENSSL_NO_CT
      CTLOG_STORE_free(a->ctlog_store);
  #endif
@@ -950,7 +950,7 @@ index ec5b1554f7..a80c81ac9e 100644
      sk_SSL_CIPHER_free(a->cipher_list_by_id);
      sk_SSL_CIPHER_free(a->tls13_ciphersuites);
      ssl_cert_free(a->cert);
-@@ -3756,13 +3822,15 @@ SSL *SSL_dup(SSL *s)
+@@ -3754,13 +3820,15 @@ SSL *SSL_dup(SSL *s)
  
      /* dup the cipher_list and cipher_list_by_id stacks */
      if (s->cipher_list != NULL) {
@@ -1191,7 +1191,7 @@ index 508bb88767..ee927baf64 100644
              return 0;
          }
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index 95f83c8462..ed69108a62 100644
+index ac5fd09134..0fdc1eaddf 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
 @@ -1742,7 +1742,7 @@ static int tls_early_post_process_client_hello(SSL *s)
