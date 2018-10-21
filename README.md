@@ -50,7 +50,9 @@ Here is the basic patch content.
 | openssl-equal-1.1.1.patch<br>openssl-equal-1.1.2-dev.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-1.1.1_ciphers.patch<br>openssl-equal-1.1.2-dev_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 | openssl-1.1.1-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
+| openssl-1.1.1-tls13_draft.patch | Enable TLS 1.3 draft 23, 26, 28, final. |
 | openssl-1.1.1-tls13_nginx_config.patch | You can set TLS 1.3 ciphere in nginx. ex) TLS13+AESGCM+AES128 |
+
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
 Example of setting TLS 1.3 cipher in nginx:
