@@ -291,7 +291,7 @@ index 1e83dffc09..d1f21424db 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index 6661e2ed29..15115e5b8a 100644
+index e803fa81e7..4c2c4d94bc 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
 @@ -917,6 +917,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
@@ -499,11 +499,11 @@ index c22c1f9ee8..6c4595c49b 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index f159a40528..4c4cdb9f9c 100644
+index f159a40528..6a7361dbdf 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
 @@ -4597,3 +4597,4 @@ EVP_MAC_do_all                          4550	1_1_2	EXIST::FUNCTION:
  EVP_MAC_do_all_sorted                   4551	1_1_2	EXIST::FUNCTION:
  EVP_str2ctrl                            4552	1_1_2	EXIST::FUNCTION:
  EVP_hex2ctrl                            4553	1_1_2	EXIST::FUNCTION:
-+EVP_chacha20_poly1305_draft             4534	1_1_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
++EVP_chacha20_poly1305_draft             4554	1_1_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
