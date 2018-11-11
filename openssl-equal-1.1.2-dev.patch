@@ -824,7 +824,7 @@ index 11331ce41f..cfc770b8d6 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 846b856af4..bcf98bdee9 100644
+index e7e8aa90f9..e2612c5bb0 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1115,6 +1115,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -1073,10 +1073,10 @@ index c22c1f9ee8..cf1b0c6081 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
-index 4b5e6fe2b8..99981c9e37 100644
+index ab4dbf6713..745897b638 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -530,8 +530,25 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
+@@ -533,8 +533,25 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
          return EXT_RETURN_FAIL;
      }
  
@@ -1103,7 +1103,7 @@ index 4b5e6fe2b8..99981c9e37 100644
              SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                       SSL_F_TLS_CONSTRUCT_CTOS_SUPPORTED_VERSIONS,
                       ERR_R_INTERNAL_ERROR);
-@@ -1760,6 +1777,15 @@ int tls_parse_stoc_supported_versions(SSL *s, PACKET *pkt, unsigned int context,
+@@ -1763,6 +1780,15 @@ int tls_parse_stoc_supported_versions(SSL *s, PACKET *pkt, unsigned int context,
          return 0;
      }
  
