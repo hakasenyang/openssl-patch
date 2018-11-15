@@ -87,7 +87,7 @@ index a11ed483e6..4fd583dd03 100644
                                  (unsigned int)rec->length) <= 0
              || EVP_CipherFinal_ex(ctx, rec->data + lenu, &lenf) <= 0
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 866ca4dfa9..1b6b99cb19 100644
+index 4b9906f215..de15b9e04e 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -31,7 +31,25 @@ const unsigned char tls12downgrade[] = {
@@ -1006,7 +1006,7 @@ index 087f768b0b..1cc5e6c3a9 100644
      /* Dup the client_CA list */
      if (!dup_ca_names(&ret->ca_names, s->ca_names)
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index e9c5c5cf80..fb153bf5bf 100644
+index 70e5a1740f..d583840984 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -741,9 +741,46 @@ typedef struct ssl_ctx_ext_secure_st {
@@ -1179,10 +1179,10 @@ index 0f2b22392b..6c1ce9813f 100644
          SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                   SSL_F_TLS_CONSTRUCT_STOC_SUPPORTED_VERSIONS,
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 95c22062ba..645cfc2d90 100644
+index 4324896f50..d0de7ffe3d 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
-@@ -1779,6 +1779,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1786,6 +1786,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
          unsigned int best_vers = 0;
          const SSL_METHOD *best_method = NULL;
          PACKET versionslist;
@@ -1191,7 +1191,7 @@ index 95c22062ba..645cfc2d90 100644
  
          suppversions->parsed = 1;
  
-@@ -1800,6 +1802,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1807,6 +1809,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              return SSL_R_BAD_LEGACY_VERSION;
  
          while (PACKET_get_net_2(&versionslist, &candidate_vers)) {
@@ -1215,7 +1215,7 @@ index 95c22062ba..645cfc2d90 100644
              if (version_cmp(s, candidate_vers, best_vers) <= 0)
                  continue;
              if (ssl_version_supported(s, candidate_vers, &best_method))
-@@ -1822,6 +1841,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1829,6 +1848,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              }
              check_for_downgrade(s, best_vers, dgrd);
              s->version = best_vers;
