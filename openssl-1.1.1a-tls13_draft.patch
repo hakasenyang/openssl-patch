@@ -1,5 +1,5 @@
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 0a18a43544..c31597584b 100644
+index d6b1b4e6a6..173dbb1ef8 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -173,12 +173,12 @@ extern "C" {
@@ -20,13 +20,13 @@ index 0a18a43544..c31597584b 100644
  /*
   * As of OpenSSL 1.0.0, ssl_create_cipher_list() in ssl/ssl_ciph.c always
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index 2e46cf80d3..0accc837a3 100644
+index e13b5dd4bc..779341c948 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
 @@ -30,6 +30,16 @@ extern "C" {
  # define TLS1_3_VERSION                  0x0304
  # define TLS_MAX_VERSION                 TLS1_3_VERSION
-
+ 
 +/* TODO(TLS1.3) REMOVE ME: Version indicators for draft version */
 +# define TLS1_3_VERSION_DRAFT_23         0x7f17
 +# define TLS1_3_VERSION_DRAFT_26         0x7f1a
@@ -39,7 +39,7 @@ index 2e46cf80d3..0accc837a3 100644
 +
  /* Special value for method supporting multiple versions */
  # define TLS_ANY_VERSION                 0x10000
-
+ 
 diff --git a/ssl/record/ssl3_record_tls13.c b/ssl/record/ssl3_record_tls13.c
 index a11ed483e6..4fd583dd03 100644
 --- a/ssl/record/ssl3_record_tls13.c
@@ -57,10 +57,10 @@ index a11ed483e6..4fd583dd03 100644
                                  (unsigned int)rec->length) <= 0
              || EVP_CipherFinal_ex(ctx, rec->data + lenu, &lenf) <= 0
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index e8819e7a28..9afa488822 100644
+index 70e5a1740f..7b3b270ffc 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
-@@ -1074,6 +1111,8 @@ struct ssl_st {
+@@ -1080,6 +1080,8 @@ struct ssl_st {
       * DTLS1_VERSION)
       */
      int version;
@@ -70,13 +70,13 @@ index e8819e7a28..9afa488822 100644
      const SSL_METHOD *method;
      /*
 diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
-index 4b5e6fe2b8..99981c9e37 100644
+index ab4dbf6713..745897b638 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
-@@ -530,8 +530,25 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
+@@ -533,8 +533,25 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
          return EXT_RETURN_FAIL;
      }
-
+ 
 +    /*
 +     * TODO(TLS1.3): There is some discussion on the TLS list as to whether
 +     * we should include versions <TLS1.2. For the moment we do. To be
@@ -100,10 +100,10 @@ index 4b5e6fe2b8..99981c9e37 100644
              SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                       SSL_F_TLS_CONSTRUCT_CTOS_SUPPORTED_VERSIONS,
                       ERR_R_INTERNAL_ERROR);
-@@ -1760,6 +1777,15 @@ int tls_parse_stoc_supported_versions(SSL *s, PACKET *pkt, unsigned int context,
+@@ -1763,6 +1780,15 @@ int tls_parse_stoc_supported_versions(SSL *s, PACKET *pkt, unsigned int context,
          return 0;
      }
-
+ 
 +    /* TODO(TLS1.3): Remove this before release */
 +    if (version == TLS1_3_VERSION_DRAFT
 +            || version == TLS1_3_VERSION_DRAFT_27
@@ -131,7 +131,7 @@ index 0f2b22392b..6c1ce9813f 100644
          WPACKET_cleanup(&hrrpkt);
          SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PARSE_CTOS_COOKIE,
 @@ -1652,7 +1653,8 @@ EXT_RETURN tls_construct_stoc_supported_versions(SSL *s, WPACKET *pkt,
-
+ 
      if (!WPACKET_put_bytes_u16(pkt, TLSEXT_TYPE_supported_versions)
              || !WPACKET_start_sub_packet_u16(pkt)
 -            || !WPACKET_put_bytes_u16(pkt, s->version)
@@ -141,21 +141,21 @@ index 0f2b22392b..6c1ce9813f 100644
          SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                   SSL_F_TLS_CONSTRUCT_STOC_SUPPORTED_VERSIONS,
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 508bb88767..ee927baf64 100644
+index 4324896f50..d0de7ffe3d 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
-@@ -1753,6 +1753,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1786,6 +1786,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
          unsigned int best_vers = 0;
          const SSL_METHOD *best_method = NULL;
          PACKET versionslist;
 +        /* TODO(TLS1.3): Remove this before release */
 +        unsigned int orig_candidate = 0;
-
+ 
          suppversions->parsed = 1;
-
-@@ -1774,6 +1776,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+ 
+@@ -1807,6 +1809,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              return SSL_R_BAD_LEGACY_VERSION;
-
+ 
          while (PACKET_get_net_2(&versionslist, &candidate_vers)) {
 +            /* TODO(TLS1.3): Remove this before release */
 +            if (candidate_vers == TLS1_3_VERSION
@@ -177,7 +177,7 @@ index 508bb88767..ee927baf64 100644
              if (version_cmp(s, candidate_vers, best_vers) <= 0)
                  continue;
              if (ssl_version_supported(s, candidate_vers, &best_method))
-@@ -1796,6 +1815,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1829,6 +1848,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              }
              check_for_downgrade(s, best_vers, dgrd);
              s->version = best_vers;

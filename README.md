@@ -31,7 +31,7 @@ Default support is in bold type.
 - [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ draft 23, 28, **final**
 - [NSS TLS 1.3(Mozilla)](https://tls13.crypto.mozilla.org/) : _TLSv1.3_ **final**
 
-[Compatible OpenSSL-1.1.1 (OpenSSL, 22764 commits)](https://github.com/openssl/openssl/tree/1708e3e85b4a86bae26860aa5d2913fc8eff6086)
+[Compatible OpenSSL-1.1.1a (OpenSSL, 22932 commits)](https://github.com/openssl/openssl/tree/d1c28d791a7391a8dc101713cd8646df96491d03)
 
 ## Patch files
 
@@ -46,12 +46,12 @@ Here is the basic patch content.
 
 | Patch file name | Patch list |
 | :--- | :--- |
-| openssl-1.1.1-tls13_draft.patch | Only for TLS 1.3 draft 23, 26, 28, final support patch. |
-| openssl-equal-1.1.1.patch<br>openssl-equal-1.1.2-dev.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
-| openssl-equal-1.1.1_ciphers.patch<br>openssl-equal-1.1.2-dev_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
-| openssl-1.1.1-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
-| openssl-1.1.1-tls13_draft.patch | Enable TLS 1.3 draft 23, 26, 28, final. |
-| openssl-1.1.1-tls13_nginx_config.patch | You can set TLS 1.3 ciphere in nginx. ex) TLS13+AESGCM+AES128 |
+| openssl-1.1.1a-tls13_draft.patch | Only for TLS 1.3 draft 23, 26, 28, final support patch. |
+| openssl-equal-1.1.1a.patch<br>openssl-equal-1.1.2-dev.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
+| openssl-equal-1.1.1a_ciphers.patch<br>openssl-equal-1.1.2-dev_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
+| openssl-1.1.1a-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
+| openssl-1.1.1a-tls13_draft.patch | Enable TLS 1.3 draft 23, 26, 28, final. |
+| openssl-1.1.1a-tls13_nginx_config.patch | You can set TLS 1.3 ciphere in nginx. ex) TLS13+AESGCM+AES128 |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
@@ -97,7 +97,7 @@ Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)!
 git clone https://github.com/openssl/openssl.git
 git clone https://github.com/hakasenyang/openssl-patch.git
 cd openssl
-patch -p1 < ../openssl-patch/openssl-1.1.1-chacha_draft.patch
+patch -p1 < ../openssl-patch/openssl-1.1.1a-chacha_draft.patch
 ```
 
 ### nginx HPACK Patch
@@ -157,12 +157,12 @@ ssl_ecdh_curve X25519:P-256:P-384;
 ssl_prefer_server_ciphers on;
 ```
 
-### OpenSSL-1.1.x (> 1.1.1) ciphers (draft 23, 26, 28, final)
+### OpenSSL-1.1.x (>= 1.1.1a) ciphers (draft 23, 26, 28, final)
 ```
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.x_ciphers (> 1.1.1) ciphers (draft 23, 26, 28, final)
+### OpenSSL-1.1.x_ciphers (>= 1.1.1a) ciphers (draft 23, 26, 28, final)
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
