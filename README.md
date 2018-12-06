@@ -52,6 +52,7 @@ Here is the basic patch content.
 | openssl-1.1.1a-chacha_draft.patch<br>openssl-3.0.0-dev-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
 | openssl-1.1.1a-tls13_draft.patch | Enable TLS 1.3 draft 23, 26, 28, final. |
 | openssl-1.1.1a-tls13_nginx_config.patch | You can set TLS 1.3 ciphere in nginx. ex) TLS13+AESGCM+AES128 |
+| openssl-3.0.0-dev_version_error.patch | **TEST** This is a way to fix nginx when the following errors occur during the build:<br>Error: missing binary operator before token "("  |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
