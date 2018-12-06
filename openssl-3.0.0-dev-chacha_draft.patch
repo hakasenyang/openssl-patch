@@ -291,7 +291,7 @@ index 590bbe9a13..39a76eb2e1 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index d22956d343..77006675f3 100644
+index 36249b4201..4896155729 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
 @@ -918,6 +918,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
@@ -318,7 +318,7 @@ index e977a24c66..280efb665e 100644
  #define LN_dhpublicnumber               "X9.42 DH"
  #define NID_dhpublicnumber              920
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 1e9e8d5721..babce9025d 100644
+index fe2e479028..da1ff8f855 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -125,6 +125,7 @@ extern "C" {
@@ -330,7 +330,7 @@ index 1e9e8d5721..babce9025d 100644
  # define SSL_TXT_ARIA            "ARIA"
  # define SSL_TXT_ARIA_GCM        "ARIAGCM"
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index e13b5dd4bc..53d43c121e 100644
+index 434dff1500..e1603867d0 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
 @@ -597,7 +597,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
@@ -372,7 +372,7 @@ index e13b5dd4bc..53d43c121e 100644
  # define TLS1_TXT_ECDHE_ECDSA_WITH_CHACHA20_POLY1305       "ECDHE-ECDSA-CHACHA20-POLY1305"
  # define TLS1_TXT_DHE_RSA_WITH_CHACHA20_POLY1305           "DHE-RSA-CHACHA20-POLY1305"
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 4b9906f215..4821bbf269 100644
+index a5b3dbbfd5..a5a7993065 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -2082,6 +2082,54 @@ static SSL_CIPHER ssl3_ciphers[] = {
@@ -431,7 +431,7 @@ index 4b9906f215..4821bbf269 100644
       1,
       TLS1_TXT_PSK_WITH_CHACHA20_POLY1305,
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 14066d0ea4..0ded2bd6b6 100644
+index bd97c0fdab..020ba7ac63 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -43,7 +43,8 @@
@@ -480,7 +480,7 @@ index 14066d0ea4..0ded2bd6b6 100644
      } else if (c->algorithm_mac & SSL_AEAD) {
          /* We're supposed to have handled all the AEAD modes above */
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index 70e5a1740f..d75ba89a40 100644
+index 98e8e8a46d..d64dd57d78 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -230,12 +230,13 @@
@@ -499,11 +499,11 @@ index 70e5a1740f..d75ba89a40 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index f7d6cb5823..de1a6e7804 100644
+index 964f581667..66d7b47dc3 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4603,3 +4603,4 @@ SRP_user_pwd_new                        4556	1_1_2	EXIST::FUNCTION:SRP
- SRP_user_pwd_set_gN                     4557	1_1_2	EXIST::FUNCTION:SRP
- SRP_user_pwd_set1_ids                   4558	1_1_2	EXIST::FUNCTION:SRP
- SRP_user_pwd_set0_sv                    4559	1_1_2	EXIST::FUNCTION:SRP
-+EVP_chacha20_poly1305_draft             4560	1_1_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
+@@ -4608,3 +4608,4 @@ OPENSSL_version_minor                   4561	3_0_0	EXIST::FUNCTION:
+ OPENSSL_version_patch                   4562	3_0_0	EXIST::FUNCTION:
+ OPENSSL_version_pre_release             4563	3_0_0	EXIST::FUNCTION:
+ OPENSSL_version_build_metadata          4564	3_0_0	EXIST::FUNCTION:
++EVP_chacha20_poly1305_draft             4565	1_1_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT

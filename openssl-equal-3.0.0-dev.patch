@@ -25,7 +25,7 @@ index 3aea982384..3c93eba0bf 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 1e9e8d5721..f49e049d90 100644
+index fe2e479028..4d4ed0a0b8 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -173,12 +173,12 @@ extern "C" {
@@ -71,7 +71,7 @@ index 87b295c9f9..d118d8e864 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index e13b5dd4bc..779341c948 100644
+index 434dff1500..f90230ff45 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
 @@ -30,6 +30,16 @@ extern "C" {
@@ -92,7 +92,7 @@ index e13b5dd4bc..779341c948 100644
  # define TLS_ANY_VERSION                 0x10000
  
 diff --git a/ssl/record/ssl3_record_tls13.c b/ssl/record/ssl3_record_tls13.c
-index a11ed483e6..4fd583dd03 100644
+index 30e5dddf82..4f1c2f2bd1 100644
 --- a/ssl/record/ssl3_record_tls13.c
 +++ b/ssl/record/ssl3_record_tls13.c
 @@ -173,8 +173,9 @@ int tls13_enc(SSL *s, SSL3_RECORD *recs, size_t n_recs, int sending)
@@ -108,7 +108,7 @@ index a11ed483e6..4fd583dd03 100644
                                  (unsigned int)rec->length) <= 0
              || EVP_CipherFinal_ex(ctx, rec->data + lenu, &lenf) <= 0
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 4b9906f215..d6739d97f7 100644
+index a5b3dbbfd5..505c32d18e 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -167,7 +167,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
@@ -352,7 +352,7 @@ index 4b9906f215..d6739d97f7 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 14066d0ea4..165f1c83b1 100644
+index bd97c0fdab..add5843bfb 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -190,6 +190,7 @@ typedef struct cipher_order_st {
@@ -795,7 +795,7 @@ index 14066d0ea4..165f1c83b1 100644
  
  char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
 diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
-index 11331ce41f..cfc770b8d6 100644
+index 7b06878cef..4e03448e95 100644
 --- a/ssl/ssl_err.c
 +++ b/ssl/ssl_err.c
 @@ -965,6 +965,9 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
@@ -824,7 +824,7 @@ index 11331ce41f..cfc770b8d6 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 087f768b0b..1cc5e6c3a9 100644
+index a709792c21..7cb488d16e 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1115,6 +1115,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -971,7 +971,7 @@ index 087f768b0b..1cc5e6c3a9 100644
      /* Dup the client_CA list */
      if (!dup_ca_names(&ret->ca_names, s->ca_names)
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index 70e5a1740f..d583840984 100644
+index 98e8e8a46d..674f820253 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -741,9 +741,46 @@ typedef struct ssl_ctx_ext_secure_st {
@@ -1073,7 +1073,7 @@ index 70e5a1740f..d583840984 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
-index ab4dbf6713..745897b638 100644
+index 6e133e026e..f26bc8e879 100644
 --- a/ssl/statem/extensions_clnt.c
 +++ b/ssl/statem/extensions_clnt.c
 @@ -533,8 +533,25 @@ EXT_RETURN tls_construct_ctos_supported_versions(SSL *s, WPACKET *pkt,
@@ -1120,7 +1120,7 @@ index ab4dbf6713..745897b638 100644
       * The only protocol version we support which is valid in this extension in
       * a ServerHello is TLSv1.3 therefore we shouldn't be getting anything else.
 diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
-index 0f2b22392b..6c1ce9813f 100644
+index 6545f5727d..15786a7bfc 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
 @@ -897,7 +897,8 @@ int tls_parse_ctos_cookie(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
@@ -1144,10 +1144,10 @@ index 0f2b22392b..6c1ce9813f 100644
          SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                   SSL_F_TLS_CONSTRUCT_STOC_SUPPORTED_VERSIONS,
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 4324896f50..d0de7ffe3d 100644
+index 9e68e05ccf..d05fa9f532 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
-@@ -1786,6 +1786,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1788,6 +1788,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
          unsigned int best_vers = 0;
          const SSL_METHOD *best_method = NULL;
          PACKET versionslist;
@@ -1156,7 +1156,7 @@ index 4324896f50..d0de7ffe3d 100644
  
          suppversions->parsed = 1;
  
-@@ -1807,6 +1809,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1809,6 +1811,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              return SSL_R_BAD_LEGACY_VERSION;
  
          while (PACKET_get_net_2(&versionslist, &candidate_vers)) {
@@ -1180,7 +1180,7 @@ index 4324896f50..d0de7ffe3d 100644
              if (version_cmp(s, candidate_vers, best_vers) <= 0)
                  continue;
              if (ssl_version_supported(s, candidate_vers, &best_method))
-@@ -1829,6 +1848,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1831,6 +1850,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              }
              check_for_downgrade(s, best_vers, dgrd);
              s->version = best_vers;
@@ -1191,7 +1191,7 @@ index 4324896f50..d0de7ffe3d 100644
              return 0;
          }
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index e7c11c4bea..a2a6c1e44e 100644
+index b0dd54903d..1d096858f8 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
 @@ -1744,7 +1744,7 @@ static int tls_early_post_process_client_hello(SSL *s)
@@ -1234,7 +1234,7 @@ index e7c11c4bea..a2a6c1e44e 100644
                  if (cipher == NULL) {
                      SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
 diff --git a/ssl/t1_trce.c b/ssl/t1_trce.c
-index be3039af38..99c4ddcb41 100644
+index 656fefe896..654271f368 100644
 --- a/ssl/t1_trce.c
 +++ b/ssl/t1_trce.c
 @@ -65,6 +65,11 @@ static const ssl_trace_tbl ssl_version_tbl[] = {
