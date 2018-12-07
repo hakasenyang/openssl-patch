@@ -1,6 +1,6 @@
 # openssl-patch
 
-## OpenSSL Equal Preference Patch
+## OpenSSL Patch
 
 ### This file is not an official OpenSSL patch. Problems can arise and this is your responsibility.
 
@@ -34,6 +34,8 @@ Default support is in bold type.
 [Compatible OpenSSL-3.0.0-dev (OpenSSL, 23063 commits)](https://github.com/openssl/openssl/tree/3a63dbef15b62b121c5df8762f8cb915fb06b27a)
 
 ## Patch files
+
+### The equal preference patch(openssl-equal-x) already includes the tls13_draft patch and the tls13_nginx_config(_ciphers file only) patch. Therefore, you do not need to patch it together.
 
 You can find the _OpenSSL 1.1.0h_ patch is [here.](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
