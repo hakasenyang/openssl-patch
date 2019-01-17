@@ -220,7 +220,7 @@ index 0d4612f314..5a3516d642 100644
  # endif
  #endif
 diff --git a/crypto/objects/obj_dat.h b/crypto/objects/obj_dat.h
-index 86bcfcaee0..09c53e087a 100644
+index 859795fa50..550e794fca 100644
 --- a/crypto/objects/obj_dat.h
 +++ b/crypto/objects/obj_dat.h
 @@ -1079,7 +1079,7 @@ static const unsigned char so[7767] = {
@@ -291,7 +291,7 @@ index 851e31e5aa..e5b288d999 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index ede4b1429b..c04f51bd37 100644
+index 9f1dbd4b8b..774f102e48 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
 @@ -928,6 +928,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
@@ -303,7 +303,7 @@ index ede4b1429b..c04f51bd37 100644
  # endif
  
 diff --git a/include/openssl/obj_mac.h b/include/openssl/obj_mac.h
-index 8ad2728dde..8c1b7ab042 100644
+index 242eaeb6ce..c8960d0e5c 100644
 --- a/include/openssl/obj_mac.h
 +++ b/include/openssl/obj_mac.h
 @@ -4824,6 +4824,10 @@
@@ -330,10 +330,10 @@ index ea41dd089e..212c6eae89 100644
  # define SSL_TXT_ARIA            "ARIA"
  # define SSL_TXT_ARIA_GCM        "ARIAGCM"
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index c57344ca0e..d219aa25ba 100644
+index 166f15ad5c..4fa1d8a32d 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
-@@ -597,7 +597,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
+@@ -599,7 +599,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
  # define TLS1_CK_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256   0x0300C09A
  # define TLS1_CK_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384   0x0300C09B
  
@@ -347,7 +347,7 @@ index c57344ca0e..d219aa25ba 100644
  # define TLS1_CK_ECDHE_RSA_WITH_CHACHA20_POLY1305         0x0300CCA8
  # define TLS1_CK_ECDHE_ECDSA_WITH_CHACHA20_POLY1305       0x0300CCA9
  # define TLS1_CK_DHE_RSA_WITH_CHACHA20_POLY1305           0x0300CCAA
-@@ -762,6 +767,9 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
+@@ -764,6 +769,9 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
  # define TLS1_RFC_DHE_RSA_WITH_CHACHA20_POLY1305         "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_ECDHE_RSA_WITH_CHACHA20_POLY1305       "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_ECDHE_ECDSA_WITH_CHACHA20_POLY1305     "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
@@ -357,7 +357,7 @@ index c57344ca0e..d219aa25ba 100644
  # define TLS1_RFC_PSK_WITH_CHACHA20_POLY1305             "TLS_PSK_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_ECDHE_PSK_WITH_CHACHA20_POLY1305       "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_DHE_PSK_WITH_CHACHA20_POLY1305         "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256"
-@@ -1090,7 +1098,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
+@@ -1092,7 +1100,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
  # define TLS1_TXT_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256    "ECDH-RSA-CAMELLIA128-SHA256"
  # define TLS1_TXT_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384    "ECDH-RSA-CAMELLIA256-SHA384"
  
@@ -431,7 +431,7 @@ index a5b3dbbfd5..a5a7993065 100644
       1,
       TLS1_TXT_PSK_WITH_CHACHA20_POLY1305,
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index bd97c0fdab..020ba7ac63 100644
+index 461a9debab..84f90c1621 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -43,7 +43,8 @@
@@ -452,7 +452,7 @@ index bd97c0fdab..020ba7ac63 100644
  };
  
  static const EVP_CIPHER *ssl_cipher_methods[SSL_ENC_NUM_IDX];
-@@ -273,6 +275,7 @@ static const SSL_CIPHER cipher_aliases[] = {
+@@ -275,6 +277,7 @@ static const SSL_CIPHER cipher_aliases[] = {
      {0, SSL_TXT_CAMELLIA256, NULL, 0, 0, 0, SSL_CAMELLIA256},
      {0, SSL_TXT_CAMELLIA, NULL, 0, 0, 0, SSL_CAMELLIA},
      {0, SSL_TXT_CHACHA20, NULL, 0, 0, 0, SSL_CHACHA20},
@@ -460,7 +460,7 @@ index bd97c0fdab..020ba7ac63 100644
  
      {0, SSL_TXT_ARIA, NULL, 0, 0, 0, SSL_ARIA},
      {0, SSL_TXT_ARIA_GCM, NULL, 0, 0, 0, SSL_ARIA128GCM | SSL_ARIA256GCM},
-@@ -1789,6 +1792,9 @@ char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
+@@ -1791,6 +1794,9 @@ char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
      case SSL_CHACHA20POLY1305:
          enc = "CHACHA20/POLY1305(256)";
          break;
@@ -470,7 +470,7 @@ index bd97c0fdab..020ba7ac63 100644
      default:
          enc = "unknown";
          break;
-@@ -2113,7 +2119,7 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
+@@ -2115,7 +2121,7 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
          out = EVP_CCM_TLS_EXPLICIT_IV_LEN + 16;
      } else if (c->algorithm_enc & (SSL_AES128CCM8 | SSL_AES256CCM8)) {
          out = EVP_CCM_TLS_EXPLICIT_IV_LEN + 8;
@@ -480,10 +480,10 @@ index bd97c0fdab..020ba7ac63 100644
      } else if (c->algorithm_mac & SSL_AEAD) {
          /* We're supposed to have handled all the AEAD modes above */
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index c2e6474f86..8452fe21da 100644
+index 2d68691a0f..441242e581 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
-@@ -231,12 +231,13 @@
+@@ -234,12 +234,13 @@
  # define SSL_CHACHA20POLY1305    0x00080000U
  # define SSL_ARIA128GCM          0x00100000U
  # define SSL_ARIA256GCM          0x00200000U
@@ -499,11 +499,11 @@ index c2e6474f86..8452fe21da 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 59fc3470f1..5439eafc87 100644
+index b8b19801b2..84db7a524a 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4620,3 +4620,4 @@ CRYPTO_siv128_set_tag                   4575	3_0_0	EXIST::FUNCTION:SIV
- CRYPTO_siv128_get_tag                   4576	3_0_0	EXIST::FUNCTION:SIV
- CRYPTO_siv128_cleanup                   4577	3_0_0	EXIST::FUNCTION:SIV
+@@ -4622,3 +4622,4 @@ CRYPTO_siv128_cleanup                   4577	3_0_0	EXIST::FUNCTION:SIV
  CRYPTO_siv128_speed                     4578	3_0_0	EXIST::FUNCTION:SIV
-+EVP_chacha20_poly1305_draft             4579	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
+ OPENSSL_INIT_set_config_filename        4579	3_0_0	EXIST::FUNCTION:STDIO
+ OPENSSL_INIT_set_config_file_flags      4580	3_0_0	EXIST::FUNCTION:STDIO
++EVP_chacha20_poly1305_draft             4581	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
