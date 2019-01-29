@@ -318,7 +318,7 @@ index 242eaeb6ce..c8960d0e5c 100644
  #define LN_dhpublicnumber               "X9.42 DH"
  #define NID_dhpublicnumber              920
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index ea41dd089e..212c6eae89 100644
+index c7a830445b..8aa020669d 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -125,6 +125,7 @@ extern "C" {
@@ -480,7 +480,7 @@ index 461a9debab..84f90c1621 100644
      } else if (c->algorithm_mac & SSL_AEAD) {
          /* We're supposed to have handled all the AEAD modes above */
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index 2d68691a0f..441242e581 100644
+index bd0d4210f4..709badc0b4 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -234,12 +234,13 @@
@@ -499,11 +499,12 @@ index 2d68691a0f..441242e581 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index b8b19801b2..84db7a524a 100644
+index cc88ac4652..7391b6f4e1 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4622,3 +4622,4 @@ CRYPTO_siv128_cleanup                   4577	3_0_0	EXIST::FUNCTION:SIV
- CRYPTO_siv128_speed                     4578	3_0_0	EXIST::FUNCTION:SIV
- OPENSSL_INIT_set_config_filename        4579	3_0_0	EXIST::FUNCTION:STDIO
- OPENSSL_INIT_set_config_file_flags      4580	3_0_0	EXIST::FUNCTION:STDIO
-+EVP_chacha20_poly1305_draft             4581	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
+@@ -4631,3 +4631,5 @@ CMS_add1_signing_cert_v2                4586	3_0_0	EXIST::FUNCTION:CMS
+ ESS_SIGNING_CERT_new_init               4587	3_0_0	EXIST::FUNCTION:
+ ESS_SIGNING_CERT_V2_new_init            4588	3_0_0	EXIST::FUNCTION:
+ ERR_load_ESS_strings                    4589	3_0_0	EXIST::FUNCTION:
++EVP_chacha20_poly1305_draft             4590	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
++

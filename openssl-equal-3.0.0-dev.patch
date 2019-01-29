@@ -25,7 +25,7 @@ index e29c5d7ced..b5bca974c9 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index ea41dd089e..d795857d16 100644
+index c7a830445b..f538b6a41b 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -173,12 +173,12 @@ extern "C" {
@@ -824,10 +824,10 @@ index 7b06878cef..4e03448e95 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index ba606e35ed..59ae36a554 100644
+index 6d6060a212..e8e2e1890f 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
-@@ -1116,6 +1116,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
+@@ -1119,6 +1119,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
      return X509_VERIFY_PARAM_set1(ssl->param, vpm);
  }
  
@@ -899,7 +899,7 @@ index ba606e35ed..59ae36a554 100644
  X509_VERIFY_PARAM *SSL_CTX_get0_param(SSL_CTX *ctx)
  {
      return ctx->param;
-@@ -1160,7 +1225,8 @@ void SSL_free(SSL *s)
+@@ -1163,7 +1228,8 @@ void SSL_free(SSL *s)
      BUF_MEM_free(s->init_buf);
  
      /* add extra stuff */
@@ -909,7 +909,7 @@ index ba606e35ed..59ae36a554 100644
      sk_SSL_CIPHER_free(s->cipher_list_by_id);
      sk_SSL_CIPHER_free(s->tls13_ciphersuites);
  
-@@ -2450,9 +2516,9 @@ STACK_OF(SSL_CIPHER) *SSL_get_ciphers(const SSL *s)
+@@ -2498,9 +2564,9 @@ STACK_OF(SSL_CIPHER) *SSL_get_ciphers(const SSL *s)
  {
      if (s != NULL) {
          if (s->cipher_list != NULL) {
@@ -921,7 +921,7 @@ index ba606e35ed..59ae36a554 100644
          }
      }
      return NULL;
-@@ -2526,8 +2592,8 @@ const char *SSL_get_cipher_list(const SSL *s, int n)
+@@ -2574,8 +2640,8 @@ const char *SSL_get_cipher_list(const SSL *s, int n)
   * preference */
  STACK_OF(SSL_CIPHER) *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
  {
@@ -932,7 +932,7 @@ index ba606e35ed..59ae36a554 100644
      return NULL;
  }
  
-@@ -2958,7 +3024,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+@@ -3006,7 +3072,7 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
                                  ret->tls13_ciphersuites,
                                  &ret->cipher_list, &ret->cipher_list_by_id,
                                  SSL_DEFAULT_CIPHER_LIST, ret->cert)
@@ -941,7 +941,7 @@ index ba606e35ed..59ae36a554 100644
          SSLerr(SSL_F_SSL_CTX_NEW, SSL_R_LIBRARY_HAS_NO_CIPHERS);
          goto err2;
      }
-@@ -3134,7 +3200,7 @@ void SSL_CTX_free(SSL_CTX *a)
+@@ -3182,7 +3248,7 @@ void SSL_CTX_free(SSL_CTX *a)
  #ifndef OPENSSL_NO_CT
      CTLOG_STORE_free(a->ctlog_store);
  #endif
@@ -950,7 +950,7 @@ index ba606e35ed..59ae36a554 100644
      sk_SSL_CIPHER_free(a->cipher_list_by_id);
      sk_SSL_CIPHER_free(a->tls13_ciphersuites);
      ssl_cert_free(a->cert);
-@@ -3812,13 +3878,15 @@ SSL *SSL_dup(SSL *s)
+@@ -3860,13 +3926,15 @@ SSL *SSL_dup(SSL *s)
  
      /* dup the cipher_list and cipher_list_by_id stacks */
      if (s->cipher_list != NULL) {
@@ -971,7 +971,7 @@ index ba606e35ed..59ae36a554 100644
      /* Dup the client_CA list */
      if (!dup_ca_names(&ret->ca_names, s->ca_names)
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index 2d68691a0f..92821b7df0 100644
+index bd0d4210f4..2c96db0618 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -745,9 +745,46 @@ typedef struct ssl_ctx_ext_secure_st {
@@ -1022,7 +1022,7 @@ index 2d68691a0f..92821b7df0 100644
      /* same as above but sorted for lookup */
      STACK_OF(SSL_CIPHER) *cipher_list_by_id;
      /* TLSv1.3 specific ciphersuites */
-@@ -1084,6 +1121,8 @@ struct ssl_st {
+@@ -1088,6 +1125,8 @@ struct ssl_st {
       * DTLS1_VERSION)
       */
      int version;
@@ -1031,7 +1031,7 @@ index 2d68691a0f..92821b7df0 100644
      /* SSLv3 */
      const SSL_METHOD *method;
      /*
-@@ -1142,7 +1181,7 @@ struct ssl_st {
+@@ -1146,7 +1185,7 @@ struct ssl_st {
      /* Per connection DANE state */
      SSL_DANE dane;
      /* crypto */
@@ -1040,7 +1040,7 @@ index 2d68691a0f..92821b7df0 100644
      STACK_OF(SSL_CIPHER) *cipher_list_by_id;
      /* TLSv1.3 specific ciphersuites */
      STACK_OF(SSL_CIPHER) *tls13_ciphersuites;
-@@ -2269,7 +2308,7 @@ __owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
+@@ -2277,7 +2316,7 @@ __owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
                                   const SSL_CIPHER *const *bp);
  __owur STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
                                                      STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
@@ -1049,7 +1049,7 @@ index 2d68691a0f..92821b7df0 100644
                                                      STACK_OF(SSL_CIPHER) **cipher_list_by_id,
                                                      const char *rule_str,
                                                      CERT *c);
-@@ -2279,6 +2318,13 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
+@@ -2287,6 +2326,13 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
                                  STACK_OF(SSL_CIPHER) **scsvs, int sslv2format,
                                  int fatal);
  void ssl_update_cache(SSL *s, int mode);
@@ -1063,7 +1063,7 @@ index 2d68691a0f..92821b7df0 100644
  __owur int ssl_cipher_get_evp(const SSL_SESSION *s, const EVP_CIPHER **enc,
                                const EVP_MD **md, int *mac_pkey_type,
                                size_t *mac_secret_size, SSL_COMP **comp,
-@@ -2362,7 +2408,7 @@ __owur unsigned long ssl3_output_cert_chain(SSL *s, WPACKET *pkt,
+@@ -2370,7 +2416,7 @@ __owur unsigned long ssl3_output_cert_chain(SSL *s, WPACKET *pkt,
                                              CERT_PKEY *cpk);
  __owur const SSL_CIPHER *ssl3_choose_cipher(SSL *ssl,
                                              STACK_OF(SSL_CIPHER) *clnt,
@@ -1144,10 +1144,10 @@ index 6545f5727d..15786a7bfc 100644
          SSLfatal(s, SSL_AD_INTERNAL_ERROR,
                   SSL_F_TLS_CONSTRUCT_STOC_SUPPORTED_VERSIONS,
 diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
-index 1a9aa41b99..a08f4fa013 100644
+index 2f78a3f602..5d5121d12b 100644
 --- a/ssl/statem/statem_lib.c
 +++ b/ssl/statem/statem_lib.c
-@@ -1788,6 +1788,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1770,6 +1770,8 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
          unsigned int best_vers = 0;
          const SSL_METHOD *best_method = NULL;
          PACKET versionslist;
@@ -1156,7 +1156,7 @@ index 1a9aa41b99..a08f4fa013 100644
  
          suppversions->parsed = 1;
  
-@@ -1809,6 +1811,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1791,6 +1793,23 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              return SSL_R_BAD_LEGACY_VERSION;
  
          while (PACKET_get_net_2(&versionslist, &candidate_vers)) {
@@ -1180,7 +1180,7 @@ index 1a9aa41b99..a08f4fa013 100644
              if (version_cmp(s, candidate_vers, best_vers) <= 0)
                  continue;
              if (ssl_version_supported(s, candidate_vers, &best_method))
-@@ -1831,6 +1850,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
+@@ -1813,6 +1832,9 @@ int ssl_choose_server_version(SSL *s, CLIENTHELLO_MSG *hello, DOWNGRADE *dgrd)
              }
              check_for_downgrade(s, best_vers, dgrd);
              s->version = best_vers;
