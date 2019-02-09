@@ -12,12 +12,10 @@
 
 ## Information
 
-- [Test Page - (TLS 1.3 draft 23, 26, 28, final)](https://ssl.hakase.io/)
+- [Test Page - (TLS 1.3 final)](https://ssl.hakase.io/)
 - [SSL Test Result - testssl.sh](https://ssl.hakase.io/ssltest/hakase.io.html)
 - [SSL Test Result - dev.ssllabs.com](https://dev.ssllabs.com/ssltest/analyze.html?d=hakase.io)
-- **If you link site to a browser that supports draft 23 or 26 or 28 or final, you'll see a TLS 1.3 message.**
-
-**Support TLS 1.3 draft 28 browsers - _Chrome Canary, Firefox Nightly_**
+- **If you link site to a browser that supports final, you'll see a TLS 1.3 message.**
 
 Displays TLSv1.3 support for large sites.
 
@@ -25,13 +23,13 @@ Default support is in bold type.
 - [Baidu(China)](https://baidu.cn/) : **TLSv1.2**
 - [Naver(Korea)](https://naver.com/) : **TLSv1.2**
 - [Twitter](https://twitter.com/) : **TLSv1.2**
-- [**My Site**](https://hakase.io/) : _TLSv1.3_ draft 23, 26, 28, **final**
+- [**My Site**](https://hakase.io/) : _TLSv1.3_ **final**
 - [Facebook](https://facebook.com/) : _TLSv1.3_ draft 23, 26, 28, **final**
-- [Cloudflare](https://cloudflare.com/) : _TLSv1.3_ draft 23, 28, **final**
-- [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ draft 23, 28, **final**
+- [Cloudflare](https://cloudflare.com/) : _TLSv1.3_ **final**
+- [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ **final**
 - [NSS TLS 1.3(Mozilla)](https://tls13.crypto.mozilla.org/) : _TLSv1.3_ **final**
 
-[Compatible OpenSSL-3.0.0-dev (OpenSSL, 23204 commits)](https://github.com/openssl/openssl/tree/829800b0735ab99a0962418180cb076ff8081028)
+[Compatible OpenSSL-3.0.0-dev (OpenSSL, 23340 commits)](https://github.com/openssl/openssl/tree/1980ce45d6bdd2b57df7003d6b56b5df560b9064)
 
 ## Patch files
 
@@ -40,19 +38,15 @@ Default support is in bold type.
 You can find the _OpenSSL 1.1.0h_ patch is [here.](https://gitlab.com/buik/openssl/blob/openssl-patch/openssl-1.1/OpenSSL1.1h-equal-preference-cipher-groups.patch)
 
 Here is the basic patch content.
-- Support TLS 1.3 draft 23 + 26 + 28 + final
-    - Server: draft 23 + 26 + 28 + final
-    - Client: draft 23 + 26 + 27 + 28 + final
 - BoringSSL's Equal Preference Patch
 - Weak 3DES and not using ECDHE ciphers is not used in TLSv1.1 or later.
 
 | Patch file name | Patch list |
 | :--- | :--- |
-| openssl-1.1.1a-tls13_draft.patch | Only for TLS 1.3 draft 23, 26, 28, final support patch. |
 | openssl-equal-1.1.1a.patch<br>openssl-equal-3.0.0-dev.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can not_** be changed on _nginx_. |
 | openssl-equal-1.1.1a_ciphers.patch<br>openssl-equal-3.0.0-dev_ciphers.patch | Support **final (TLS 1.3)**, TLS 1.3 cipher settings **_can_** be changed on _nginx_. |
 | openssl-1.1.1a-chacha_draft.patch<br>openssl-3.0.0-dev-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
-| openssl-1.1.1a-tls13_draft.patch | Enable TLS 1.3 draft 23, 26, 28, final. |
+| openssl-1.1.1a-tls13_draft.patch | Only for **TLS 1.3 draft 23, 26, 28, final support patch**. |
 | openssl-1.1.1a-tls13_nginx_config.patch | You can set TLS 1.3 ciphere in nginx. ex) TLS13+AESGCM+AES128 |
 | openssl-3.0.0-dev_version_error.patch | **TEST** This is a way to fix nginx when the following errors occur during the build:<br>Error: missing binary operator before token "("<br>Maybe patched: [https://github.com/openssl/openssl/pull/7839](https://github.com/openssl/openssl/pull/7839)<br>Patched : [https://github.com/openssl/openssl/commit/5d609f22d28615c45685d9da871d432e9cb81127](https://github.com/openssl/openssl/commit/5d609f22d28615c45685d9da871d432e9cb81127) |
 
@@ -162,12 +156,12 @@ ssl_ecdh_curve X25519:P-256:P-384;
 ssl_prefer_server_ciphers on;
 ```
 
-### OpenSSL-1.1.1a, 3.0.0-dev ciphers (draft 23, 26, 28, final)
+### OpenSSL-1.1.1a, 3.0.0-dev ciphers
 ```
 [EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
 
-### OpenSSL-1.1.1a_ciphers, 3.0.0-dev_ciphers ciphers (draft 23, 26, 28, final)
+### OpenSSL-1.1.1a_ciphers, 3.0.0-dev_ciphers ciphers
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
