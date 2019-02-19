@@ -220,7 +220,7 @@ index c1917bb86a..ea64c6b70e 100644
  # endif
  #endif
 diff --git a/crypto/objects/obj_dat.h b/crypto/objects/obj_dat.h
-index 9ab1a14b9e..5c141b9011 100644
+index 9ab1a14b9e..ba3e602186 100644
 --- a/crypto/objects/obj_dat.h
 +++ b/crypto/objects/obj_dat.h
 @@ -1078,7 +1078,7 @@ static const unsigned char so[7762] = {
@@ -236,7 +236,7 @@ index 9ab1a14b9e..5c141b9011 100644
      {"magma-mac", "magma-mac", NID_magma_mac},
      {"hmacWithSHA512-224", "hmacWithSHA512-224", NID_hmacWithSHA512_224, 8, &so[7745]},
      {"hmacWithSHA512-256", "hmacWithSHA512-256", NID_hmacWithSHA512_256, 8, &so[7753]},
-+    {"ChaCha20-Poly1305-D", "chacha20-poly1305-draft", NID_chacha20_poly1305_draft },
++    {"ChaCha20-Poly1305-D", "chacha20-poly1305-draft", NID_chacha20_poly1305_draft},
  };
  
 -#define NUM_SN 1186
@@ -248,7 +248,7 @@ index 9ab1a14b9e..5c141b9011 100644
       417,    /* "CSPName" */
      1019,    /* "ChaCha20" */
      1018,    /* "ChaCha20-Poly1305" */
-+    1195,    /* "chacha20-poly1305-draft" */
++    1195,    /* "ChaCha20-Poly1305-D" */
       367,    /* "CrlID" */
       391,    /* "DC" */
        31,    /* "DES-CBC" */
@@ -265,7 +265,7 @@ index 9ab1a14b9e..5c141b9011 100644
       883,    /* "certificateRevocationList" */
      1019,    /* "chacha20" */
      1018,    /* "chacha20-poly1305" */
-+    1195,    /* "ChaCha20-Poly1305-D" */
++    1195,    /* "chacha20-poly1305-draft" */
        54,    /* "challengePassword" */
       407,    /* "characteristic-two-field" */
       395,    /* "clearance" */
@@ -291,7 +291,7 @@ index 6dbc41ce37..581169eda8 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index cfc33f6a8c..ea097d8105 100644
+index e2416724e6..de1cb8c7c1 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
 @@ -915,6 +915,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
@@ -303,22 +303,22 @@ index cfc33f6a8c..ea097d8105 100644
  # endif
  
 diff --git a/include/openssl/obj_mac.h b/include/openssl/obj_mac.h
-index 31fad4640f..47ff8270c9 100644
+index 31fad4640f..f3669a46c9 100644
 --- a/include/openssl/obj_mac.h
 +++ b/include/openssl/obj_mac.h
-@@ -4811,6 +4811,10 @@
+@@ -4807,6 +4807,10 @@
+ #define LN_chacha20_poly1305            "chacha20-poly1305"
+ #define NID_chacha20_poly1305           1018
+ 
++#define SN_chacha20_poly1305_draft              "ChaCha20-Poly1305-D"
++#define LN_chacha20_poly1305_draft              "chacha20-poly1305-draft"
++#define NID_chacha20_poly1305_draft             1195
++
+ #define SN_chacha20             "ChaCha20"
  #define LN_chacha20             "chacha20"
  #define NID_chacha20            1019
- 
-+#define SN_chacha20_poly1305_draft      "ChaCha20-Poly1305-D"
-+#define LN_chacha20_poly1305_draft      "chacha20-poly1305-draft"
-+#define NID_chacha20_poly1305_draft     1195
-+
- #define SN_dhpublicnumber               "dhpublicnumber"
- #define LN_dhpublicnumber               "X9.42 DH"
- #define NID_dhpublicnumber              920
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index d6b1b4e6a6..6d166c94f0 100644
+index 4b7757395f..a625ce46e3 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -125,6 +125,7 @@ extern "C" {
@@ -499,11 +499,11 @@ index 307131de93..0b1c345b93 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 32c64cb2c7..c577257d5d 100644
+index 32c64cb2c7..86cb7a994b 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
 @@ -4579,3 +4579,4 @@ EVP_PKEY_meth_set_digest_custom         4532	1_1_1	EXIST::FUNCTION:
  EVP_PKEY_meth_get_digest_custom         4533	1_1_1	EXIST::FUNCTION:
  OPENSSL_INIT_set_config_filename        4534	1_1_1b	EXIST::FUNCTION:STDIO
  OPENSSL_INIT_set_config_file_flags      4535	1_1_1b	EXIST::FUNCTION:STDIO
-+EVP_chacha20_poly1305_draft             4536	1_1_0	EXIST::FUNCTION:CHACHA,POLY1305_DRAFT
++EVP_chacha20_poly1305_draft             4536	1_1_0	EXIST::FUNCTION:CHACHA,POLY1305
