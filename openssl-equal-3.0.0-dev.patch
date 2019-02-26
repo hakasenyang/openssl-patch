@@ -46,7 +46,7 @@ index 9d6e1c5024..cee7db9a25 100644
  /*
   * As of OpenSSL 1.0.0, ssl_create_cipher_list() in ssl/ssl_ciph.c always
 diff --git a/include/openssl/sslerr.h b/include/openssl/sslerr.h
-index f8783717bc..0e7ad2818b 100644
+index 63057517dc..97ccb41d43 100644
 --- a/include/openssl/sslerr.h
 +++ b/include/openssl/sslerr.h
 @@ -596,6 +596,8 @@ int ERR_load_SSL_strings(void);
@@ -55,10 +55,10 @@ index f8783717bc..0e7ad2818b 100644
  # define SSL_R_MISSING_TMP_ECDH_KEY                       311
 +# define SSL_R_MIXED_SPECIAL_OPERATOR_WITH_GROUPS         101
 +# define SSL_R_NESTED_GROUP                               108
+ # define SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA     293
  # define SSL_R_NOT_ON_RECORD_BOUNDARY                     182
  # define SSL_R_NOT_REPLACING_CERTIFICATE                  289
- # define SSL_R_NOT_SERVER                                 284
-@@ -726,9 +728,11 @@ int ERR_load_SSL_strings(void);
+@@ -727,9 +729,11 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_UNABLE_TO_FIND_PUBLIC_KEY_PARAMETERS       239
  # define SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES           242
  # define SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES          243
@@ -758,7 +758,7 @@ index 461a9debab..c8d8517735 100644
  
  char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
 diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
-index 7b06878cef..4e03448e95 100644
+index ceae87bbc9..46521b7136 100644
 --- a/ssl/ssl_err.c
 +++ b/ssl/ssl_err.c
 @@ -965,6 +965,9 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
@@ -766,12 +766,12 @@ index 7b06878cef..4e03448e95 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MISSING_TMP_ECDH_KEY),
      "missing tmp ecdh key"},
 +    {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MIXED_SPECIAL_OPERATOR_WITH_GROUPS),
-+     "mixed special operator with groups"},
++    "mixed special operator with groups"},
 +    {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_NESTED_GROUP), "nested group"},
+     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA),
+     "mixed handshake and non handshake data"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_NOT_ON_RECORD_BOUNDARY),
-     "not on record boundary"},
-     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_NOT_REPLACING_CERTIFICATE),
-@@ -1199,11 +1202,14 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
+@@ -1201,11 +1204,14 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
      "unable to load ssl3 md5 routines"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES),
      "unable to load ssl3 sha1 routines"},
@@ -782,7 +782,7 @@ index 7b06878cef..4e03448e95 100644
      "unexpected end of early data"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNEXPECTED_MESSAGE), "unexpected message"},
 +    {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNEXPECTED_OPERATOR_IN_GROUP),
-+     "unexpected operator in group"},
++    "unexpected operator in group"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNEXPECTED_RECORD), "unexpected record"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
@@ -934,7 +934,7 @@ index 322a4381b0..ac33c35560 100644
      /* Dup the client_CA list */
      if (!dup_ca_names(&ret->ca_names, s->ca_names)
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index bd0d4210f4..8973b7b3a1 100644
+index ae6417b592..9f839acc74 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -745,9 +745,46 @@ typedef struct ssl_ctx_ext_secure_st {
@@ -994,7 +994,7 @@ index bd0d4210f4..8973b7b3a1 100644
      STACK_OF(SSL_CIPHER) *cipher_list_by_id;
      /* TLSv1.3 specific ciphersuites */
      STACK_OF(SSL_CIPHER) *tls13_ciphersuites;
-@@ -2277,7 +2314,7 @@ __owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
+@@ -2275,7 +2312,7 @@ __owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
                                   const SSL_CIPHER *const *bp);
  __owur STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
                                                      STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
@@ -1003,7 +1003,7 @@ index bd0d4210f4..8973b7b3a1 100644
                                                      STACK_OF(SSL_CIPHER) **cipher_list_by_id,
                                                      const char *rule_str,
                                                      CERT *c);
-@@ -2287,6 +2324,13 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
+@@ -2285,6 +2322,13 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
                                  STACK_OF(SSL_CIPHER) **scsvs, int sslv2format,
                                  int fatal);
  void ssl_update_cache(SSL *s, int mode);
@@ -1017,7 +1017,7 @@ index bd0d4210f4..8973b7b3a1 100644
  __owur int ssl_cipher_get_evp(const SSL_SESSION *s, const EVP_CIPHER **enc,
                                const EVP_MD **md, int *mac_pkey_type,
                                size_t *mac_secret_size, SSL_COMP **comp,
-@@ -2370,7 +2414,7 @@ __owur unsigned long ssl3_output_cert_chain(SSL *s, WPACKET *pkt,
+@@ -2368,7 +2412,7 @@ __owur unsigned long ssl3_output_cert_chain(SSL *s, WPACKET *pkt,
                                              CERT_PKEY *cpk);
  __owur const SSL_CIPHER *ssl3_choose_cipher(SSL *ssl,
                                              STACK_OF(SSL_CIPHER) *clnt,
