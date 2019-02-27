@@ -480,7 +480,7 @@ index 461a9debab..84f90c1621 100644
      } else if (c->algorithm_mac & SSL_AEAD) {
          /* We're supposed to have handled all the AEAD modes above */
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index bd0d4210f4..709badc0b4 100644
+index ae6417b592..c783031ea2 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -234,12 +234,13 @@
@@ -499,11 +499,11 @@ index bd0d4210f4..709badc0b4 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 991a9feea8..b9bc370329 100644
+index 9957cf80f6..21ea627067 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4644,3 +4644,4 @@ CRYPTO_alloc_ex_data                    4599	3_0_0	EXIST::FUNCTION:
- OPENSSL_CTX_new                         4600	3_0_0	EXIST::FUNCTION:
- OPENSSL_CTX_free                        4601	3_0_0	EXIST::FUNCTION:
+@@ -4646,3 +4646,4 @@ OPENSSL_CTX_free                        4601	3_0_0	EXIST::FUNCTION:
  OPENSSL_LH_flush                        4602	3_0_0	EXIST::FUNCTION:
-+EVP_chacha20_poly1305_draft             4603	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
+ BN_native2bn                            4603	3_0_0	EXIST::FUNCTION:
+ BN_bn2nativepad                         4604	3_0_0	EXIST::FUNCTION:
++EVP_chacha20_poly1305_draft             4605	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
