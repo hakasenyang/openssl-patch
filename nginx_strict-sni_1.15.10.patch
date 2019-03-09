@@ -1,0 +1,211 @@
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+index bee264c9..f4b7deec 100644
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -2818,6 +2818,9 @@ ngx_ssl_connection_error(ngx_connection_t *c, int sslerr, ngx_err_t err,
+     char *text)
+ {
+     int         n;
++#if (defined SSL_R_CALLBACK_FAILED && defined SSL_F_FINAL_SERVER_NAME)
++    int         f;
++#endif
+     ngx_uint_t  level;
+ 
+     level = NGX_LOG_CRIT;
+@@ -2854,6 +2857,24 @@ ngx_ssl_connection_error(ngx_connection_t *c, int sslerr, ngx_err_t err,
+ 
+         n = ERR_GET_REASON(ERR_peek_error());
+ 
++        /* Strict SNI Error Patch
++         * https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319
++         * https://github.com/hakasenyang/openssl-patch/issues/7#issuecomment-427872934
++         */
++#if (defined SSL_R_CALLBACK_FAILED && defined SSL_F_FINAL_SERVER_NAME)
++        if (n == SSL_R_CALLBACK_FAILED) {
++            f = ERR_GET_FUNC(ERR_peek_error());
++            if (f == SSL_F_FINAL_SERVER_NAME) {
++                while (ERR_peek_error()) {
++                    ngx_ssl_error(NGX_LOG_DEBUG, c->log, 0,
++                                  "ignoring ssl error at STRICT SNI block");
++                }
++                ERR_clear_error();
++                return;
++            }
++        }
++#endif
++
+             /* handshake failures */
+         if (n == SSL_R_BAD_CHANGE_CIPHER_SPEC                        /*  103 */
+ #ifdef SSL_R_NO_SUITABLE_KEY_SHARE
+diff --git a/src/http/ngx_http_core_module.c b/src/http/ngx_http_core_module.c
+index 5e7152f0..45b271f5 100644
+--- a/src/http/ngx_http_core_module.c
++++ b/src/http/ngx_http_core_module.c
+@@ -441,6 +441,20 @@ static ngx_command_t  ngx_http_core_commands[] = {
+       offsetof(ngx_http_core_loc_conf_t, directio_alignment),
+       NULL },
+ 
++    { ngx_string("strict_sni"),
++      NGX_HTTP_MAIN_CONF|NGX_CONF_FLAG,
++      ngx_conf_set_flag_slot,
++      NGX_HTTP_LOC_CONF_OFFSET,
++      offsetof(ngx_http_core_loc_conf_t, strict_sni),
++      NULL },
++
++    { ngx_string("strict_sni_header"),
++      NGX_HTTP_MAIN_CONF|NGX_CONF_FLAG,
++      ngx_conf_set_flag_slot,
++      NGX_HTTP_LOC_CONF_OFFSET,
++      offsetof(ngx_http_core_loc_conf_t, strict_sni_header),
++      NULL },
++
+     { ngx_string("tcp_nopush"),
+       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_FLAG,
+       ngx_conf_set_flag_slot,
+@@ -3395,6 +3409,8 @@ ngx_http_core_create_loc_conf(ngx_conf_t *cf)
+     clcf->read_ahead = NGX_CONF_UNSET_SIZE;
+     clcf->directio = NGX_CONF_UNSET;
+     clcf->directio_alignment = NGX_CONF_UNSET;
++    clcf->strict_sni = NGX_CONF_UNSET;
++    clcf->strict_sni_header = NGX_CONF_UNSET;
+     clcf->tcp_nopush = NGX_CONF_UNSET;
+     clcf->tcp_nodelay = NGX_CONF_UNSET;
+     clcf->send_timeout = NGX_CONF_UNSET_MSEC;
+@@ -3623,6 +3639,8 @@ ngx_http_core_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
+                               NGX_OPEN_FILE_DIRECTIO_OFF);
+     ngx_conf_merge_off_value(conf->directio_alignment, prev->directio_alignment,
+                               512);
++    ngx_conf_merge_value(conf->strict_sni, prev->strict_sni, 0);
++    ngx_conf_merge_value(conf->strict_sni_header, prev->strict_sni_header, 0);
+     ngx_conf_merge_value(conf->tcp_nopush, prev->tcp_nopush, 0);
+     ngx_conf_merge_value(conf->tcp_nodelay, prev->tcp_nodelay, 1);
+ 
+diff --git a/src/http/ngx_http_core_module.h b/src/http/ngx_http_core_module.h
+index 4c6da7c0..04e14d09 100644
+--- a/src/http/ngx_http_core_module.h
++++ b/src/http/ngx_http_core_module.h
+@@ -382,6 +382,8 @@ struct ngx_http_core_loc_conf_s {
+     ngx_flag_t    sendfile;                /* sendfile */
+     ngx_flag_t    aio;                     /* aio */
+     ngx_flag_t    aio_write;               /* aio_write */
++    ngx_flag_t    strict_sni;              /* strict_sni */
++    ngx_flag_t    strict_sni_header;       /* strict_sni_header */
+     ngx_flag_t    tcp_nopush;              /* tcp_nopush */
+     ngx_flag_t    tcp_nodelay;             /* tcp_nodelay */
+     ngx_flag_t    reset_timedout_connection; /* reset_timedout_connection */
+diff --git a/src/http/ngx_http_request.c b/src/http/ngx_http_request.c
+index 80c19656..26b7de81 100644
+--- a/src/http/ngx_http_request.c
++++ b/src/http/ngx_http_request.c
+@@ -866,6 +866,10 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+ 
+     c = ngx_ssl_get_connection(ssl_conn);
+ 
++    hc = c->data;
++
++    clcf = ngx_http_get_module_loc_conf(hc->conf_ctx, ngx_http_core_module);
++
+     if (c->ssl->handshaked) {
+         *ad = SSL_AD_NO_RENEGOTIATION;
+         return SSL_TLSEXT_ERR_ALERT_FATAL;
+@@ -874,7 +878,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+     servername = SSL_get_servername(ssl_conn, TLSEXT_NAMETYPE_host_name);
+ 
+     if (servername == NULL) {
+-        return SSL_TLSEXT_ERR_OK;
++        return (clcf->strict_sni) ? SSL_TLSEXT_ERR_ALERT_FATAL : SSL_TLSEXT_ERR_OK;
+     }
+ 
+     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
+@@ -883,7 +887,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+     host.len = ngx_strlen(servername);
+ 
+     if (host.len == 0) {
+-        return SSL_TLSEXT_ERR_OK;
++        return (clcf->strict_sni) ? SSL_TLSEXT_ERR_ALERT_FATAL : SSL_TLSEXT_ERR_OK;
+     }
+ 
+     host.data = (u_char *) servername;
+@@ -899,8 +903,6 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+         return SSL_TLSEXT_ERR_OK;
+     }
+ 
+-    hc = c->data;
+-
+     rc = ngx_http_find_virtual_server(c, hc->addr_conf->virtual_names, &host,
+                                       NULL, &cscf);
+ 
+@@ -910,7 +912,7 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+     }
+ 
+     if (rc == NGX_DECLINED) {
+-        return SSL_TLSEXT_ERR_OK;
++        return (clcf->strict_sni) ? SSL_TLSEXT_ERR_ALERT_FATAL : SSL_TLSEXT_ERR_OK;
+     }
+ 
+     hc->ssl_servername = ngx_palloc(c->pool, sizeof(ngx_str_t));
+@@ -923,8 +925,6 @@ ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+ 
+     hc->conf_ctx = cscf->ctx;
+ 
+-    clcf = ngx_http_get_module_loc_conf(hc->conf_ctx, ngx_http_core_module);
+-
+     ngx_set_connection_log(c, clcf->error_log);
+ 
+     sscf = ngx_http_get_module_srv_conf(hc->conf_ctx, ngx_http_ssl_module);
+@@ -1037,15 +1037,18 @@ failed:
+ static void
+ ngx_http_process_request_line(ngx_event_t *rev)
+ {
+-    ssize_t              n;
+-    ngx_int_t            rc, rv;
+-    ngx_str_t            host;
+-    ngx_connection_t    *c;
+-    ngx_http_request_t  *r;
++    ssize_t                    n;
++    ngx_int_t                  rc, rv;
++    ngx_str_t                  host;
++    ngx_connection_t          *c;
++    ngx_http_core_loc_conf_t  *clcf;
++    ngx_http_request_t        *r;
+ 
+     c = rev->data;
+     r = c->data;
+ 
++    clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
++
+     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
+                    "http process request line");
+ 
+@@ -1161,10 +1164,10 @@ ngx_http_process_request_line(ngx_event_t *rev)
+                           ngx_http_client_errors[rc - NGX_HTTP_CLIENT_ERROR]);
+ 
+             if (rc == NGX_HTTP_PARSE_INVALID_VERSION) {
+-                ngx_http_finalize_request(r, NGX_HTTP_VERSION_NOT_SUPPORTED);
++                (r->http_connection->ssl && clcf->strict_sni && clcf->strict_sni_header) ? ngx_http_terminate_request(r, 0) : ngx_http_finalize_request(r, NGX_HTTP_VERSION_NOT_SUPPORTED);
+ 
+             } else {
+-                ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
++                (r->http_connection->ssl && clcf->strict_sni && clcf->strict_sni_header) ? ngx_http_terminate_request(r, 0) : ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
+             }
+ 
+             break;
+@@ -1909,6 +1912,9 @@ ngx_http_process_multi_header_lines(ngx_http_request_t *r, ngx_table_elt_t *h,
+ ngx_int_t
+ ngx_http_process_request_header(ngx_http_request_t *r)
+ {
++    ngx_http_core_loc_conf_t  *clcf;
++    clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
++
+     if (r->headers_in.server.len == 0
+         && ngx_http_set_virtual_server(r, &r->headers_in.server)
+            == NGX_ERROR)
+@@ -1919,7 +1925,7 @@ ngx_http_process_request_header(ngx_http_request_t *r)
+     if (r->headers_in.host == NULL && r->http_version > NGX_HTTP_VERSION_10) {
+         ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
+                    "client sent HTTP/1.1 request without \"Host\" header");
+-        ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
++        (r->http_connection->ssl && clcf->strict_sni && clcf->strict_sni_header) ? ngx_http_terminate_request(r, 0) : ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
+         return NGX_ERROR;
+     }
+ 
