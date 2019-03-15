@@ -331,7 +331,7 @@ index a3639fd18c..c24b5154ac 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 5aa04dbd53..dc238fc9c9 100644
+index 5aa04dbd53..655e259c9b 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -193,6 +193,7 @@ typedef struct cipher_order_st {
@@ -717,7 +717,7 @@ index 5aa04dbd53..dc238fc9c9 100644
  
      OSSL_TRACE_BEGIN(TLS_CIPHER) {
          BIO_printf(trc_out, "cipher selection:\n");
-@@ -1618,11 +1673,10 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+@@ -1618,26 +1673,51 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
      for (curr = head; curr != NULL; curr = curr->next) {
          if (curr->active) {
              if (!sk_SSL_CIPHER_push(cipherstack, curr->cipher)) {
@@ -731,8 +731,9 @@ index 5aa04dbd53..dc238fc9c9 100644
              if (trc_out != NULL)
                  BIO_printf(trc_out, "<%s>\n", curr->cipher->name);
          }
-@@ -1630,14 +1684,39 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
+     }
      OPENSSL_free(co_list);      /* Not needed any longer */
++    co_list = NULL;
      OSSL_TRACE_END(TLS_CIPHER);
  
 -    if (!update_cipher_list_by_id(cipher_list_by_id, cipherstack)) {
