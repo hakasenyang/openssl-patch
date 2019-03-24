@@ -1,24 +1,8 @@
 diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
-index 7c915d4645..d8c8d714b9 100644
+index f52beb131e..ad1e04452b 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
-@@ -2128,7 +2128,6 @@ CONF_R_UNKNOWN_MODULE_NAME:113:unknown module name
- CONF_R_VARIABLE_EXPANSION_TOO_LONG:116:variable expansion too long
- CONF_R_VARIABLE_HAS_NO_VALUE:104:variable has no value
- CRMF_R_BAD_PBM_ITERATIONCOUNT:100:bad pbm iterationcount
--CRMF_R_MALFORMED_IV:101:malformed iv
- CRMF_R_CRMFERROR:102:crmferror
- CRMF_R_ERROR:103:error
- CRMF_R_ERROR_DECODING_CERTIFICATE:104:error decoding certificate
-@@ -2136,6 +2135,7 @@ CRMF_R_ERROR_DECRYPTING_CERTIFICATE:105:error decrypting certificate
- CRMF_R_ERROR_DECRYPTING_SYMMETRIC_KEY:106:error decrypting symmetric key
- CRMF_R_FAILURE_OBTAINING_RANDOM:107:failure obtaining random
- CRMF_R_ITERATIONCOUNT_BELOW_100:108:iterationcount below 100
-+CRMF_R_MALFORMED_IV:101:malformed iv
- CRMF_R_NULL_ARGUMENT:109:null argument
- CRMF_R_SETTING_MAC_ALGOR_FAILURE:110:setting mac algor failure
- CRMF_R_SETTING_OWF_ALGOR_FAILURE:111:setting owf algor failure
-@@ -2865,6 +2865,8 @@ SSL_R_MISSING_TMP_DH_KEY:171:missing tmp dh key
+@@ -2880,6 +2880,8 @@ SSL_R_MISSING_TMP_DH_KEY:171:missing tmp dh key
  SSL_R_MISSING_TMP_ECDH_KEY:311:missing tmp ecdh key
  SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA:293:\
  	mixed handshake and non handshake data
@@ -27,7 +11,7 @@ index 7c915d4645..d8c8d714b9 100644
  SSL_R_NOT_ON_RECORD_BOUNDARY:182:not on record boundary
  SSL_R_NOT_REPLACING_CERTIFICATE:289:not replacing certificate
  SSL_R_NOT_SERVER:284:not server
-@@ -2973,7 +2975,9 @@ SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES:242:unable to load ssl3 md5 routines
+@@ -2988,7 +2990,9 @@ SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES:242:unable to load ssl3 md5 routines
  SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES:243:unable to load ssl3 sha1 routines
  SSL_R_UNEXPECTED_CCS_MESSAGE:262:unexpected ccs message
  SSL_R_UNEXPECTED_END_OF_EARLY_DATA:178:unexpected end of early data
