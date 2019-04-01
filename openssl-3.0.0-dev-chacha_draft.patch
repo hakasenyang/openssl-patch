@@ -11,7 +11,7 @@ index a97eaa1685..24112723f0 100644
  #endif
  }
 diff --git a/crypto/evp/e_chacha20_poly1305.c b/crypto/evp/e_chacha20_poly1305.c
-index 37902000a0..56832b63a0 100644
+index 37902000a0..6c9078321a 100644
 --- a/crypto/evp/e_chacha20_poly1305.c
 +++ b/crypto/evp/e_chacha20_poly1305.c
 @@ -156,6 +156,7 @@ typedef struct {
@@ -194,7 +194,7 @@ index 37902000a0..56832b63a0 100644
 +    NID_chacha20_poly1305_draft,
 +    1,                  /* block_size */
 +    CHACHA_KEY_SIZE,    /* key_len */
-+    0,                 /* iv_len, none */
++    0,                  /* iv_len, none */
 +    EVP_CIPH_FLAG_AEAD_CIPHER | EVP_CIPH_CUSTOM_IV |
 +    EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CTRL_INIT |
 +    EVP_CIPH_CUSTOM_COPY | EVP_CIPH_FLAG_CUSTOM_CIPHER,
@@ -318,7 +318,7 @@ index a0d4eed358..6ab0a3bd3f 100644
  #define LN_chacha20             "chacha20"
  #define NID_chacha20            1019
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 1091b1c8b9..fcfc428cd1 100644
+index f4b17f1beb..bb3fe66300 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -125,6 +125,7 @@ extern "C" {
@@ -330,10 +330,10 @@ index 1091b1c8b9..fcfc428cd1 100644
  # define SSL_TXT_ARIA            "ARIA"
  # define SSL_TXT_ARIA_GCM        "ARIAGCM"
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index 166f15ad5c..4fa1d8a32d 100644
+index 4db2b6a0db..5b07fb3cba 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
-@@ -599,7 +599,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
+@@ -567,7 +567,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
  # define TLS1_CK_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256   0x0300C09A
  # define TLS1_CK_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384   0x0300C09B
  
@@ -347,7 +347,7 @@ index 166f15ad5c..4fa1d8a32d 100644
  # define TLS1_CK_ECDHE_RSA_WITH_CHACHA20_POLY1305         0x0300CCA8
  # define TLS1_CK_ECDHE_ECDSA_WITH_CHACHA20_POLY1305       0x0300CCA9
  # define TLS1_CK_DHE_RSA_WITH_CHACHA20_POLY1305           0x0300CCAA
-@@ -764,6 +769,9 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
+@@ -732,6 +737,9 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
  # define TLS1_RFC_DHE_RSA_WITH_CHACHA20_POLY1305         "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_ECDHE_RSA_WITH_CHACHA20_POLY1305       "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_ECDHE_ECDSA_WITH_CHACHA20_POLY1305     "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
@@ -357,7 +357,7 @@ index 166f15ad5c..4fa1d8a32d 100644
  # define TLS1_RFC_PSK_WITH_CHACHA20_POLY1305             "TLS_PSK_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_ECDHE_PSK_WITH_CHACHA20_POLY1305       "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256"
  # define TLS1_RFC_DHE_PSK_WITH_CHACHA20_POLY1305         "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256"
-@@ -1092,7 +1100,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
+@@ -1060,7 +1068,12 @@ __owur int SSL_check_chain(SSL *s, X509 *x, EVP_PKEY *pk, STACK_OF(X509) *chain)
  # define TLS1_TXT_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256    "ECDH-RSA-CAMELLIA128-SHA256"
  # define TLS1_TXT_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384    "ECDH-RSA-CAMELLIA256-SHA384"
  
@@ -372,7 +372,7 @@ index 166f15ad5c..4fa1d8a32d 100644
  # define TLS1_TXT_ECDHE_ECDSA_WITH_CHACHA20_POLY1305       "ECDHE-ECDSA-CHACHA20-POLY1305"
  # define TLS1_TXT_DHE_RSA_WITH_CHACHA20_POLY1305           "DHE-RSA-CHACHA20-POLY1305"
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index a3639fd18c..c13137e1af 100644
+index 330b9e3f0c..fc6889acae 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -2083,6 +2083,54 @@ static SSL_CIPHER ssl3_ciphers[] = {

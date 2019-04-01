@@ -1,8 +1,8 @@
 diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
-index f52beb131e..ad1e04452b 100644
+index 27e1890393..df8690a1bd 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
-@@ -2880,6 +2880,8 @@ SSL_R_MISSING_TMP_DH_KEY:171:missing tmp dh key
+@@ -2879,6 +2879,8 @@ SSL_R_MISSING_TMP_DH_KEY:171:missing tmp dh key
  SSL_R_MISSING_TMP_ECDH_KEY:311:missing tmp ecdh key
  SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA:293:\
  	mixed handshake and non handshake data
@@ -11,7 +11,7 @@ index f52beb131e..ad1e04452b 100644
  SSL_R_NOT_ON_RECORD_BOUNDARY:182:not on record boundary
  SSL_R_NOT_REPLACING_CERTIFICATE:289:not replacing certificate
  SSL_R_NOT_SERVER:284:not server
-@@ -2988,7 +2990,9 @@ SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES:242:unable to load ssl3 md5 routines
+@@ -2985,7 +2987,9 @@ SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES:242:unable to load ssl3 md5 routines
  SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES:243:unable to load ssl3 sha1 routines
  SSL_R_UNEXPECTED_CCS_MESSAGE:262:unexpected ccs message
  SSL_R_UNEXPECTED_END_OF_EARLY_DATA:178:unexpected end of early data
@@ -48,10 +48,10 @@ index e29c5d7ced..7d795c390e 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/sslerr.h b/include/openssl/sslerr.h
-index 4603ef4274..fac8736d1d 100644
+index 7f776f97f7..bef78d6c2c 100644
 --- a/include/openssl/sslerr.h
 +++ b/include/openssl/sslerr.h
-@@ -601,6 +601,8 @@ int ERR_load_SSL_strings(void);
+@@ -600,6 +600,8 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_MISSING_TMP_DH_KEY                         171
  # define SSL_R_MISSING_TMP_ECDH_KEY                       311
  # define SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA     293
@@ -60,7 +60,7 @@ index 4603ef4274..fac8736d1d 100644
  # define SSL_R_NOT_ON_RECORD_BOUNDARY                     182
  # define SSL_R_NOT_REPLACING_CERTIFICATE                  289
  # define SSL_R_NOT_SERVER                                 284
-@@ -733,7 +735,9 @@ int ERR_load_SSL_strings(void);
+@@ -730,7 +732,9 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES          243
  # define SSL_R_UNEXPECTED_CCS_MESSAGE                     262
  # define SSL_R_UNEXPECTED_END_OF_EARLY_DATA               178
@@ -71,7 +71,7 @@ index 4603ef4274..fac8736d1d 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index a3639fd18c..c24b5154ac 100644
+index 330b9e3f0c..a2b2a85bab 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -168,7 +168,7 @@ static SSL_CIPHER ssl3_ciphers[] = {
@@ -101,7 +101,7 @@ index a3639fd18c..c24b5154ac 100644
       DTLS1_BAD_VER, DTLS1_2_VERSION,
       SSL_HIGH | SSL_FIPS,
       SSL_HANDSHAKE_MAC_DEFAULT | TLS1_PRF,
-@@ -4125,6 +4125,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
+@@ -4118,6 +4118,17 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
      return 1;
  }
  
@@ -119,7 +119,7 @@ index a3639fd18c..c24b5154ac 100644
  /*
   * ssl3_choose_cipher - choose a cipher from those offered by the client
   * @s: SSL connection
-@@ -4134,16 +4145,24 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
+@@ -4127,16 +4138,24 @@ int ssl3_put_cipher_by_char(const SSL_CIPHER *c, WPACKET *pkt, size_t *len)
   * Returns the selected cipher or NULL when no common ciphers.
   */
  const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
@@ -150,7 +150,7 @@ index a3639fd18c..c24b5154ac 100644
  
      /* Let's see which ciphers we can support */
  
-@@ -4170,54 +4189,13 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4163,54 +4182,13 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
      } OSSL_TRACE_END(TLS_CIPHER);
  
      /* SUITE-B takes precedence over server preference and ChaCha priortiy */
@@ -208,7 +208,7 @@ index a3639fd18c..c24b5154ac 100644
          allow = srvr;
      }
  
-@@ -4248,14 +4226,16 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4241,14 +4219,16 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
      for (i = 0; i < sk_SSL_CIPHER_num(prio); i++) {
          c = sk_SSL_CIPHER_value(prio, i);
  
@@ -227,7 +227,7 @@ index a3639fd18c..c24b5154ac 100644
  
          /*
           * Since TLS 1.3 ciphersuites can be used with any auth or
-@@ -4277,10 +4257,10 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4270,10 +4250,10 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  #ifndef OPENSSL_NO_PSK
              /* with PSK there must be server callback set */
              if ((alg_k & SSL_PSK) && s->psk_server_callback == NULL)
@@ -240,7 +240,7 @@ index a3639fd18c..c24b5154ac 100644
              OSSL_TRACE7(TLS_CIPHER,
                          "%d:[%08lX:%08lX:%08lX:%08lX]%p:%s\n",
                          ok, alg_k, alg_a, mask_k, mask_a, (void *)c, c->name);
-@@ -4296,6 +4276,14 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4289,6 +4269,14 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
  
              if (!ok)
                  continue;
@@ -255,7 +255,7 @@ index a3639fd18c..c24b5154ac 100644
          }
          ii = sk_SSL_CIPHER_find(allow, c);
          if (ii >= 0) {
-@@ -4303,14 +4291,7 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4296,14 +4284,7 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
              if (!ssl_security(s, SSL_SECOP_CIPHER_SHARED,
                                c->strength_bits, 0, (void *)c))
                  continue;
@@ -271,7 +271,7 @@ index a3639fd18c..c24b5154ac 100644
              if (prefer_sha256) {
                  const SSL_CIPHER *tmp = sk_SSL_CIPHER_value(allow, ii);
  
-@@ -4322,13 +4303,38 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+@@ -4315,13 +4296,38 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
                      ret = tmp;
                  continue;
              }
@@ -763,10 +763,10 @@ index 5aa04dbd53..655e259c9b 100644
  
  char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
 diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
-index ceae87bbc9..10836f3667 100644
+index afe1b58214..f38ac1558c 100644
 --- a/ssl/ssl_err.c
 +++ b/ssl/ssl_err.c
-@@ -967,6 +967,9 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
+@@ -966,6 +966,9 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
      "missing tmp ecdh key"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA),
      "mixed handshake and non handshake data"},
@@ -776,7 +776,7 @@ index ceae87bbc9..10836f3667 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_NOT_ON_RECORD_BOUNDARY),
      "not on record boundary"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_NOT_REPLACING_CERTIFICATE),
-@@ -1205,7 +1208,11 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
+@@ -1200,7 +1203,11 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
      "unexpected ccs message"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNEXPECTED_END_OF_EARLY_DATA),
      "unexpected end of early data"},
@@ -1029,10 +1029,10 @@ index 1d3397d880..265c32d15e 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index e482e2d074..f81fe86291 100644
+index 781efd236e..4ce62feed7 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
-@@ -1751,7 +1751,7 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1755,7 +1755,7 @@ static int tls_early_post_process_client_hello(SSL *s)
      /* For TLSv1.3 we must select the ciphersuite *before* session resumption */
      if (SSL_IS_TLS13(s)) {
          const SSL_CIPHER *cipher =
@@ -1041,7 +1041,7 @@ index e482e2d074..f81fe86291 100644
  
          if (cipher == NULL) {
              SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
-@@ -1934,7 +1934,7 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1938,7 +1938,7 @@ static int tls_early_post_process_client_hello(SSL *s)
              /* check if some cipher was preferred by call back */
              if (pref_cipher == NULL)
                  pref_cipher = ssl3_choose_cipher(s, s->session->ciphers,
@@ -1050,7 +1050,7 @@ index e482e2d074..f81fe86291 100644
              if (pref_cipher == NULL) {
                  SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
                           SSL_F_TLS_EARLY_POST_PROCESS_CLIENT_HELLO,
-@@ -1943,8 +1943,9 @@ static int tls_early_post_process_client_hello(SSL *s)
+@@ -1947,8 +1947,9 @@ static int tls_early_post_process_client_hello(SSL *s)
              }
  
              s->session->cipher = pref_cipher;
@@ -1062,7 +1062,7 @@ index e482e2d074..f81fe86291 100644
              sk_SSL_CIPHER_free(s->cipher_list_by_id);
              s->cipher_list_by_id = sk_SSL_CIPHER_dup(s->session->ciphers);
          }
-@@ -2258,7 +2259,7 @@ WORK_STATE tls_post_process_client_hello(SSL *s, WORK_STATE wst)
+@@ -2262,7 +2263,7 @@ WORK_STATE tls_post_process_client_hello(SSL *s, WORK_STATE wst)
              /* In TLSv1.3 we selected the ciphersuite before resumption */
              if (!SSL_IS_TLS13(s)) {
                  cipher =
