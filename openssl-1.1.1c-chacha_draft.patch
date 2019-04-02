@@ -291,7 +291,7 @@ index 6dbc41ce37..581169eda8 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index 9f05b5a3b7..020895c022 100644
+index dd1117d0fe..accc766b3b 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
 @@ -915,6 +915,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
@@ -431,7 +431,7 @@ index 99ae48199c..7e36a0d7ea 100644
       1,
       TLS1_TXT_PSK_WITH_CHACHA20_POLY1305,
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index b60d67aa0d..7dac0053a2 100644
+index b60d67aa0d..ce750c4425 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -43,7 +43,8 @@
@@ -460,7 +460,17 @@ index b60d67aa0d..7dac0053a2 100644
  
      {0, SSL_TXT_ARIA, NULL, 0, 0, 0, SSL_ARIA},
      {0, SSL_TXT_ARIA_GCM, NULL, 0, 0, 0, SSL_ARIA128GCM | SSL_ARIA256GCM},
-@@ -2115,7 +2118,7 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
+@@ -1791,6 +1794,9 @@ char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
+     case SSL_CHACHA20POLY1305:
+         enc = "CHACHA20/POLY1305(256)";
+         break;
++    case SSL_CHACHA20POLY1305_D:
++        enc = "CHACHA20/POLY1305-Draft(256)";
++        break;
+     default:
+         enc = "unknown";
+         break;
+@@ -2115,7 +2121,7 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
          out = EVP_CCM_TLS_EXPLICIT_IV_LEN + 16;
      } else if (c->algorithm_enc & (SSL_AES128CCM8 | SSL_AES256CCM8)) {
          out = EVP_CCM_TLS_EXPLICIT_IV_LEN + 8;
@@ -489,11 +499,11 @@ index 33db1460ab..00c5ee4cff 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 32c64cb2c7..9574117daa 100644
+index 474f9f950d..196c8f0ea4 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4579,3 +4579,4 @@ EVP_PKEY_meth_set_digest_custom         4532	1_1_1	EXIST::FUNCTION:
- EVP_PKEY_meth_get_digest_custom         4533	1_1_1	EXIST::FUNCTION:
+@@ -4580,3 +4580,4 @@ EVP_PKEY_meth_get_digest_custom         4533	1_1_1	EXIST::FUNCTION:
  OPENSSL_INIT_set_config_filename        4534	1_1_1b	EXIST::FUNCTION:STDIO
  OPENSSL_INIT_set_config_file_flags      4535	1_1_1b	EXIST::FUNCTION:STDIO
-+EVP_chacha20_poly1305_draft             4536	1_1_1c	EXIST::FUNCTION:CHACHA,POLY1305
+ EVP_PKEY_get0_engine                    4536	1_1_1c	EXIST::FUNCTION:ENGINE
++EVP_chacha20_poly1305_draft             4537	1_1_1c	EXIST::FUNCTION:CHACHA,POLY1305
