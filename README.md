@@ -70,6 +70,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | nginx_hpack_remove_server_header_1.15.3.patch | HPACK + Remove nginx server header. (http2, http1.1) |
 | nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny). [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
 | nginx_openssl-1.1.x_renegotiation_bugfix.patch | Bugfix **Secure Client-Initiated Renegotiation**. (Check testssl.sh) OpenSSL >= 1.1.x, nginx = 1.15.4<br>[Patched nginx 1.15.5](https://github.com/nginx/nginx/commit/53803b4780be15d8014be183d4161091fd5f3376) |
+| nginx_ocsp.sh | Some of the parts that can not get OCSP Stapling value at nginx start or reload are solved.<br>OCSP stapling in nginx is made up of a callback, so you only need to connect at least once to get the value.<br>This file is a temporary file and may not work normally. |
 
 ## How To Use?
 
