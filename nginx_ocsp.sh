@@ -34,7 +34,7 @@ done
 
 rm /rmp/ocsp*.tmp > /dev/null 2>&1
 
-FINALS=`echo ${hosts[@]} | tr " " "\n" | sed -e "s/^*//g" | sed -e "s/*/wildcards/g" | sed "/\\\#/d" | sed "/localhost/d" | sort -u`
+FINALS=`echo ${hosts[@]} | tr " " "\n" | sed -e "s/^*//g" | sed -e "s/*/wildcards/g" | sort -u`
 
 for conn in $FINALS; do
   data1=`echo $conn | awk -F: '{print $1}'`
