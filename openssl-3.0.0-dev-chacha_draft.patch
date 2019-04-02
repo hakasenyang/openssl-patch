@@ -431,7 +431,7 @@ index 330b9e3f0c..fc6889acae 100644
       1,
       TLS1_TXT_PSK_WITH_CHACHA20_POLY1305,
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 5aa04dbd53..71094c195e 100644
+index 5aa04dbd53..8b2b7e7b36 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -44,7 +44,8 @@
@@ -460,7 +460,17 @@ index 5aa04dbd53..71094c195e 100644
  
      {0, SSL_TXT_ARIA, NULL, 0, 0, 0, SSL_ARIA},
      {0, SSL_TXT_ARIA_GCM, NULL, 0, 0, 0, SSL_ARIA128GCM | SSL_ARIA256GCM},
-@@ -2122,7 +2125,7 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
+@@ -1798,6 +1801,9 @@ char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
+     case SSL_CHACHA20POLY1305:
+         enc = "CHACHA20/POLY1305(256)";
+         break;
++    case SSL_CHACHA20POLY1305_D:
++        enc = "CHACHA20/POLY1305-Draft(256)";
++        break;
+     default:
+         enc = "unknown";
+         break;
+@@ -2122,7 +2128,7 @@ int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
          out = EVP_CCM_TLS_EXPLICIT_IV_LEN + 16;
      } else if (c->algorithm_enc & (SSL_AES128CCM8 | SSL_AES256CCM8)) {
          out = EVP_CCM_TLS_EXPLICIT_IV_LEN + 8;
