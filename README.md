@@ -132,6 +132,7 @@ This is a condition for using strict sni. [View issue.](https://github.com/hakas
     - strict_sni_header : if you do not want to respond to invalid headers. (**only with strict_sni**)
     - Strict SNI requires at least two ssl server (fake) settings (server { listen 443 ssl }).
     - It does not matter what kind of certificate or duplicate.
+    - (>1.15.10) If no SNI is required, print the certificate without applying strict-SNI.
 
 Thanks [@JemmyLoveJenny](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427040319), [@NewBugger](https://github.com/hakasenyang/openssl-patch/issues/7#issuecomment-427831677)!
 
