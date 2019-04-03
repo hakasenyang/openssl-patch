@@ -166,3 +166,18 @@ ssl_prefer_server_ciphers on;
 ```
 [TLS13+AESGCM+AES128|TLS13+AESGCM+AES256|TLS13+CHACHA20]:[EECDH+ECDSA+AESGCM+AES128|EECDH+ECDSA+CHACHA20]:EECDH+ECDSA+AESGCM+AES256:EECDH+ECDSA+AES128+SHA:EECDH+ECDSA+AES256+SHA:[EECDH+aRSA+AESGCM+AES128|EECDH+aRSA+CHACHA20]:EECDH+aRSA+AESGCM+AES256:EECDH+aRSA+AES128+SHA:EECDH+aRSA+AES256+SHA:RSA+AES128+SHA:RSA+AES256+SHA:RSA+3DES
 ```
+
+## Other.
+
+### nginx ocsp shell
+
+The configuration file recognizes the ***.conf** file in **/etc/nginx**.
+
+Precedence settings in **nginx.conf** are as follows:
+
+worker_processes 1 - **If this number is high, the remaining worker processes do not have OCSP Stapling values.**
+
+After reload or restart, execute the corresponding shell. That's it!
+
+I tried to edit nginx, but I have not found a good way yet. :(
+
