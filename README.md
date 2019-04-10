@@ -29,7 +29,7 @@ Default support is in bold type.
 - [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ **final**
 - [NSS TLS 1.3(Mozilla)](https://tls13.crypto.mozilla.org/) : _TLSv1.3_ **final**
 
-[Compatible OpenSSL-3.0.0-dev (OpenSSL, 23649 commits)](https://github.com/openssl/openssl/tree/0b45d8eec051fd9816b6bf46a975fa461ffc983d)
+[Compatible OpenSSL-3.0.0-dev (OpenSSL, 23705 commits)](https://github.com/openssl/openssl/tree/ee215c7eea91f193d4765127eb31332758753058)
 
 ## Patch files
 
