@@ -9,6 +9,7 @@
 - [HPACK Patch](https://github.com/cloudflare/sslconfig/blob/master/patches/nginx_1.13.1_http2_hpack.patch) by [Cloudflare](https://github.com/cloudflare/sslconfig)
 - [nginx Strict-SNI Patch](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
 - [OpenSSL OLD-CHACHA20-POLY1305](https://github.com/JemmyLoveJenny/ngx_ossl_patches) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
+- [OpenSSL 1.1.1-c PrioritizeChacha Patch](https://github.com/hakasenyang/openssl-patch/pull/17) by [@felixbuenemann](https://github.com/felixbuenemann)
 
 ## Information
 
@@ -48,6 +49,8 @@ Here is the basic patch content.
 | openssl-1.1.1a-chacha_draft.patch<br>openssl-3.0.0-dev-chacha_draft.patch | A draft version of chacha20-poly1305 is available. [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-427554824) |
 | openssl-1.1.1a-tls13_draft.patch | Only for **TLS 1.3 draft 23, 26, 28, final support patch**. |
 | openssl-1.1.1a-tls13_nginx_config.patch | You can set TLS 1.3 ciphere in nginx. ex) TLS13+AESGCM+AES128 |
+| openssl-1.1.1c-prioritize_chacha_draft.patch | Priority applied patch for CHACHA20 and CHACHA20-DRAFT. [View Pull Request](https://github.com/hakasenyang/openssl-patch/pull/17) |
+| openssl-3.0.0-session_tls13.patch | For TLS 1.2 and below, the existing session timeout value is written. For TLS 1.3, 172800 (2 days) is fixed. |
 | openssl-3.0.0-dev_version_error.patch | **TEST** This is a way to fix nginx when the following errors occur during the build:<br>Error: missing binary operator before token "("<br>Maybe patched: [https://github.com/openssl/openssl/pull/7839](https://github.com/openssl/openssl/pull/7839)<br>Patched : [https://github.com/openssl/openssl/commit/5d609f22d28615c45685d9da871d432e9cb81127](https://github.com/openssl/openssl/commit/5d609f22d28615c45685d9da871d432e9cb81127) |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
