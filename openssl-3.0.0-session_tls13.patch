@@ -1,0 +1,29 @@
+diff --git a/ssl/ssl_sess.c b/ssl/ssl_sess.c
+index d04b4fab77..d240f3595c 100644
+--- a/ssl/ssl_sess.c
++++ b/ssl/ssl_sess.c
+@@ -403,7 +403,10 @@ int ssl_get_new_session(SSL *s, int session)
+     if (s->session_ctx->session_timeout == 0)
+         ss->timeout = SSL_get_default_timeout(s);
+     else
+-        ss->timeout = s->session_ctx->session_timeout;
++        if (SSL_IS_TLS13(s))
++            ss->timeout = (60 * 60 * 24 * 2); /* 172800 = 2 days */
++        else
++            ss->timeout = s->session_ctx->session_timeout;
+ 
+     SSL_SESSION_free(s->session);
+     s->session = NULL;
+@@ -1019,8 +1022,11 @@ long SSL_CTX_set_timeout(SSL_CTX *s, long t)
+     long l;
+     if (s == NULL)
+         return 0;
++    if (SSL_IS_TLS13(s))
++        s->session_timeout = 60 * 60 * 24 * 2; /* 172800 */
++    else
++        s->session_timeout = t;
+     l = s->session_timeout;
+-    s->session_timeout = t;
+     return l;
+ }
+ 
