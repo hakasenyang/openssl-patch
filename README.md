@@ -9,7 +9,7 @@
 - [HPACK Patch](https://github.com/cloudflare/sslconfig/blob/master/patches/nginx_1.13.1_http2_hpack.patch) by [Cloudflare](https://github.com/cloudflare/sslconfig)
 - [nginx Strict-SNI Patch](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
 - [OpenSSL OLD-CHACHA20-POLY1305](https://github.com/JemmyLoveJenny/ngx_ossl_patches) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
-- [OpenSSL 1.1.1-c PrioritizeChacha Patch](https://github.com/hakasenyang/openssl-patch/pull/17) by [@felixbuenemann](https://github.com/felixbuenemann)
+- [OpenSSL 1.1.1c PrioritizeChacha Patch](https://github.com/hakasenyang/openssl-patch/pull/17) by [@felixbuenemann](https://github.com/felixbuenemann)
 
 ## Information
 
