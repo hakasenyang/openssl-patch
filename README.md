@@ -13,9 +13,9 @@
 
 ## Information
 
-- [Test Page - (TLS 1.3 final)](https://ssl.hakase.io/)
-- [SSL Test Result - testssl.sh](https://ssl.hakase.io/ssltest/hakase.io.html)
-- [SSL Test Result - dev.ssllabs.com](https://dev.ssllabs.com/ssltest/analyze.html?d=hakase.io)
+- [Test Page - (TLS 1.3 final)](https://ssl.haka.se/)
+- [SSL Test Result - testssl.sh](https://ssl.haka.se/ssltest/haka.se.html)
+- [SSL Test Result - dev.ssllabs.com](https://dev.ssllabs.com/ssltest/analyze.html?d=haka.se)
 - **If you link site to a browser that supports final, you'll see a TLS 1.3 message.**
 
 Displays TLSv1.3 support for large sites.
@@ -24,7 +24,7 @@ Default support is in bold type.
 - [Baidu(China)](https://baidu.cn/) : **TLSv1.2**
 - [Naver(Korea)](https://naver.com/) : **TLSv1.2**
 - [Twitter](https://twitter.com/) : **TLSv1.2**
-- [**My Site**](https://hakase.io/) : _TLSv1.3_ **final**
+- [**My Site**](https://haka.se/) : _TLSv1.3_ **final**
 - [Facebook](https://facebook.com/) : _TLSv1.3_ draft 23, 26, 28, **final**
 - [Cloudflare](https://cloudflare.com/) : _TLSv1.3_ **final**
 - [Google(Gmail)](https://gmail.com/) : _TLSv1.3_ **final**
