@@ -11,7 +11,7 @@ index a97eaa1685..24112723f0 100644
  #endif
  }
 diff --git a/crypto/evp/e_chacha20_poly1305.c b/crypto/evp/e_chacha20_poly1305.c
-index 37902000a0..6c9078321a 100644
+index ccef031b89..083179398c 100644
 --- a/crypto/evp/e_chacha20_poly1305.c
 +++ b/crypto/evp/e_chacha20_poly1305.c
 @@ -156,6 +156,7 @@ typedef struct {
@@ -291,10 +291,10 @@ index 2240916ff4..2a61f1a23a 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index a903b29ffe..059a38eb2e 100644
+index 6fc0f35114..c26c6d0182 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
-@@ -930,6 +930,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
+@@ -933,6 +933,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
  const EVP_CIPHER *EVP_chacha20(void);
  #  ifndef OPENSSL_NO_POLY1305
  const EVP_CIPHER *EVP_chacha20_poly1305(void);
@@ -372,7 +372,7 @@ index 4db2b6a0db..5b07fb3cba 100644
  # define TLS1_TXT_ECDHE_ECDSA_WITH_CHACHA20_POLY1305       "ECDHE-ECDSA-CHACHA20-POLY1305"
  # define TLS1_TXT_DHE_RSA_WITH_CHACHA20_POLY1305           "DHE-RSA-CHACHA20-POLY1305"
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 330b9e3f0c..fc6889acae 100644
+index 4ed9894d52..64a0759274 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -2083,6 +2083,54 @@ static SSL_CIPHER ssl3_ciphers[] = {
@@ -480,7 +480,7 @@ index 5aa04dbd53..8b2b7e7b36 100644
      } else if (c->algorithm_mac & SSL_AEAD) {
          /* We're supposed to have handled all the AEAD modes above */
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index a5df3cfb7f..a049c7653a 100644
+index 4a72864980..5da1a0f0c0 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
 @@ -234,12 +234,13 @@
@@ -499,11 +499,11 @@ index a5df3cfb7f..a049c7653a 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 9569bf43f3..6cc9ce933c 100644
+index 8259ddbb5e..1869da0de5 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4795,3 +4795,4 @@ EVP_MD_upref                            4742	3_0_0	EXIST::FUNCTION:
- EVP_MD_fetch                            4743	3_0_0	EXIST::FUNCTION:
- EVP_set_default_properties              4744	3_0_0	EXIST::FUNCTION:
- OSSL_PARAM_construct_end                4745	3_0_0	EXIST::FUNCTION:
-+EVP_chacha20_poly1305_draft             4746	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
+@@ -4800,3 +4800,4 @@ EVP_CIPHER_upref                        4747	3_0_0	EXIST::FUNCTION:
+ EVP_CIPHER_fetch                        4748	3_0_0	EXIST::FUNCTION:
+ EVP_CIPHER_mode                         4749	3_0_0	EXIST::FUNCTION:
+ OPENSSL_info                            4750	3_0_0	EXIST::FUNCTION:
++EVP_chacha20_poly1305_draft             4751	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
