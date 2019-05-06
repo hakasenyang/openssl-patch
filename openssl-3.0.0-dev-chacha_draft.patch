@@ -372,7 +372,7 @@ index 4db2b6a0db..5b07fb3cba 100644
  # define TLS1_TXT_ECDHE_ECDSA_WITH_CHACHA20_POLY1305       "ECDHE-ECDSA-CHACHA20-POLY1305"
  # define TLS1_TXT_DHE_RSA_WITH_CHACHA20_POLY1305           "DHE-RSA-CHACHA20-POLY1305"
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index 4ed9894d52..64a0759274 100644
+index 5ea2c2d029..5877f6876c 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -2083,6 +2083,54 @@ static SSL_CIPHER ssl3_ciphers[] = {
@@ -499,11 +499,11 @@ index 4a72864980..5da1a0f0c0 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 8259ddbb5e..1869da0de5 100644
+index 010f8686d5..e6ae934b4d 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4800,3 +4800,4 @@ EVP_CIPHER_upref                        4747	3_0_0	EXIST::FUNCTION:
- EVP_CIPHER_fetch                        4748	3_0_0	EXIST::FUNCTION:
- EVP_CIPHER_mode                         4749	3_0_0	EXIST::FUNCTION:
- OPENSSL_info                            4750	3_0_0	EXIST::FUNCTION:
-+EVP_chacha20_poly1305_draft             4751	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
+@@ -4804,3 +4804,4 @@ EVP_KDF_CTX_new                         4751	3_0_0	EXIST::FUNCTION:
+ EVP_KDF_CTX_kdf                         4752	3_0_0	EXIST::FUNCTION:
+ EVP_KDF_nid                             4753	3_0_0	EXIST::FUNCTION:
+ EVP_get_kdfbyname                       4754	3_0_0	EXIST::FUNCTION:
++EVP_chacha20_poly1305_draft             4755	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
