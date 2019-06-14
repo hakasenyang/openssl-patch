@@ -10,6 +10,7 @@
 - [nginx Strict-SNI Patch](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
 - [OpenSSL OLD-CHACHA20-POLY1305](https://github.com/JemmyLoveJenny/ngx_ossl_patches) by [@JemmyLoveJenny](https://github.com/JemmyLoveJenny)
 - [OpenSSL 1.1.1c PrioritizeChacha Patch](https://github.com/hakasenyang/openssl-patch/pull/17) by [@felixbuenemann](https://github.com/felixbuenemann)
+- [nginx io_uring support Patch](https://github.com/hakasenyang/openssl-patch/pull/22) by [@CarterLi](https://github.com/CarterLi)
 
 ## Information
 
@@ -74,6 +75,7 @@ Example of setting TLS 1.3 cipher in nginx:
 | nginx_strict-sni.patch | Enable **Strict-SNI**. Thanks [@JemmyLoveJenny](https://github.com/JemmyLoveJenny). [View issue](https://github.com/hakasenyang/openssl-patch/issues/1#issuecomment-421551872) |
 | nginx_openssl-1.1.x_renegotiation_bugfix.patch | Bugfix **Secure Client-Initiated Renegotiation**. (Check testssl.sh) OpenSSL >= 1.1.x, nginx = 1.15.4<br>[Patched nginx 1.15.5](https://github.com/nginx/nginx/commit/53803b4780be15d8014be183d4161091fd5f3376) |
 | nginx_ocsp.sh | Some of the parts that can not get OCSP Stapling value at nginx start or reload are solved.<br>OCSP stapling in nginx is made up of a callback, so you only need to connect at least once to get the value.<br>This file is a temporary file and may not work normally. |
+| nginx_io_uring.patch | Add **io_uring** support patch. Thanks [@CarterLi](https://github.com/CarterLi). [View how to install](https://github.com/hakasenyang/openssl-patch/pull/22) |
 
 ## How To Use?
 
@@ -146,6 +148,10 @@ It has already been patched by nginx >= 1.15.4.
 Run it from the nginx directory.
 
 ``curl https://raw.githubusercontent.com/hakasenyang/openssl-patch/master/nginx_openssl-1.1.x_renegotiation_bugfix.patch | patch -p1``
+
+### io_uring Patch
+
+[View this link.](https://github.com/hakasenyang/openssl-patch/pull/22)
 
 ## nginx Configuration
 
