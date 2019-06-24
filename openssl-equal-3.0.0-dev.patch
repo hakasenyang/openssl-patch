@@ -1029,7 +1029,7 @@ index a61987f327..e03be541e1 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index 79c2aa0ede..a39647431f 100644
+index 79c2aa0ede..0be033fd90 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
 @@ -1749,7 +1749,7 @@ static int tls_early_post_process_client_hello(SSL *s)
@@ -1058,7 +1058,7 @@ index 79c2aa0ede..a39647431f 100644
 -            s->cipher_list = sk_SSL_CIPHER_dup(s->peer_ciphers);
 +            ssl_cipher_preference_list_free(s->cipher_list);
 +            s->cipher_list = ssl_cipher_preference_list_from_ciphers(
-+                                                       s->session->ciphers);
++                                                       s->peer_ciphers);
              sk_SSL_CIPHER_free(s->cipher_list_by_id);
              s->cipher_list_by_id = sk_SSL_CIPHER_dup(s->peer_ciphers);
          }
