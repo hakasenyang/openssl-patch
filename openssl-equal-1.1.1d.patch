@@ -315,7 +315,7 @@ index 066bf47221..517eda6630 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index 27a1b2ec68..dffc0623b6 100644
+index 27a1b2ec68..9880a0b363 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -192,6 +192,7 @@ typedef struct cipher_order_st {
@@ -501,30 +501,24 @@ index 27a1b2ec68..dffc0623b6 100644
      return retval;
  }
  
-@@ -1377,8 +1435,8 @@ int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
- {
+@@ -1378,7 +1436,7 @@ int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
      int ret = set_ciphersuites(&(ctx->tls13_ciphersuites), str);
  
--    if (ret && ctx->cipher_list != NULL)
+     if (ret && ctx->cipher_list != NULL)
 -        return update_cipher_list(&ctx->cipher_list, &ctx->cipher_list_by_id,
-+    if (ret && ctx->cipher_list->ciphers != NULL)
 +        return update_cipher_list(&ctx->cipher_list->ciphers, &ctx->cipher_list_by_id,
                                    ctx->tls13_ciphersuites);
  
      return ret;
-@@ -1389,12 +1447,12 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
-     STACK_OF(SSL_CIPHER) *cipher_list;
-     int ret = set_ciphersuites(&(s->tls13_ciphersuites), str);
+@@ -1391,10 +1449,10 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
  
--    if (s->cipher_list == NULL) {
-+    if (s->cipher_list->ciphers == NULL) {
+     if (s->cipher_list == NULL) {
          if ((cipher_list = SSL_get_ciphers(s)) != NULL)
 -            s->cipher_list = sk_SSL_CIPHER_dup(cipher_list);
 +            s->cipher_list->ciphers = sk_SSL_CIPHER_dup(cipher_list);
      }
--    if (ret && s->cipher_list != NULL)
+     if (ret && s->cipher_list != NULL)
 -        return update_cipher_list(&s->cipher_list, &s->cipher_list_by_id,
-+    if (ret && s->cipher_list->ciphers != NULL)
 +        return update_cipher_list(&s->cipher_list->ciphers, &s->cipher_list_by_id,
                                    s->tls13_ciphersuites);
  

@@ -291,10 +291,10 @@ index 47cf2f183d..660bcd8521 100644
  
  ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 diff --git a/include/openssl/evp.h b/include/openssl/evp.h
-index 69d70e5e9c..d451c574c0 100644
+index bbdc2b75c1..0c4b51d6c5 100644
 --- a/include/openssl/evp.h
 +++ b/include/openssl/evp.h
-@@ -957,6 +957,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
+@@ -959,6 +959,7 @@ const EVP_CIPHER *EVP_camellia_256_ctr(void);
  const EVP_CIPHER *EVP_chacha20(void);
  #  ifndef OPENSSL_NO_POLY1305
  const EVP_CIPHER *EVP_chacha20_poly1305(void);
@@ -499,11 +499,11 @@ index b66979b4da..195267cb5e 100644
  # define SSL_ARIA                (SSL_ARIAGCM)
  
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index e5c869af44..e50f80c2d1 100644
+index 1b14b440dc..0c27ed1138 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -4752,3 +4752,4 @@ EVP_PKEY_CTX_get_signature_md           4868	3_0_0	EXIST::FUNCTION:
- EVP_PKEY_CTX_get_params                 4869	3_0_0	EXIST::FUNCTION:
- EVP_PKEY_CTX_gettable_params            4870	3_0_0	EXIST::FUNCTION:
- EVP_PKEY_CTX_settable_params            4871	3_0_0	EXIST::FUNCTION:
-+EVP_chacha20_poly1305_draft             4872	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
+@@ -4764,3 +4764,4 @@ ERR_peek_last_error_data                4880	3_0_0	EXIST::FUNCTION:
+ ERR_peek_last_error_all                 4881	3_0_0	EXIST::FUNCTION:
+ EVP_CIPHER_is_a                         4882	3_0_0	EXIST::FUNCTION:
+ EVP_MAC_is_a                            4883	3_0_0	EXIST::FUNCTION:
++EVP_chacha20_poly1305_draft             4884	3_0_0	EXIST::FUNCTION:CHACHA,POLY1305
