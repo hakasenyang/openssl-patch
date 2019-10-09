@@ -1,8 +1,8 @@
 diff --git a/crypto/err/openssl.txt b/crypto/err/openssl.txt
-index 700f1da20f..fc9001fb76 100644
+index ac170dea6a..a6238dabb1 100644
 --- a/crypto/err/openssl.txt
 +++ b/crypto/err/openssl.txt
-@@ -3000,6 +3000,8 @@ SSL_R_MISSING_TMP_DH_KEY:171:missing tmp dh key
+@@ -3016,6 +3016,8 @@ SSL_R_MISSING_TMP_DH_KEY:171:missing tmp dh key
  SSL_R_MISSING_TMP_ECDH_KEY:311:missing tmp ecdh key
  SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA:293:\
  	mixed handshake and non handshake data
@@ -11,7 +11,7 @@ index 700f1da20f..fc9001fb76 100644
  SSL_R_NOT_ON_RECORD_BOUNDARY:182:not on record boundary
  SSL_R_NOT_REPLACING_CERTIFICATE:289:not replacing certificate
  SSL_R_NOT_SERVER:284:not server
-@@ -3106,7 +3108,9 @@ SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES:242:unable to load ssl3 md5 routines
+@@ -3122,7 +3124,9 @@ SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES:242:unable to load ssl3 md5 routines
  SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES:243:unable to load ssl3 sha1 routines
  SSL_R_UNEXPECTED_CCS_MESSAGE:262:unexpected ccs message
  SSL_R_UNEXPECTED_END_OF_EARLY_DATA:178:unexpected end of early data
@@ -22,10 +22,10 @@ index 700f1da20f..fc9001fb76 100644
  SSL_R_UNINITIALIZED:276:uninitialized
  SSL_R_UNKNOWN_ALERT_TYPE:246:unknown alert type
 diff --git a/doc/man1/openssl-ciphers.pod b/doc/man1/openssl-ciphers.pod
-index 7e498333c6..1d4e0a894e 100644
+index e0fd549b96..a37a3e1384 100644
 --- a/doc/man1/openssl-ciphers.pod
 +++ b/doc/man1/openssl-ciphers.pod
-@@ -399,6 +399,21 @@ permissible.
+@@ -401,6 +401,21 @@ permissible.
  
  =back
  
@@ -48,10 +48,10 @@ index 7e498333c6..1d4e0a894e 100644
  
  The following lists give the SSL or TLS cipher suites names from the
 diff --git a/include/openssl/sslerr.h b/include/openssl/sslerr.h
-index d8d3cea5d8..d260e0bcde 100644
+index 87c6465edc..6042bc4b61 100644
 --- a/include/openssl/sslerr.h
 +++ b/include/openssl/sslerr.h
-@@ -603,6 +603,8 @@ int ERR_load_SSL_strings(void);
+@@ -609,6 +609,8 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_MISSING_TMP_DH_KEY                         171
  # define SSL_R_MISSING_TMP_ECDH_KEY                       311
  # define SSL_R_MIXED_HANDSHAKE_AND_NON_HANDSHAKE_DATA     293
@@ -60,7 +60,7 @@ index d8d3cea5d8..d260e0bcde 100644
  # define SSL_R_NOT_ON_RECORD_BOUNDARY                     182
  # define SSL_R_NOT_REPLACING_CERTIFICATE                  289
  # define SSL_R_NOT_SERVER                                 284
-@@ -733,7 +735,9 @@ int ERR_load_SSL_strings(void);
+@@ -739,7 +741,9 @@ int ERR_load_SSL_strings(void);
  # define SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES          243
  # define SSL_R_UNEXPECTED_CCS_MESSAGE                     262
  # define SSL_R_UNEXPECTED_END_OF_EARLY_DATA               178
@@ -71,7 +71,7 @@ index d8d3cea5d8..d260e0bcde 100644
  # define SSL_R_UNINITIALIZED                              276
  # define SSL_R_UNKNOWN_ALERT_TYPE                         246
 diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
-index d23f932ce9..16240d337b 100644
+index a329915ac9..3575a5b14e 100644
 --- a/ssl/s3_lib.c
 +++ b/ssl/s3_lib.c
 @@ -32,7 +32,25 @@ const unsigned char tls12downgrade[] = {
@@ -391,7 +391,7 @@ index d23f932ce9..16240d337b 100644
  }
  
 diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
-index e427c407fc..7b6c78fbe8 100644
+index d047b8ff5d..c0cff5da78 100644
 --- a/ssl/ssl_ciph.c
 +++ b/ssl/ssl_ciph.c
 @@ -193,6 +193,7 @@ typedef struct cipher_order_st {
@@ -869,7 +869,7 @@ index fc81948815..b703f8c8ad 100644
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNINITIALIZED), "uninitialized"},
      {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_UNKNOWN_ALERT_TYPE), "unknown alert type"},
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index 0d40ecaec9..1f1ed9b714 100644
+index 120566d8e6..cbe6b9e6b2 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -1127,6 +1127,71 @@ int SSL_set1_param(SSL *ssl, X509_VERIFY_PARAM *vpm)
@@ -1015,10 +1015,10 @@ index 0d40ecaec9..1f1ed9b714 100644
  
      /* Dup the client_CA list */
      if (!dup_ca_names(&ret->ca_names, s->ca_names)
-diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index b66979b4da..80109b925c 100644
---- a/ssl/ssl_locl.h
-+++ b/ssl/ssl_locl.h
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index c6f0af7922..23e748dea9 100644
+--- a/ssl/ssl_local.h
++++ b/ssl/ssl_local.h
 @@ -737,9 +737,46 @@ typedef struct ssl_ctx_ext_secure_st {
      unsigned char tick_aes_key[TLSEXT_TICK_KEY_LENGTH];
  } SSL_CTX_EXT_SECURE;
@@ -1109,7 +1109,7 @@ index b66979b4da..80109b925c 100644
  __owur int ssl3_new(SSL *s);
  void ssl3_free(SSL *s);
 diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
-index acd3e27087..840006dd47 100644
+index 5f709e5f99..961c0157bb 100644
 --- a/ssl/statem/statem_srvr.c
 +++ b/ssl/statem/statem_srvr.c
 @@ -1749,7 +1749,7 @@ static int tls_early_post_process_client_hello(SSL *s)
