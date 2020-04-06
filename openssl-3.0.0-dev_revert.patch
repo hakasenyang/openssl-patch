@@ -1,0 +1,3699 @@
+diff --git a/apps/build.info b/apps/build.info
+index 2186de3a27..ee934e1fb1 100644
+--- a/apps/build.info
++++ b/apps/build.info
+@@ -14,14 +14,14 @@ $OPENSSLSRC=\
+         openssl.c progs.c \
+         asn1pars.c ca.c ciphers.c cms.c crl.c crl2p7.c dgst.c \
+         ec.c ecparam.c enc.c engine.c errstr.c \
+-        genpkey.c kdf.c mac.c nseq.c ocsp.c passwd.c pkcs12.c pkcs7.c \
+-        pkcs8.c pkey.c pkeyparam.c pkeyutl.c prime.c rand.c req.c \
+-        s_client.c s_server.c s_time.c sess_id.c smime.c speed.c \
++        genpkey.c genrsa.c kdf.c mac.c nseq.c ocsp.c passwd.c pkcs12.c pkcs7.c \
++        pkcs8.c pkey.c pkeyparam.c pkeyutl.c prime.c rand.c req.c rsa.c \
++        rsautl.c s_client.c s_server.c s_time.c sess_id.c smime.c speed.c \
+         spkac.c srp.c ts.c verify.c version.c x509.c rehash.c storeutl.c \
+         list.c info.c provider.c fipsinstall.c
+ IF[{- !$disabled{'deprecated-3.0'} -}]
+   $OPENSSLSRC=$OPENSSLSRC \
+-        dhparam.c dsa.c dsaparam.c gendsa.c rsa.c rsautl.c genrsa.c
++        dhparam.c dsa.c dsaparam.c gendsa.c
+ ENDIF
+ IF[{- !$disabled{'cmp'} -}]
+   $OPENSSLSRC=$OPENSSLSRC cmp_mock_srv.c
+diff --git a/apps/genrsa.c b/apps/genrsa.c
+index 3f76d9bada..a7d04fed30 100644
+--- a/apps/genrsa.c
++++ b/apps/genrsa.c
+@@ -7,9 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/* We need to use the deprecated RSA low level calls */
+-#define OPENSSL_SUPPRESS_DEPRECATED
+-
+ #include <openssl/opensslconf.h>
+ #ifdef OPENSSL_NO_RSA
+ NON_EMPTY_TRANSLATION_UNIT
+diff --git a/apps/rsa.c b/apps/rsa.c
+index d626bbb31a..539b0144ab 100644
+--- a/apps/rsa.c
++++ b/apps/rsa.c
+@@ -7,9 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/* We need to use the deprecated RSA low level calls */
+-#define OPENSSL_SUPPRESS_DEPRECATED
+-
+ #include <openssl/opensslconf.h>
+ #ifdef OPENSSL_NO_RSA
+ NON_EMPTY_TRANSLATION_UNIT
+diff --git a/apps/rsautl.c b/apps/rsautl.c
+index b72f527ce4..ddd507ce9a 100644
+--- a/apps/rsautl.c
++++ b/apps/rsautl.c
+@@ -7,9 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/* We need to use the deprecated RSA low level calls */
+-#define OPENSSL_SUPPRESS_DEPRECATED
+-
+ #include <openssl/opensslconf.h>
+ #ifdef OPENSSL_NO_RSA
+ NON_EMPTY_TRANSLATION_UNIT
+diff --git a/apps/speed.c b/apps/speed.c
+index 9d4ab2c330..c735ad2031 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -94,7 +94,7 @@
+ #ifndef OPENSSL_NO_CAST
+ # include <openssl/cast.h>
+ #endif
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+ # include <openssl/rsa.h>
+ # include "./testrsa.h"
+ #endif
+@@ -417,7 +417,7 @@ static const OPT_PAIR dsa_choices[DSA_NUM] = {
+ static double dsa_results[DSA_NUM][2];  /* 2 ops: sign then verify */
+ #endif  /* OPENSSL_NO_DSA */
+ 
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+ enum {
+     R_RSA_512, R_RSA_1024, R_RSA_2048, R_RSA_3072, R_RSA_4096, R_RSA_7680,
+     R_RSA_15360, RSA_NUM
+@@ -543,7 +543,7 @@ typedef struct loopargs_st {
+     unsigned char *key;
+     unsigned int siglen;
+     size_t sigsize;
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+     RSA *rsa_key[RSA_NUM];
+ #endif
+ #if !defined(OPENSSL_NO_DSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+@@ -1022,7 +1022,7 @@ static int EVP_CMAC_loop(void *args)
+ }
+ #endif
+ 
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+ static long rsa_c[RSA_NUM][2];  /* # RSA iteration test */
+ 
+ static int RSA_sign_loop(void *args)
+@@ -1504,7 +1504,7 @@ int speed_main(int argc, char **argv)
+ #if !defined(OPENSSL_NO_CAMELLIA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+     CAMELLIA_KEY camellia_ks[3];
+ #endif
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+     static const struct {
+         const unsigned char *data;
+         unsigned int length;
+@@ -1712,10 +1712,8 @@ int speed_main(int argc, char **argv)
+                 goto end;
+             break;
+         case OPT_PRIMES:
+-#ifndef OPENSSL_NO_DEPRECATED_3_0
+             if (!opt_int(opt_arg(), &primes))
+                 goto end;
+-#endif
+             break;
+         case OPT_SECONDS:
+             seconds.sym = seconds.rsa = seconds.dsa = seconds.ecdsa
+@@ -1753,7 +1751,7 @@ int speed_main(int argc, char **argv)
+             doit[D_SHA1] = doit[D_SHA256] = doit[D_SHA512] = 1;
+             continue;
+         }
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+         if (strcmp(algo, "openssl") == 0) /* just for compatibility */
+             continue;
+         if (strncmp(algo, "rsa", 3) == 0) {
+@@ -1916,7 +1914,7 @@ int speed_main(int argc, char **argv)
+     if (argc == 0 && !doit[D_EVP] && !doit[D_EVP_HMAC] && !doit[D_EVP_CMAC]) {
+         memset(doit, 1, sizeof(doit));
+         doit[D_EVP] = doit[D_EVP_HMAC] = doit[D_EVP_CMAC] = 0;
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+         memset(rsa_doit, 1, sizeof(rsa_doit));
+ #endif
+ #if !defined(OPENSSL_NO_DSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+@@ -1940,7 +1938,7 @@ int speed_main(int argc, char **argv)
+                    "You have chosen to measure elapsed time "
+                    "instead of user CPU time.\n");
+ 
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+     for (i = 0; i < loopargs_len; i++) {
+         if (primes > RSA_DEFAULT_PRIME_NUM) {
+             /* for multi-prime RSA, skip this */
+@@ -2110,7 +2108,7 @@ int speed_main(int argc, char **argv)
+         c[D_IGE_256_AES][i] = c[D_IGE_256_AES][i - 1] * l0 / l1;
+     }
+ 
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#  ifndef OPENSSL_NO_RSA
+     rsa_c[R_RSA_512][0] = count / 2000;
+     rsa_c[R_RSA_512][1] = count / 400;
+     for (i = 1; i < RSA_NUM; i++) {
+@@ -2866,7 +2864,7 @@ int speed_main(int argc, char **argv)
+         if (RAND_bytes(loopargs[i].buf, 36) <= 0)
+             goto end;
+ 
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+     for (testnum = 0; testnum < RSA_NUM; testnum++) {
+         int st = 0;
+         if (!rsa_doit[testnum])
+@@ -3571,7 +3569,7 @@ int speed_main(int argc, char **argv)
+         }
+         printf("\n");
+     }
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+     testnum = 1;
+     for (k = 0; k < RSA_NUM; k++) {
+         if (!rsa_doit[k])
+@@ -3698,7 +3696,7 @@ int speed_main(int argc, char **argv)
+         OPENSSL_free(loopargs[i].buf_malloc);
+         OPENSSL_free(loopargs[i].buf2_malloc);
+ 
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
++#ifndef OPENSSL_NO_RSA
+         for (k = 0; k < RSA_NUM; k++)
+             RSA_free(loopargs[i].rsa_key[k]);
+ #endif
+@@ -3894,9 +3892,7 @@ static int do_multi(int multi, int size_num)
+                 sstrsep(&p, sep);
+                 for (j = 0; j < size_num; ++j)
+                     results[alg][j] += atof(sstrsep(&p, sep));
+-            }
+-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+-            else if (strncmp(buf, "+F2:", 4) == 0) {
++            } else if (strncmp(buf, "+F2:", 4) == 0) {
+                 int k;
+                 double d;
+ 
+@@ -3910,7 +3906,6 @@ static int do_multi(int multi, int size_num)
+                 d = atof(sstrsep(&p, sep));
+                 rsa_results[k][1] += d;
+             }
+-#endif
+ #if !defined(OPENSSL_NO_DSA) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+             else if (strncmp(buf, "+F3:", 4) == 0) {
+                 int k;
+diff --git a/crypto/evp/p_dec.c b/crypto/evp/p_dec.c
+index 9a6f271000..d1d8b0b59e 100644
+--- a/crypto/evp/p_dec.c
++++ b/crypto/evp/p_dec.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/rsa.h>
+diff --git a/crypto/evp/p_enc.c b/crypto/evp/p_enc.c
+index 349eabde4c..4c169857c2 100644
+--- a/crypto/evp/p_enc.c
++++ b/crypto/evp/p_enc.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/rsa.h>
+diff --git a/crypto/rsa/rsa_ameth.c b/crypto/rsa/rsa_ameth.c
+index fb378ae039..f4a5a06e5d 100644
+--- a/crypto/rsa/rsa_ameth.c
++++ b/crypto/rsa/rsa_ameth.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/asn1t.h>
+diff --git a/crypto/rsa/rsa_asn1.c b/crypto/rsa/rsa_asn1.c
+index 8798bd52d6..e6b81253fa 100644
+--- a/crypto/rsa/rsa_asn1.c
++++ b/crypto/rsa/rsa_asn1.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+diff --git a/crypto/rsa/rsa_chk.c b/crypto/rsa/rsa_chk.c
+index e6b700bc0d..6ba0010c77 100644
+--- a/crypto/rsa/rsa_chk.c
++++ b/crypto/rsa/rsa_chk.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <openssl/bn.h>
+ #include <openssl/err.h>
+ #include "crypto/rsa.h"
+diff --git a/crypto/rsa/rsa_crpt.c b/crypto/rsa/rsa_crpt.c
+index 83cae46103..6abee298c6 100644
+--- a/crypto/rsa/rsa_crpt.c
++++ b/crypto/rsa/rsa_crpt.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include <openssl/crypto.h>
+ #include "internal/cryptlib.h"
+diff --git a/crypto/rsa/rsa_depr.c b/crypto/rsa/rsa_depr.c
+index 8ba6e8c2ee..ed63262645 100644
+--- a/crypto/rsa/rsa_depr.c
++++ b/crypto/rsa/rsa_depr.c
+@@ -12,12 +12,6 @@
+  * "new" versions).
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <openssl/opensslconf.h>
+ #ifdef OPENSSL_NO_DEPRECATED_0_9_8
+ NON_EMPTY_TRANSLATION_UNIT
+diff --git a/crypto/rsa/rsa_gen.c b/crypto/rsa/rsa_gen.c
+index 5d82ae6f34..b74f43f8a1 100644
+--- a/crypto/rsa/rsa_gen.c
++++ b/crypto/rsa/rsa_gen.c
+@@ -13,12 +13,6 @@
+  * Geoff
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include <time.h>
+ #include "internal/cryptlib.h"
+diff --git a/crypto/rsa/rsa_lib.c b/crypto/rsa/rsa_lib.c
+index e9a5b48fbc..51fd3c5ca0 100644
+--- a/crypto/rsa/rsa_lib.c
++++ b/crypto/rsa/rsa_lib.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include <openssl/crypto.h>
+ #include <openssl/core_names.h>
+diff --git a/crypto/rsa/rsa_meth.c b/crypto/rsa/rsa_meth.c
+index 6bbe21814e..a2a0426ee4 100644
+--- a/crypto/rsa/rsa_meth.c
++++ b/crypto/rsa/rsa_meth.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <string.h>
+ #include "rsa_local.h"
+ #include <openssl/err.h>
+diff --git a/crypto/rsa/rsa_none.c b/crypto/rsa/rsa_none.c
+index 5298ca7328..833ab94028 100644
+--- a/crypto/rsa/rsa_none.c
++++ b/crypto/rsa/rsa_none.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+ #include <openssl/rsa.h>
+diff --git a/crypto/rsa/rsa_oaep.c b/crypto/rsa/rsa_oaep.c
+index ed486acbe6..a0af741183 100644
+--- a/crypto/rsa/rsa_oaep.c
++++ b/crypto/rsa/rsa_oaep.c
+@@ -20,12 +20,6 @@
+  * one-wayness.  For the RSA function, this is an equivalent notion.
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include "internal/constant_time.h"
+ 
+ #include <stdio.h>
+diff --git a/crypto/rsa/rsa_ossl.c b/crypto/rsa/rsa_ossl.c
+index 504ad82f17..7746f6d961 100644
+--- a/crypto/rsa/rsa_ossl.c
++++ b/crypto/rsa/rsa_ossl.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include "internal/cryptlib.h"
+ #include "crypto/bn.h"
+ #include "rsa_local.h"
+diff --git a/crypto/rsa/rsa_pk1.c b/crypto/rsa/rsa_pk1.c
+index b8aa49d701..c6bbf2dcd6 100644
+--- a/crypto/rsa/rsa_pk1.c
++++ b/crypto/rsa/rsa_pk1.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include "internal/constant_time.h"
+ 
+ #include <stdio.h>
+diff --git a/crypto/rsa/rsa_pmeth.c b/crypto/rsa/rsa_pmeth.c
+index 7a298d5d93..96937ae059 100644
+--- a/crypto/rsa/rsa_pmeth.c
++++ b/crypto/rsa/rsa_pmeth.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include "internal/constant_time.h"
+ 
+ #include <stdio.h>
+diff --git a/crypto/rsa/rsa_prn.c b/crypto/rsa/rsa_prn.c
+index 1e52e9e3e6..5e4c098a16 100644
+--- a/crypto/rsa/rsa_prn.c
++++ b/crypto/rsa/rsa_prn.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/rsa.h>
+diff --git a/crypto/rsa/rsa_pss.c b/crypto/rsa/rsa_pss.c
+index 999fc3122f..bd82faf54a 100644
+--- a/crypto/rsa/rsa_pss.c
++++ b/crypto/rsa/rsa_pss.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+diff --git a/crypto/rsa/rsa_saos.c b/crypto/rsa/rsa_saos.c
+index e7041ca2ae..7041535cc0 100644
+--- a/crypto/rsa/rsa_saos.c
++++ b/crypto/rsa/rsa_saos.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+diff --git a/crypto/rsa/rsa_sign.c b/crypto/rsa/rsa_sign.c
+index 544cca446e..3d89a8db54 100644
+--- a/crypto/rsa/rsa_sign.c
++++ b/crypto/rsa/rsa_sign.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+diff --git a/crypto/rsa/rsa_ssl.c b/crypto/rsa/rsa_ssl.c
+index 0309665338..49005a54a4 100644
+--- a/crypto/rsa/rsa_ssl.c
++++ b/crypto/rsa/rsa_ssl.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+diff --git a/crypto/rsa/rsa_x931.c b/crypto/rsa/rsa_x931.c
+index 7a1503752f..3caafb699f 100644
+--- a/crypto/rsa/rsa_x931.c
++++ b/crypto/rsa/rsa_x931.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
+ #include <openssl/bn.h>
+diff --git a/crypto/rsa/rsa_x931g.c b/crypto/rsa/rsa_x931g.c
+index 7b65133ec8..1f6042a3d2 100644
+--- a/crypto/rsa/rsa_x931g.c
++++ b/crypto/rsa/rsa_x931g.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include <string.h>
+ #include <time.h>
+diff --git a/engines/build.info b/engines/build.info
+index 3bfe1dc057..fca41358e9 100644
+--- a/engines/build.info
++++ b/engines/build.info
+@@ -78,7 +78,6 @@ IF[{- !$disabled{"engine"} -}]
+       SOURCE[dasync]=dasync.ld
+       GENERATE[dasync.ld]=../util/engines.num
+     ENDIF
+-
+     SOURCE[ossltest]=e_ossltest.c
+     DEPEND[ossltest]=../libcrypto
+     INCLUDE[ossltest]=../include
+diff --git a/engines/e_dasync.c b/engines/e_dasync.c
+index 446680e535..c5d58ded09 100644
+--- a/engines/e_dasync.c
++++ b/engines/e_dasync.c
+@@ -15,7 +15,6 @@
+  */
+ #include "internal/deprecated.h"
+ 
+-#include <openssl/opensslconf.h>
+ #if defined(_WIN32)
+ # include <windows.h>
+ #endif
+@@ -102,29 +101,22 @@ static int dasync_digest_nids(const int **nids)
+ }
+ 
+ /* RSA */
+-static int dasync_pkey(ENGINE *e, EVP_PKEY_METHOD **pmeth,
+-                       const int **pnids, int nid);
+-
+-static int dasync_rsa_init(EVP_PKEY_CTX *ctx);
+-static void dasync_rsa_cleanup(EVP_PKEY_CTX *ctx);
+-static int dasync_rsa_paramgen_init(EVP_PKEY_CTX *ctx);
+-static int dasync_rsa_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY *pkey);
+-static int dasync_rsa_keygen_init(EVP_PKEY_CTX *ctx);
+-static int dasync_rsa_keygen(EVP_PKEY_CTX *ctx, EVP_PKEY *pkey);
+-static int dasync_rsa_encrypt_init(EVP_PKEY_CTX *ctx);
+-static int dasync_rsa_encrypt(EVP_PKEY_CTX *ctx, unsigned char *out,
+-                              size_t *outlen, const unsigned char *in,
+-                              size_t inlen);
+-static int dasync_rsa_decrypt_init(EVP_PKEY_CTX *ctx);
+-static int dasync_rsa_decrypt(EVP_PKEY_CTX *ctx, unsigned char *out,
+-                              size_t *outlen, const unsigned char *in,
+-                              size_t inlen);
+-static int dasync_rsa_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2);
+-static int dasync_rsa_ctrl_str(EVP_PKEY_CTX *ctx, const char *type,
+-                               const char *value);
+-
+-static EVP_PKEY_METHOD *dasync_rsa;
+-static const EVP_PKEY_METHOD *dasync_rsa_orig;
++
++static int dasync_pub_enc(int flen, const unsigned char *from,
++                    unsigned char *to, RSA *rsa, int padding);
++static int dasync_pub_dec(int flen, const unsigned char *from,
++                    unsigned char *to, RSA *rsa, int padding);
++static int dasync_rsa_priv_enc(int flen, const unsigned char *from,
++                      unsigned char *to, RSA *rsa, int padding);
++static int dasync_rsa_priv_dec(int flen, const unsigned char *from,
++                      unsigned char *to, RSA *rsa, int padding);
++static int dasync_rsa_mod_exp(BIGNUM *r0, const BIGNUM *I, RSA *rsa,
++                              BN_CTX *ctx);
++
++static int dasync_rsa_init(RSA *rsa);
++static int dasync_rsa_finish(RSA *rsa);
++
++static RSA_METHOD *dasync_rsa_method = NULL;
+ 
+ /* AES */
+ 
+@@ -205,30 +197,26 @@ static int dasync_cipher_nids[] = {
+ 
+ static int bind_dasync(ENGINE *e)
+ {
+-    /* Setup RSA */
+-    ;
+-    if ((dasync_rsa_orig = EVP_PKEY_meth_find(EVP_PKEY_RSA)) == NULL
+-        || (dasync_rsa = EVP_PKEY_meth_new(EVP_PKEY_RSA, 0)) == NULL)
++    /* Setup RSA_METHOD */
++    if ((dasync_rsa_method = RSA_meth_new("Dummy Async RSA method", 0)) == NULL
++        || RSA_meth_set_pub_enc(dasync_rsa_method, dasync_pub_enc) == 0
++        || RSA_meth_set_pub_dec(dasync_rsa_method, dasync_pub_dec) == 0
++        || RSA_meth_set_priv_enc(dasync_rsa_method, dasync_rsa_priv_enc) == 0
++        || RSA_meth_set_priv_dec(dasync_rsa_method, dasync_rsa_priv_dec) == 0
++        || RSA_meth_set_mod_exp(dasync_rsa_method, dasync_rsa_mod_exp) == 0
++        || RSA_meth_set_bn_mod_exp(dasync_rsa_method, BN_mod_exp_mont) == 0
++        || RSA_meth_set_init(dasync_rsa_method, dasync_rsa_init) == 0
++        || RSA_meth_set_finish(dasync_rsa_method, dasync_rsa_finish) == 0) {
++        DASYNCerr(DASYNC_F_BIND_DASYNC, DASYNC_R_INIT_FAILED);
+         return 0;
+-    EVP_PKEY_meth_set_init(dasync_rsa, dasync_rsa_init);
+-    EVP_PKEY_meth_set_cleanup(dasync_rsa, dasync_rsa_cleanup);
+-    EVP_PKEY_meth_set_paramgen(dasync_rsa, dasync_rsa_paramgen_init,
+-                               dasync_rsa_paramgen);
+-    EVP_PKEY_meth_set_keygen(dasync_rsa, dasync_rsa_keygen_init,
+-                             dasync_rsa_keygen);
+-    EVP_PKEY_meth_set_encrypt(dasync_rsa, dasync_rsa_encrypt_init,
+-                              dasync_rsa_encrypt);
+-    EVP_PKEY_meth_set_decrypt(dasync_rsa, dasync_rsa_decrypt_init,
+-                              dasync_rsa_decrypt);
+-    EVP_PKEY_meth_set_ctrl(dasync_rsa, dasync_rsa_ctrl,
+-                           dasync_rsa_ctrl_str);
++    }
+ 
+     /* Ensure the dasync error handling is set up */
+     ERR_load_DASYNC_strings();
+ 
+     if (!ENGINE_set_id(e, engine_dasync_id)
+         || !ENGINE_set_name(e, engine_dasync_name)
+-        || !ENGINE_set_pkey_meths(e, dasync_pkey)
++        || !ENGINE_set_RSA(e, dasync_rsa_method)
+         || !ENGINE_set_digests(e, dasync_digests)
+         || !ENGINE_set_ciphers(e, dasync_ciphers)
+         || !ENGINE_set_destroy_function(e, dasync_destroy)
+@@ -307,13 +295,6 @@ static int bind_dasync(ENGINE *e)
+     return 1;
+ }
+ 
+-static void destroy_pkey(void)
+-{
+-    EVP_PKEY_meth_free(dasync_rsa);
+-    dasync_rsa_orig = NULL;
+-    dasync_rsa = NULL;
+-}
+-
+ # ifndef OPENSSL_NO_DYNAMIC_ENGINE
+ static int bind_helper(ENGINE *e, const char *id)
+ {
+@@ -366,30 +347,11 @@ static int dasync_destroy(ENGINE *e)
+ {
+     destroy_digests();
+     destroy_ciphers();
+-    destroy_pkey();
++    RSA_meth_free(dasync_rsa_method);
+     ERR_unload_DASYNC_strings();
+     return 1;
+ }
+ 
+-static int dasync_pkey(ENGINE *e, EVP_PKEY_METHOD **pmeth,
+-                       const int **pnids, int nid)
+-{
+-    static const int rnid = EVP_PKEY_RSA;
+-
+-    if (pmeth == NULL) {
+-        *pnids = &rnid;
+-        return 1;
+-    }
+-
+-    if (nid == EVP_PKEY_RSA) {
+-        *pmeth = dasync_rsa;
+-        return 1;
+-    }
+-
+-    *pmeth = NULL;
+-    return 0;
+-}
+-
+ static int dasync_digests(ENGINE *e, const EVP_MD **digest,
+                           const int **nids, int nid)
+ {
+@@ -560,6 +522,60 @@ static int dasync_sha1_final(EVP_MD_CTX *ctx, unsigned char *md)
+     return EVP_MD_meth_get_final(EVP_sha1())(ctx, md);
+ }
+ 
++/*
++ * RSA implementation
++ */
++
++static int dasync_pub_enc(int flen, const unsigned char *from,
++                    unsigned char *to, RSA *rsa, int padding) {
++    /* Ignore errors - we carry on anyway */
++    dummy_pause_job();
++    return RSA_meth_get_pub_enc(RSA_PKCS1_OpenSSL())
++        (flen, from, to, rsa, padding);
++}
++
++static int dasync_pub_dec(int flen, const unsigned char *from,
++                    unsigned char *to, RSA *rsa, int padding) {
++    /* Ignore errors - we carry on anyway */
++    dummy_pause_job();
++    return RSA_meth_get_pub_dec(RSA_PKCS1_OpenSSL())
++        (flen, from, to, rsa, padding);
++}
++
++static int dasync_rsa_priv_enc(int flen, const unsigned char *from,
++                      unsigned char *to, RSA *rsa, int padding)
++{
++    /* Ignore errors - we carry on anyway */
++    dummy_pause_job();
++    return RSA_meth_get_priv_enc(RSA_PKCS1_OpenSSL())
++        (flen, from, to, rsa, padding);
++}
++
++static int dasync_rsa_priv_dec(int flen, const unsigned char *from,
++                      unsigned char *to, RSA *rsa, int padding)
++{
++    /* Ignore errors - we carry on anyway */
++    dummy_pause_job();
++    return RSA_meth_get_priv_dec(RSA_PKCS1_OpenSSL())
++        (flen, from, to, rsa, padding);
++}
++
++static int dasync_rsa_mod_exp(BIGNUM *r0, const BIGNUM *I, RSA *rsa, BN_CTX *ctx)
++{
++    /* Ignore errors - we carry on anyway */
++    dummy_pause_job();
++    return RSA_meth_get_mod_exp(RSA_PKCS1_OpenSSL())(r0, I, rsa, ctx);
++}
++
++static int dasync_rsa_init(RSA *rsa)
++{
++    return RSA_meth_get_init(RSA_PKCS1_OpenSSL())(rsa);
++}
++static int dasync_rsa_finish(RSA *rsa)
++{
++    return RSA_meth_get_finish(RSA_PKCS1_OpenSSL())(rsa);
++}
++
+ /* Cipher helper functions */
+ 
+ static int dasync_cipher_ctrl_helper(EVP_CIPHER_CTX *ctx, int type, int arg,
+@@ -787,125 +803,3 @@ static int dasync_aes128_cbc_hmac_sha1_cleanup(EVP_CIPHER_CTX *ctx)
+      */
+     return dasync_cipher_cleanup_helper(ctx, EVP_aes_128_cbc_hmac_sha1());
+ }
+-
+-
+-/*
+- * RSA implementation
+- */
+-static int dasync_rsa_init(EVP_PKEY_CTX *ctx)
+-{
+-    static int (*pinit)(EVP_PKEY_CTX *ctx);
+-
+-    if (pinit == NULL)
+-        EVP_PKEY_meth_get_init(dasync_rsa_orig, &pinit);
+-    return pinit(ctx);
+-}
+-
+-static void dasync_rsa_cleanup(EVP_PKEY_CTX *ctx)
+-{
+-    static void (*pcleanup)(EVP_PKEY_CTX *ctx);
+-
+-    if (pcleanup == NULL)
+-        EVP_PKEY_meth_get_cleanup(dasync_rsa_orig, &pcleanup);
+-    pcleanup(ctx);
+-}
+-
+-static int dasync_rsa_paramgen_init(EVP_PKEY_CTX *ctx)
+-{
+-    static int (*pparamgen_init)(EVP_PKEY_CTX *ctx);
+-
+-    if (pparamgen_init == NULL)
+-        EVP_PKEY_meth_get_paramgen(dasync_rsa_orig, &pparamgen_init, NULL);
+-    return pparamgen_init(ctx);
+-}
+-
+-static int dasync_rsa_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY *pkey)
+-{
+-    static int (*pparamgen)(EVP_PKEY_CTX *c, EVP_PKEY *pkey);
+-
+-    if (pparamgen == NULL)
+-        EVP_PKEY_meth_get_paramgen(dasync_rsa_orig, NULL, &pparamgen);
+-    return pparamgen(ctx, pkey);
+-}
+-
+-static int dasync_rsa_keygen_init(EVP_PKEY_CTX *ctx)
+-{
+-    static int (*pkeygen_init)(EVP_PKEY_CTX *ctx);
+-
+-    if (pkeygen_init == NULL)
+-        EVP_PKEY_meth_get_keygen(dasync_rsa_orig, &pkeygen_init, NULL);
+-    return pkeygen_init(ctx);
+-}
+-
+-static int dasync_rsa_keygen(EVP_PKEY_CTX *ctx, EVP_PKEY *pkey)
+-{
+-    static int (*pkeygen)(EVP_PKEY_CTX *c, EVP_PKEY *pkey);
+-
+-    if (pkeygen == NULL)
+-        EVP_PKEY_meth_get_keygen(dasync_rsa_orig, NULL, &pkeygen);
+-    return pkeygen(ctx, pkey);
+-}
+-
+-static int dasync_rsa_encrypt_init(EVP_PKEY_CTX *ctx)
+-{
+-    static int (*pencrypt_init)(EVP_PKEY_CTX *ctx);
+-
+-    if (pencrypt_init == NULL)
+-        EVP_PKEY_meth_get_encrypt(dasync_rsa_orig, &pencrypt_init, NULL);
+-    return pencrypt_init(ctx);
+-}
+-
+-static int dasync_rsa_encrypt(EVP_PKEY_CTX *ctx, unsigned char *out,
+-                              size_t *outlen, const unsigned char *in,
+-                              size_t inlen)
+-{
+-    static int (*pencryptfn)(EVP_PKEY_CTX *ctx, unsigned char *out,
+-                             size_t *outlen, const unsigned char *in,
+-                             size_t inlen);
+-
+-    if (pencryptfn == NULL)
+-        EVP_PKEY_meth_get_encrypt(dasync_rsa_orig, NULL, &pencryptfn);
+-    return pencryptfn(ctx, out, outlen, in, inlen);
+-}
+-
+-static int dasync_rsa_decrypt_init(EVP_PKEY_CTX *ctx)
+-{
+-    static int (*pdecrypt_init)(EVP_PKEY_CTX *ctx);
+-
+-    if (pdecrypt_init == NULL)
+-        EVP_PKEY_meth_get_decrypt(dasync_rsa_orig, &pdecrypt_init, NULL);
+-    return pdecrypt_init(ctx);
+-}
+-
+-static int dasync_rsa_decrypt(EVP_PKEY_CTX *ctx, unsigned char *out,
+-                              size_t *outlen, const unsigned char *in,
+-                              size_t inlen)
+-{
+-    static int (*pdecrypt)(EVP_PKEY_CTX *ctx, unsigned char *out,
+-                             size_t *outlen, const unsigned char *in,
+-                             size_t inlen);
+-
+-    if (pdecrypt == NULL)
+-        EVP_PKEY_meth_get_encrypt(dasync_rsa_orig, NULL, &pdecrypt);
+-    return pdecrypt(ctx, out, outlen, in, inlen);
+-}
+-
+-static int dasync_rsa_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
+-{
+-    static int (*pctrl)(EVP_PKEY_CTX *ctx, int type, int p1, void *p2);
+-
+-    if (pctrl == NULL)
+-        EVP_PKEY_meth_get_ctrl(dasync_rsa_orig, &pctrl, NULL);
+-    return pctrl(ctx, type, p1, p2);
+-}
+-
+-static int dasync_rsa_ctrl_str(EVP_PKEY_CTX *ctx, const char *type,
+-                               const char *value)
+-{
+-    static int (*pctrl_str)(EVP_PKEY_CTX *ctx, const char *type,
+-                            const char *value);
+-
+-    if (pctrl_str == NULL)
+-        EVP_PKEY_meth_get_ctrl(dasync_rsa_orig, NULL, &pctrl_str);
+-    return pctrl_str(ctx, type, value);
+-}
+diff --git a/fuzz/asn1.c b/fuzz/asn1.c
+index 0858bee91d..0212e5674d 100644
+--- a/fuzz/asn1.c
++++ b/fuzz/asn1.c
+@@ -338,7 +338,7 @@ int FuzzerTestOneInput(const uint8_t *buf, size_t len)
+     DO_TEST_NO_PRINT(DSA, d2i_DSAPublicKey, i2d_DSAPublicKey);
+     DO_TEST_NO_PRINT(DSA, d2i_DSAparams, i2d_DSAparams);
+ #endif
+-    DO_TEST_NO_PRINT(RSA, d2i_RSAPublicKey, i2d_RSAPublicKey);
++    DO_TEST_PRINT_OFFSET(RSA, d2i_RSAPublicKey, i2d_RSAPublicKey, RSA_print);
+ #ifndef OPENSSL_NO_EC
+     DO_TEST_PRINT_OFFSET(EC_GROUP, d2i_ECPKParameters, i2d_ECPKParameters, ECPKParameters_print);
+     DO_TEST_PRINT_OFFSET(EC_KEY, d2i_ECPrivateKey, i2d_ECPrivateKey, EC_KEY_print);
+diff --git a/include/openssl/rsa.h b/include/openssl/rsa.h
+index 49040bf7e6..1df1c08eb3 100644
+--- a/include/openssl/rsa.h
++++ b/include/openssl/rsa.h
+@@ -33,50 +33,46 @@
+ extern "C" {
+ #  endif
+ 
++/* The types RSA and RSA_METHOD are defined in ossl_typ.h */
++
+ #  ifndef OPENSSL_RSA_MAX_MODULUS_BITS
+ #   define OPENSSL_RSA_MAX_MODULUS_BITS   16384
+ #  endif
+ 
+-#  ifndef OPENSSL_NO_DEPRECATED_3_0
+-/* The types RSA and RSA_METHOD are defined in ossl_typ.h */
+-
+-#   define OPENSSL_RSA_FIPS_MIN_MODULUS_BITS 1024
++#  define OPENSSL_RSA_FIPS_MIN_MODULUS_BITS 1024
+ 
+-#   ifndef OPENSSL_RSA_SMALL_MODULUS_BITS
+-#    define OPENSSL_RSA_SMALL_MODULUS_BITS 3072
+-#   endif
++#  ifndef OPENSSL_RSA_SMALL_MODULUS_BITS
++#   define OPENSSL_RSA_SMALL_MODULUS_BITS 3072
++#  endif
++#  ifndef OPENSSL_RSA_MAX_PUBEXP_BITS
+ 
+ /* exponent limit enforced for "large" modulus only */
+-#   ifndef OPENSSL_RSA_MAX_PUBEXP_BITS
+-#    define OPENSSL_RSA_MAX_PUBEXP_BITS    64
+-#   endif
++#   define OPENSSL_RSA_MAX_PUBEXP_BITS    64
++#  endif
+ 
+-#   define RSA_3   0x3L
+-#   define RSA_F4  0x10001L
++#  define RSA_3   0x3L
++#  define RSA_F4  0x10001L
+ 
+ /* based on RFC 8017 appendix A.1.2 */
+-#   define RSA_ASN1_VERSION_DEFAULT        0
+-#   define RSA_ASN1_VERSION_MULTI          1
++#  define RSA_ASN1_VERSION_DEFAULT        0
++#  define RSA_ASN1_VERSION_MULTI          1
+ 
+-#   define RSA_DEFAULT_PRIME_NUM           2
+-#  endif /* OPENSSL_NO_DEPRECATED_3_0 */
++#  define RSA_DEFAULT_PRIME_NUM           2
+ 
+ /* Don't check pub/private match */
+-/* TODO(3.0): deprecate this? It is exposed for sls/t1_lib.c's use */
+ #  define RSA_METHOD_FLAG_NO_CHECK        0x0001
+ 
+-#  ifndef OPENSSL_NO_DEPRECATED_3_0
+-#   define RSA_FLAG_CACHE_PUBLIC           0x0002
+-#   define RSA_FLAG_CACHE_PRIVATE          0x0004
+-#   define RSA_FLAG_BLINDING               0x0008
+-#   define RSA_FLAG_THREAD_SAFE            0x0010
++#  define RSA_FLAG_CACHE_PUBLIC           0x0002
++#  define RSA_FLAG_CACHE_PRIVATE          0x0004
++#  define RSA_FLAG_BLINDING               0x0008
++#  define RSA_FLAG_THREAD_SAFE            0x0010
+ /*
+  * This flag means the private key operations will be handled by rsa_mod_exp
+  * and that they do not depend on the private key components being present:
+  * for example a key stored in external hardware. Without this flag
+  * bn_mod_exp gets called when private key components are absent.
+  */
+-#   define RSA_FLAG_EXT_PKEY               0x0020
++#  define RSA_FLAG_EXT_PKEY               0x0020
+ 
+ /*
+  * new with 0.9.6j and 0.9.7b; the built-in
+@@ -84,14 +80,14 @@ extern "C" {
+  * default (ignoring RSA_FLAG_BLINDING),
+  * but other engines might not need it
+  */
+-#   define RSA_FLAG_NO_BLINDING            0x0080
+-#  endif /* OPENSSL_NO_DEPRECATED_3_0 */
++#  define RSA_FLAG_NO_BLINDING            0x0080
++#  ifndef OPENSSL_NO_DEPRECATED_1_1_0
+ /*
+  * Does nothing. Previously this switched off constant time behaviour.
+  */
+-#  ifndef OPENSSL_NO_DEPRECATED_1_1_0
+ #   define RSA_FLAG_NO_CONSTTIME           0x0000
+ #  endif
++#  ifndef OPENSSL_NO_DEPRECATED_0_9_8
+ /* deprecated name for the flag*/
+ /*
+  * new with 0.9.7h; the built-in RSA
+@@ -101,7 +97,6 @@ extern "C" {
+  * faster variable sliding window method to
+  * be used for all exponents.
+  */
+-#  ifndef OPENSSL_NO_DEPRECATED_0_9_8
+ #   define RSA_FLAG_NO_EXP_CONSTTIME RSA_FLAG_NO_CONSTTIME
+ #  endif
+ 
+@@ -135,6 +130,7 @@ int EVP_PKEY_CTX_get_rsa_mgf1_md(EVP_PKEY_CTX *ctx, const EVP_MD **md);
+ int EVP_PKEY_CTX_get_rsa_mgf1_md_name(EVP_PKEY_CTX *ctx, char *name,
+                                       size_t namelen);
+ 
++
+ #  define  EVP_PKEY_CTX_set_rsa_pss_keygen_mgf1_md(ctx, md) \
+         EVP_PKEY_CTX_ctrl(ctx, EVP_PKEY_RSA_PSS, EVP_PKEY_OP_KEYGEN, \
+                           EVP_PKEY_CTRL_RSA_MGF1_MD, 0, (void *)(md))
+@@ -145,7 +141,8 @@ int EVP_PKEY_CTX_set_rsa_oaep_md_name(EVP_PKEY_CTX *ctx, const char *mdname,
+ int EVP_PKEY_CTX_get_rsa_oaep_md(EVP_PKEY_CTX *ctx, const EVP_MD **md);
+ int EVP_PKEY_CTX_get_rsa_oaep_md_name(EVP_PKEY_CTX *ctx, char *name,
+                                       size_t namelen);
+-int EVP_PKEY_CTX_set0_rsa_oaep_label(EVP_PKEY_CTX *ctx, void *label, int llen);
++int EVP_PKEY_CTX_set0_rsa_oaep_label(EVP_PKEY_CTX *ctx, void *label,
++                                     int llen);
+ int EVP_PKEY_CTX_get0_rsa_oaep_label(EVP_PKEY_CTX *ctx, unsigned char **label);
+ 
+ #  define  EVP_PKEY_CTX_set_rsa_pss_keygen_md(ctx, md) \
+@@ -189,10 +186,10 @@ int EVP_PKEY_CTX_get0_rsa_oaep_label(EVP_PKEY_CTX *ctx, unsigned char **label);
+ #  define RSA_get_app_data(s)             RSA_get_ex_data(s,0)
+ 
+ RSA *RSA_new(void);
+-DEPRECATEDIN_3_0(RSA *RSA_new_method(ENGINE *engine))
+-DEPRECATEDIN_3_0(int RSA_bits(const RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_size(const RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_security_bits(const RSA *rsa))
++RSA *RSA_new_method(ENGINE *engine);
++int RSA_bits(const RSA *rsa);
++int RSA_size(const RSA *rsa);
++int RSA_security_bits(const RSA *rsa);
+ 
+ int RSA_set0_key(RSA *r, BIGNUM *n, BIGNUM *e, BIGNUM *d);
+ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q);
+@@ -217,12 +214,12 @@ const BIGNUM *RSA_get0_q(const RSA *d);
+ const BIGNUM *RSA_get0_dmp1(const RSA *r);
+ const BIGNUM *RSA_get0_dmq1(const RSA *r);
+ const BIGNUM *RSA_get0_iqmp(const RSA *r);
+-DEPRECATEDIN_3_0(const RSA_PSS_PARAMS *RSA_get0_pss_params(const RSA *r))
++const RSA_PSS_PARAMS *RSA_get0_pss_params(const RSA *r);
+ void RSA_clear_flags(RSA *r, int flags);
+ int RSA_test_flags(const RSA *r, int flags);
+ void RSA_set_flags(RSA *r, int flags);
+-DEPRECATEDIN_3_0(int RSA_get_version(RSA *r))
+-DEPRECATEDIN_3_0(ENGINE *RSA_get0_engine(const RSA *r))
++int RSA_get_version(RSA *r);
++ENGINE *RSA_get0_engine(const RSA *r);
+ 
+ /* Deprecated version */
+ DEPRECATEDIN_0_9_8(RSA *RSA_generate_key(int bits, unsigned long e, void
+@@ -230,52 +227,43 @@ DEPRECATEDIN_0_9_8(RSA *RSA_generate_key(int bits, unsigned long e, void
+                                          void *cb_arg))
+ 
+ /* New version */
+-DEPRECATEDIN_3_0(int RSA_generate_key_ex(RSA *rsa, int bits, BIGNUM *e,
+-                                         BN_GENCB *cb))
++int RSA_generate_key_ex(RSA *rsa, int bits, BIGNUM *e, BN_GENCB *cb);
+ /* Multi-prime version */
+-DEPRECATEDIN_3_0(int RSA_generate_multi_prime_key(RSA *rsa, int bits,
+-                                                  int primes, BIGNUM *e,
+-                                                  BN_GENCB *cb))
+-
+-DEPRECATEDIN_3_0(int RSA_X931_derive_ex(RSA *rsa, BIGNUM *p1, BIGNUM *p2,
+-                                        BIGNUM *q1, BIGNUM *q2,
+-                                        const BIGNUM *Xp1, const BIGNUM *Xp2,
+-                                        const BIGNUM *Xp, const BIGNUM *Xq1,
+-                                        const BIGNUM *Xq2, const BIGNUM *Xq,
+-                                        const BIGNUM *e, BN_GENCB *cb))
+-DEPRECATEDIN_3_0(int RSA_X931_generate_key_ex(RSA *rsa, int bits,
+-                                              const BIGNUM *e, BN_GENCB *cb))
+-
+-DEPRECATEDIN_3_0(int RSA_check_key(const RSA *))
+-DEPRECATEDIN_3_0(int RSA_check_key_ex(const RSA *, BN_GENCB *cb))
++int RSA_generate_multi_prime_key(RSA *rsa, int bits, int primes,
++                                 BIGNUM *e, BN_GENCB *cb);
++
++int RSA_X931_derive_ex(RSA *rsa, BIGNUM *p1, BIGNUM *p2, BIGNUM *q1,
++                       BIGNUM *q2, const BIGNUM *Xp1, const BIGNUM *Xp2,
++                       const BIGNUM *Xp, const BIGNUM *Xq1, const BIGNUM *Xq2,
++                       const BIGNUM *Xq, const BIGNUM *e, BN_GENCB *cb);
++int RSA_X931_generate_key_ex(RSA *rsa, int bits, const BIGNUM *e,
++                             BN_GENCB *cb);
++
++int RSA_check_key(const RSA *);
++int RSA_check_key_ex(const RSA *, BN_GENCB *cb);
+         /* next 4 return -1 on error */
+-DEPRECATEDIN_3_0(int RSA_public_encrypt(int flen, const unsigned char *from,
+-                                        unsigned char *to, RSA *rsa,
+-                                        int padding))
+-DEPRECATEDIN_3_0(int RSA_private_encrypt(int flen, const unsigned char *from,
+-                                         unsigned char *to, RSA *rsa,
+-                                         int padding))
+-DEPRECATEDIN_3_0(int RSA_public_decrypt(int flen, const unsigned char *from,
+-                                        unsigned char *to, RSA *rsa,
+-                                        int padding))
+-DEPRECATEDIN_3_0(int RSA_private_decrypt(int flen, const unsigned char *from,
+-                                         unsigned char *to, RSA *rsa,
+-                                         int padding))
++int RSA_public_encrypt(int flen, const unsigned char *from,
++                       unsigned char *to, RSA *rsa, int padding);
++int RSA_private_encrypt(int flen, const unsigned char *from,
++                        unsigned char *to, RSA *rsa, int padding);
++int RSA_public_decrypt(int flen, const unsigned char *from,
++                       unsigned char *to, RSA *rsa, int padding);
++int RSA_private_decrypt(int flen, const unsigned char *from,
++                        unsigned char *to, RSA *rsa, int padding);
+ void RSA_free(RSA *r);
+ /* "up" the RSA object's reference count */
+ int RSA_up_ref(RSA *r);
+ 
+-/* TODO(3.0): deprecate this one ssl/ssl_rsa.c can be changed to avoid it */
+ int RSA_flags(const RSA *r);
+ 
+-DEPRECATEDIN_3_0(void RSA_set_default_method(const RSA_METHOD *meth))
+-DEPRECATEDIN_3_0(const RSA_METHOD *RSA_get_default_method(void))
+-DEPRECATEDIN_3_0(const RSA_METHOD *RSA_null_method(void))
+-DEPRECATEDIN_3_0(const RSA_METHOD *RSA_get_method(const RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_set_method(RSA *rsa, const RSA_METHOD *meth))
++void RSA_set_default_method(const RSA_METHOD *meth);
++const RSA_METHOD *RSA_get_default_method(void);
++const RSA_METHOD *RSA_null_method(void);
++const RSA_METHOD *RSA_get_method(const RSA *rsa);
++int RSA_set_method(RSA *rsa, const RSA_METHOD *meth);
+ 
+ /* these are the actual RSA functions */
+-DEPRECATEDIN_3_0(const RSA_METHOD *RSA_PKCS1_OpenSSL(void))
++const RSA_METHOD *RSA_PKCS1_OpenSSL(void);
+ 
+ int RSA_pkey_ctx_ctrl(EVP_PKEY_CTX *ctx, int optype, int cmd, int p1, void *p2);
+ 
+@@ -304,129 +292,101 @@ typedef struct rsa_oaep_params_st {
+ DECLARE_ASN1_FUNCTIONS(RSA_OAEP_PARAMS)
+ 
+ #  ifndef OPENSSL_NO_STDIO
+-DEPRECATEDIN_3_0(int RSA_print_fp(FILE *fp, const RSA *r, int offset))
++int RSA_print_fp(FILE *fp, const RSA *r, int offset);
+ #  endif
+ 
+-DEPRECATEDIN_3_0(int RSA_print(BIO *bp, const RSA *r, int offset))
++int RSA_print(BIO *bp, const RSA *r, int offset);
+ 
+ /*
+  * The following 2 functions sign and verify a X509_SIG ASN1 object inside
+  * PKCS#1 padded RSA encryption
+  */
+-DEPRECATEDIN_3_0(int RSA_sign(int type, const unsigned char *m,
+-                              unsigned int m_length, unsigned char *sigret,
+-                              unsigned int *siglen, RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_verify(int type, const unsigned char *m,
+-                                unsigned int m_length,
+-                                const unsigned char *sigbuf,
+-                                unsigned int siglen, RSA *rsa))
++int RSA_sign(int type, const unsigned char *m, unsigned int m_length,
++             unsigned char *sigret, unsigned int *siglen, RSA *rsa);
++int RSA_verify(int type, const unsigned char *m, unsigned int m_length,
++               const unsigned char *sigbuf, unsigned int siglen, RSA *rsa);
+ 
+ /*
+  * The following 2 function sign and verify a ASN1_OCTET_STRING object inside
+  * PKCS#1 padded RSA encryption
+  */
+-DEPRECATEDIN_3_0(int RSA_sign_ASN1_OCTET_STRING(int type,
+-                                                const unsigned char *m,
+-                                                unsigned int m_length,
+-                                                unsigned char *sigret,
+-                                                unsigned int *siglen, RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_verify_ASN1_OCTET_STRING(int type,
+-                                                  const unsigned char *m,
+-                                                  unsigned int m_length,
+-                                                  unsigned char *sigbuf,
+-                                                  unsigned int siglen,
+-                                                  RSA *rsa))
+-
+-/* TODO(3.0): figure out how to deprecate these two */
++int RSA_sign_ASN1_OCTET_STRING(int type,
++                               const unsigned char *m, unsigned int m_length,
++                               unsigned char *sigret, unsigned int *siglen,
++                               RSA *rsa);
++int RSA_verify_ASN1_OCTET_STRING(int type, const unsigned char *m,
++                                 unsigned int m_length, unsigned char *sigbuf,
++                                 unsigned int siglen, RSA *rsa);
++
+ int RSA_blinding_on(RSA *rsa, BN_CTX *ctx);
+ void RSA_blinding_off(RSA *rsa);
+-DEPRECATEDIN_3_0(BN_BLINDING *RSA_setup_blinding(RSA *rsa, BN_CTX *ctx))
+-
+-DEPRECATEDIN_3_0(int RSA_padding_add_PKCS1_type_1(unsigned char *to, int tlen,
+-                                                  const unsigned char *f,
+-                                                  int fl))
+-DEPRECATEDIN_3_0(int RSA_padding_check_PKCS1_type_1(unsigned char *to, int tlen,
+-                                                    const unsigned char *f,
+-                                                    int fl, int rsa_len))
+-DEPRECATEDIN_3_0(int RSA_padding_add_PKCS1_type_2(unsigned char *to, int tlen,
+-                                                  const unsigned char *f,
+-                                                  int fl))
+-DEPRECATEDIN_3_0(int RSA_padding_check_PKCS1_type_2(unsigned char *to, int tlen,
+-                                                    const unsigned char *f,
+-                                                    int fl, int rsa_len))
+-DEPRECATEDIN_3_0(int PKCS1_MGF1(unsigned char *mask, long len,
+-                                const unsigned char *seed, long seedlen,
+-                                const EVP_MD *dgst))
+-DEPRECATEDIN_3_0(int RSA_padding_add_PKCS1_OAEP(unsigned char *to, int tlen,
+-                                                const unsigned char *f, int fl,
+-                                                const unsigned char *p, int pl))
+-DEPRECATEDIN_3_0(int RSA_padding_check_PKCS1_OAEP(unsigned char *to, int tlen,
+-                                                  const unsigned char *f,
+-                                                  int fl, int rsa_len,
+-                                                  const unsigned char *p,
+-                                                  int pl))
+-DEPRECATEDIN_3_0(int RSA_padding_add_PKCS1_OAEP_mgf1(unsigned char *to,
+-                                                     int tlen,
+-                                                     const unsigned char *from,
+-                                                     int flen,
+-                                                     const unsigned char *param,
+-                                                     int plen,
+-                                                     const EVP_MD *md,
+-                                                     const EVP_MD *mgf1md))
+-DEPRECATEDIN_3_0(int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to,
+-                                                       int tlen,
+-                                                       const unsigned char *from,
+-                                                       int flen, int num,
+-                                                       const unsigned char *param,
+-                                                       int plen, const EVP_MD *md,
+-                                                       const EVP_MD *mgf1md))
+-DEPRECATEDIN_3_0(int RSA_padding_add_SSLv23(unsigned char *to, int tlen,
+-                                            const unsigned char *f, int fl))
+-DEPRECATEDIN_3_0(int RSA_padding_check_SSLv23(unsigned char *to, int tlen,
+-                                              const unsigned char *f, int fl,
+-                                              int rsa_len))
+-DEPRECATEDIN_3_0(int RSA_padding_add_none(unsigned char *to, int tlen,
+-                                          const unsigned char *f, int fl))
+-DEPRECATEDIN_3_0(int RSA_padding_check_none(unsigned char *to, int tlen,
+-                                            const unsigned char *f, int fl,
+-                                            int rsa_len))
+-DEPRECATEDIN_3_0(int RSA_padding_add_X931(unsigned char *to, int tlen,
+-                                          const unsigned char *f, int fl))
+-DEPRECATEDIN_3_0(int RSA_padding_check_X931(unsigned char *to, int tlen,
+-                                            const unsigned char *f, int fl,
+-                                            int rsa_len))
+-DEPRECATEDIN_3_0(int RSA_X931_hash_id(int nid))
+-
+-DEPRECATEDIN_3_0(int RSA_verify_PKCS1_PSS(RSA *rsa, const unsigned char *mHash,
+-                                          const EVP_MD *Hash,
+-                                          const unsigned char *EM, int sLen))
+-DEPRECATEDIN_3_0(int RSA_padding_add_PKCS1_PSS(RSA *rsa, unsigned char *EM,
+-                                               const unsigned char *mHash,
+-                                               const EVP_MD *Hash, int sLen))
+-
+-DEPRECATEDIN_3_0(int RSA_verify_PKCS1_PSS_mgf1(RSA *rsa,
+-                                               const unsigned char *mHash,
+-                                               const EVP_MD *Hash,
+-                                               const EVP_MD *mgf1Hash,
+-                                               const unsigned char *EM,
+-                                               int sLen))
+-
+-DEPRECATEDIN_3_0(int RSA_padding_add_PKCS1_PSS_mgf1(RSA *rsa,
+-                                                    unsigned char *EM,
+-                                                    const unsigned char *mHash,
+-                                                    const EVP_MD *Hash,
+-                                                    const EVP_MD *mgf1Hash,
+-                                                    int sLen))
++BN_BLINDING *RSA_setup_blinding(RSA *rsa, BN_CTX *ctx);
++
++int RSA_padding_add_PKCS1_type_1(unsigned char *to, int tlen,
++                                 const unsigned char *f, int fl);
++int RSA_padding_check_PKCS1_type_1(unsigned char *to, int tlen,
++                                   const unsigned char *f, int fl,
++                                   int rsa_len);
++int RSA_padding_add_PKCS1_type_2(unsigned char *to, int tlen,
++                                 const unsigned char *f, int fl);
++int RSA_padding_check_PKCS1_type_2(unsigned char *to, int tlen,
++                                   const unsigned char *f, int fl,
++                                   int rsa_len);
++int PKCS1_MGF1(unsigned char *mask, long len, const unsigned char *seed,
++               long seedlen, const EVP_MD *dgst);
++int RSA_padding_add_PKCS1_OAEP(unsigned char *to, int tlen,
++                               const unsigned char *f, int fl,
++                               const unsigned char *p, int pl);
++int RSA_padding_check_PKCS1_OAEP(unsigned char *to, int tlen,
++                                 const unsigned char *f, int fl, int rsa_len,
++                                 const unsigned char *p, int pl);
++int RSA_padding_add_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
++                                    const unsigned char *from, int flen,
++                                    const unsigned char *param, int plen,
++                                    const EVP_MD *md, const EVP_MD *mgf1md);
++int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
++                                      const unsigned char *from, int flen,
++                                      int num, const unsigned char *param,
++                                      int plen, const EVP_MD *md,
++                                      const EVP_MD *mgf1md);
++int RSA_padding_add_SSLv23(unsigned char *to, int tlen,
++                           const unsigned char *f, int fl);
++int RSA_padding_check_SSLv23(unsigned char *to, int tlen,
++                             const unsigned char *f, int fl, int rsa_len);
++int RSA_padding_add_none(unsigned char *to, int tlen, const unsigned char *f,
++                         int fl);
++int RSA_padding_check_none(unsigned char *to, int tlen,
++                           const unsigned char *f, int fl, int rsa_len);
++int RSA_padding_add_X931(unsigned char *to, int tlen, const unsigned char *f,
++                         int fl);
++int RSA_padding_check_X931(unsigned char *to, int tlen,
++                           const unsigned char *f, int fl, int rsa_len);
++int RSA_X931_hash_id(int nid);
++
++int RSA_verify_PKCS1_PSS(RSA *rsa, const unsigned char *mHash,
++                         const EVP_MD *Hash, const unsigned char *EM,
++                         int sLen);
++int RSA_padding_add_PKCS1_PSS(RSA *rsa, unsigned char *EM,
++                              const unsigned char *mHash, const EVP_MD *Hash,
++                              int sLen);
++
++int RSA_verify_PKCS1_PSS_mgf1(RSA *rsa, const unsigned char *mHash,
++                              const EVP_MD *Hash, const EVP_MD *mgf1Hash,
++                              const unsigned char *EM, int sLen);
++
++int RSA_padding_add_PKCS1_PSS_mgf1(RSA *rsa, unsigned char *EM,
++                                   const unsigned char *mHash,
++                                   const EVP_MD *Hash, const EVP_MD *mgf1Hash,
++                                   int sLen);
+ 
+ #  define RSA_get_ex_new_index(l, p, newf, dupf, freef) \
+     CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_RSA, l, p, newf, dupf, freef)
+-DEPRECATEDIN_3_0(int RSA_set_ex_data(RSA *r, int idx, void *arg))
+-DEPRECATEDIN_3_0(void *RSA_get_ex_data(const RSA *r, int idx))
++int RSA_set_ex_data(RSA *r, int idx, void *arg);
++void *RSA_get_ex_data(const RSA *r, int idx);
+ 
+ DECLARE_ASN1_DUP_FUNCTION_name(RSA, RSAPublicKey)
+ DECLARE_ASN1_DUP_FUNCTION_name(RSA, RSAPrivateKey)
+ 
+-#  ifndef OPENSSL_NO_DEPRECATED_3_0
+ /*
+  * If this flag is set the RSA method is FIPS compliant and can be used in
+  * FIPS mode. This is set in the validated module method. If an application
+@@ -434,7 +394,7 @@ DECLARE_ASN1_DUP_FUNCTION_name(RSA, RSAPrivateKey)
+  * result is compliant.
+  */
+ 
+-#   define RSA_FLAG_FIPS_METHOD                    0x0400
++#  define RSA_FLAG_FIPS_METHOD                    0x0400
+ 
+ /*
+  * If this flag is set the operations normally disabled in FIPS mode are
+@@ -442,101 +402,99 @@ DECLARE_ASN1_DUP_FUNCTION_name(RSA, RSAPrivateKey)
+  * usage is compliant.
+  */
+ 
+-#   define RSA_FLAG_NON_FIPS_ALLOW                 0x0400
++#  define RSA_FLAG_NON_FIPS_ALLOW                 0x0400
+ /*
+  * Application has decided PRNG is good enough to generate a key: don't
+  * check.
+  */
+-#   define RSA_FLAG_CHECKED                        0x0800
+-#  endif /* OPENSSL_NO_DEPRECATED_3_0 */
+-
+-DEPRECATEDIN_3_0(RSA_METHOD *RSA_meth_new(const char *name, int flags))
+-DEPRECATEDIN_3_0(void RSA_meth_free(RSA_METHOD *meth))
+-DEPRECATEDIN_3_0(RSA_METHOD *RSA_meth_dup(const RSA_METHOD *meth))
+-DEPRECATEDIN_3_0(const char *RSA_meth_get0_name(const RSA_METHOD *meth))
+-DEPRECATEDIN_3_0(int RSA_meth_set1_name(RSA_METHOD *meth, const char *name))
+-DEPRECATEDIN_3_0(int RSA_meth_get_flags(const RSA_METHOD *meth))
+-DEPRECATEDIN_3_0(int RSA_meth_set_flags(RSA_METHOD *meth, int flags))
+-DEPRECATEDIN_3_0(void *RSA_meth_get0_app_data(const RSA_METHOD *meth))
+-DEPRECATEDIN_3_0(int RSA_meth_set0_app_data(RSA_METHOD *meth, void *app_data))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_pub_enc(const RSA_METHOD *meth))
++#  define RSA_FLAG_CHECKED                        0x0800
++
++RSA_METHOD *RSA_meth_new(const char *name, int flags);
++void RSA_meth_free(RSA_METHOD *meth);
++RSA_METHOD *RSA_meth_dup(const RSA_METHOD *meth);
++const char *RSA_meth_get0_name(const RSA_METHOD *meth);
++int RSA_meth_set1_name(RSA_METHOD *meth, const char *name);
++int RSA_meth_get_flags(const RSA_METHOD *meth);
++int RSA_meth_set_flags(RSA_METHOD *meth, int flags);
++void *RSA_meth_get0_app_data(const RSA_METHOD *meth);
++int RSA_meth_set0_app_data(RSA_METHOD *meth, void *app_data);
++int (*RSA_meth_get_pub_enc(const RSA_METHOD *meth))
+     (int flen, const unsigned char *from,
+-     unsigned char *to, RSA *rsa, int padding))
+-DEPRECATEDIN_3_0(int RSA_meth_set_pub_enc(RSA_METHOD *rsa,
++     unsigned char *to, RSA *rsa, int padding);
++int RSA_meth_set_pub_enc(RSA_METHOD *rsa,
+                          int (*pub_enc) (int flen, const unsigned char *from,
+                                          unsigned char *to, RSA *rsa,
+-                                         int padding)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_pub_dec(const RSA_METHOD *meth))
++                                         int padding));
++int (*RSA_meth_get_pub_dec(const RSA_METHOD *meth))
+     (int flen, const unsigned char *from,
+-     unsigned char *to, RSA *rsa, int padding))
+-DEPRECATEDIN_3_0(int RSA_meth_set_pub_dec(RSA_METHOD *rsa,
++     unsigned char *to, RSA *rsa, int padding);
++int RSA_meth_set_pub_dec(RSA_METHOD *rsa,
+                          int (*pub_dec) (int flen, const unsigned char *from,
+                                          unsigned char *to, RSA *rsa,
+-                                         int padding)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_priv_enc(const RSA_METHOD *meth))
++                                         int padding));
++int (*RSA_meth_get_priv_enc(const RSA_METHOD *meth))
+     (int flen, const unsigned char *from,
+-     unsigned char *to, RSA *rsa, int padding))
+-DEPRECATEDIN_3_0(int RSA_meth_set_priv_enc(RSA_METHOD *rsa,
++     unsigned char *to, RSA *rsa, int padding);
++int RSA_meth_set_priv_enc(RSA_METHOD *rsa,
+                           int (*priv_enc) (int flen, const unsigned char *from,
+                                            unsigned char *to, RSA *rsa,
+-                                           int padding)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_priv_dec(const RSA_METHOD *meth))
++                                           int padding));
++int (*RSA_meth_get_priv_dec(const RSA_METHOD *meth))
+     (int flen, const unsigned char *from,
+-     unsigned char *to, RSA *rsa, int padding))
+-DEPRECATEDIN_3_0(int RSA_meth_set_priv_dec(RSA_METHOD *rsa,
++     unsigned char *to, RSA *rsa, int padding);
++int RSA_meth_set_priv_dec(RSA_METHOD *rsa,
+                           int (*priv_dec) (int flen, const unsigned char *from,
+                                            unsigned char *to, RSA *rsa,
+-                                           int padding)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_mod_exp(const RSA_METHOD *meth))
+-    (BIGNUM *r0, const BIGNUM *i, RSA *rsa, BN_CTX *ctx))
+-DEPRECATEDIN_3_0(int RSA_meth_set_mod_exp(RSA_METHOD *rsa,
++                                           int padding));
++int (*RSA_meth_get_mod_exp(const RSA_METHOD *meth))
++    (BIGNUM *r0, const BIGNUM *i, RSA *rsa, BN_CTX *ctx);
++int RSA_meth_set_mod_exp(RSA_METHOD *rsa,
+                          int (*mod_exp) (BIGNUM *r0, const BIGNUM *i, RSA *rsa,
+-                                         BN_CTX *ctx)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_bn_mod_exp(const RSA_METHOD *meth))
++                                         BN_CTX *ctx));
++int (*RSA_meth_get_bn_mod_exp(const RSA_METHOD *meth))
+     (BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
+-     const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx))
+-DEPRECATEDIN_3_0(int RSA_meth_set_bn_mod_exp(RSA_METHOD *rsa,
++     const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx);
++int RSA_meth_set_bn_mod_exp(RSA_METHOD *rsa,
+                             int (*bn_mod_exp) (BIGNUM *r,
+                                                const BIGNUM *a,
+                                                const BIGNUM *p,
+                                                const BIGNUM *m,
+                                                BN_CTX *ctx,
+-                                               BN_MONT_CTX *m_ctx)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_init(const RSA_METHOD *meth)) (RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_meth_set_init(RSA_METHOD *rsa, int (*init) (RSA *rsa)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_finish(const RSA_METHOD *meth)) (RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_meth_set_finish(RSA_METHOD *rsa,
+-                            int (*finish) (RSA *rsa)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_sign(const RSA_METHOD *meth))
++                                               BN_MONT_CTX *m_ctx));
++int (*RSA_meth_get_init(const RSA_METHOD *meth)) (RSA *rsa);
++int RSA_meth_set_init(RSA_METHOD *rsa, int (*init) (RSA *rsa));
++int (*RSA_meth_get_finish(const RSA_METHOD *meth)) (RSA *rsa);
++int RSA_meth_set_finish(RSA_METHOD *rsa, int (*finish) (RSA *rsa));
++int (*RSA_meth_get_sign(const RSA_METHOD *meth))
+     (int type,
+      const unsigned char *m, unsigned int m_length,
+      unsigned char *sigret, unsigned int *siglen,
+-     const RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_meth_set_sign(RSA_METHOD *rsa,
++     const RSA *rsa);
++int RSA_meth_set_sign(RSA_METHOD *rsa,
+                       int (*sign) (int type, const unsigned char *m,
+                                    unsigned int m_length,
+                                    unsigned char *sigret, unsigned int *siglen,
+-                                   const RSA *rsa)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_verify(const RSA_METHOD *meth))
++                                   const RSA *rsa));
++int (*RSA_meth_get_verify(const RSA_METHOD *meth))
+     (int dtype, const unsigned char *m,
+      unsigned int m_length, const unsigned char *sigbuf,
+-     unsigned int siglen, const RSA *rsa))
+-DEPRECATEDIN_3_0(int RSA_meth_set_verify(RSA_METHOD *rsa,
++     unsigned int siglen, const RSA *rsa);
++int RSA_meth_set_verify(RSA_METHOD *rsa,
+                         int (*verify) (int dtype, const unsigned char *m,
+                                        unsigned int m_length,
+                                        const unsigned char *sigbuf,
+-                                       unsigned int siglen, const RSA *rsa)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_keygen(const RSA_METHOD *meth))
+-    (RSA *rsa, int bits, BIGNUM *e, BN_GENCB *cb))
+-DEPRECATEDIN_3_0(int RSA_meth_set_keygen(RSA_METHOD *rsa,
++                                       unsigned int siglen, const RSA *rsa));
++int (*RSA_meth_get_keygen(const RSA_METHOD *meth))
++    (RSA *rsa, int bits, BIGNUM *e, BN_GENCB *cb);
++int RSA_meth_set_keygen(RSA_METHOD *rsa,
+                         int (*keygen) (RSA *rsa, int bits, BIGNUM *e,
+-                                       BN_GENCB *cb)))
+-DEPRECATEDIN_3_0(int (*RSA_meth_get_multi_prime_keygen(const RSA_METHOD *meth))
+-    (RSA *rsa, int bits, int primes, BIGNUM *e, BN_GENCB *cb))
+-DEPRECATEDIN_3_0(int RSA_meth_set_multi_prime_keygen(RSA_METHOD *meth,
++                                       BN_GENCB *cb));
++int (*RSA_meth_get_multi_prime_keygen(const RSA_METHOD *meth))
++    (RSA *rsa, int bits, int primes, BIGNUM *e, BN_GENCB *cb);
++int RSA_meth_set_multi_prime_keygen(RSA_METHOD *meth,
+                                     int (*keygen) (RSA *rsa, int bits,
+                                                    int primes, BIGNUM *e,
+-                                                   BN_GENCB *cb)))
++                                                   BN_GENCB *cb));
+ 
+ #  ifdef  __cplusplus
+ }
+diff --git a/providers/implementations/asymciphers/rsa_enc.c b/providers/implementations/asymciphers/rsa_enc.c
+index 5f05d1810b..dad9edf962 100644
+--- a/providers/implementations/asymciphers/rsa_enc.c
++++ b/providers/implementations/asymciphers/rsa_enc.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <openssl/crypto.h>
+ #include <openssl/evp.h>
+ #include <openssl/core_numbers.h>
+diff --git a/providers/implementations/keymgmt/rsa_kmgmt.c b/providers/implementations/keymgmt/rsa_kmgmt.c
+index 8ea394115b..f117d99001 100644
+--- a/providers/implementations/keymgmt/rsa_kmgmt.c
++++ b/providers/implementations/keymgmt/rsa_kmgmt.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <openssl/core_numbers.h>
+ #include <openssl/core_names.h>
+ #include <openssl/bn.h>
+diff --git a/providers/implementations/serializers/serializer_rsa.c b/providers/implementations/serializers/serializer_rsa.c
+index 21898f9e3d..594c3d758f 100644
+--- a/providers/implementations/serializers/serializer_rsa.c
++++ b/providers/implementations/serializers/serializer_rsa.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include "crypto/rsa.h"           /* rsa_get0_all_params() */
+ #include "prov/bio.h"             /* ossl_prov_bio_printf() */
+ #include "prov/implementations.h" /* rsa_keymgmt_functions */
+diff --git a/providers/implementations/serializers/serializer_rsa_priv.c b/providers/implementations/serializers/serializer_rsa_priv.c
+index 23042041de..af0aadcda1 100644
+--- a/providers/implementations/serializers/serializer_rsa_priv.c
++++ b/providers/implementations/serializers/serializer_rsa_priv.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <openssl/core_numbers.h>
+ #include <openssl/core_names.h>
+ #include <openssl/err.h>
+diff --git a/providers/implementations/serializers/serializer_rsa_pub.c b/providers/implementations/serializers/serializer_rsa_pub.c
+index 3ee0501ee1..f7eccf7624 100644
+--- a/providers/implementations/serializers/serializer_rsa_pub.c
++++ b/providers/implementations/serializers/serializer_rsa_pub.c
+@@ -7,12 +7,6 @@
+  * https://www.openssl.org/source/license.html
+  */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <openssl/core_numbers.h>
+ #include <openssl/pem.h>
+ #include <openssl/rsa.h>
+diff --git a/ssl/s3_enc.c b/ssl/s3_enc.c
+index 76bea32dbd..ea0fb750f1 100644
+--- a/ssl/s3_enc.c
++++ b/ssl/s3_enc.c
+@@ -86,7 +86,7 @@ static int ssl3_generate_key_block(SSL *s, unsigned char *km, int num)
+  err:
+     EVP_MD_CTX_free(m5);
+     EVP_MD_CTX_free(s1);
+-    ssl_evp_md_free(md5);
++    EVP_MD_free(md5);
+     return ret;
+ }
+ 
+@@ -257,16 +257,13 @@ int ssl3_setup_key_block(SSL *s)
+     if (s->s3.tmp.key_block_length != 0)
+         return 1;
+ 
+-    if (!ssl_cipher_get_evp(s->ctx, s->session, &c, &hash, NULL, NULL, &comp,
+-                            0)) {
++    if (!ssl_cipher_get_evp(s->session, &c, &hash, NULL, NULL, &comp, 0)) {
+         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_SSL3_SETUP_KEY_BLOCK,
+                  SSL_R_CIPHER_OR_HASH_UNAVAILABLE);
+         return 0;
+     }
+ 
+-    ssl_evp_cipher_free(s->s3.tmp.new_sym_enc);
+     s->s3.tmp.new_sym_enc = c;
+-    ssl_evp_md_free(s->s3.tmp.new_hash);
+     s->s3.tmp.new_hash = hash;
+ #ifdef OPENSSL_NO_COMP
+     s->s3.tmp.new_compression = NULL;
+diff --git a/ssl/s3_lib.c b/ssl/s3_lib.c
+index 9902fa3811..26f19108ee 100644
+--- a/ssl/s3_lib.c
++++ b/ssl/s3_lib.c
+@@ -3334,9 +3334,6 @@ void ssl3_free(SSL *s)
+     s->s3.tmp.pkey = NULL;
+ #endif
+ 
+-    ssl_evp_cipher_free(s->s3.tmp.new_sym_enc);
+-    ssl_evp_md_free(s->s3.tmp.new_hash);
+-
+     OPENSSL_free(s->s3.tmp.ctype);
+     sk_X509_NAME_pop_free(s->s3.tmp.peer_ca_names, X509_NAME_free);
+     OPENSSL_free(s->s3.tmp.ciphers_raw);
+@@ -4160,6 +4157,7 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+     STACK_OF(SSL_CIPHER) *prio, *allow;
+     int i, ii, ok, prefer_sha256 = 0;
+     unsigned long alg_k = 0, alg_a = 0, mask_k = 0, mask_a = 0;
++    const EVP_MD *mdsha256 = EVP_sha256();
+ #ifndef OPENSSL_NO_CHACHA
+     STACK_OF(SSL_CIPHER) *prio_chacha = NULL;
+ #endif
+@@ -4333,12 +4331,7 @@ const SSL_CIPHER *ssl3_choose_cipher(SSL *s, STACK_OF(SSL_CIPHER) *clnt,
+             if (prefer_sha256) {
+                 const SSL_CIPHER *tmp = sk_SSL_CIPHER_value(allow, ii);
+ 
+-                /*
+-                 * TODO: When there are no more legacy digests we can just use
+-                 * OSSL_DIGEST_NAME_SHA2_256 instead of calling OBJ_nid2sn
+-                 */
+-                if (EVP_MD_is_a(ssl_md(s->ctx, tmp->algorithm2),
+-                                       OBJ_nid2sn(NID_sha256))) {
++                if (ssl_md(tmp->algorithm2) == mdsha256) {
+                     ret = tmp;
+                     break;
+                 }
+diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
+index 066c38a7cc..04ffae325c 100644
+--- a/ssl/ssl_ciph.c
++++ b/ssl/ssl_ciph.c
+@@ -22,6 +22,30 @@
+ #include "internal/thread_once.h"
+ #include "internal/cryptlib.h"
+ 
++#define SSL_ENC_DES_IDX         0
++#define SSL_ENC_3DES_IDX        1
++#define SSL_ENC_RC4_IDX         2
++#define SSL_ENC_RC2_IDX         3
++#define SSL_ENC_IDEA_IDX        4
++#define SSL_ENC_NULL_IDX        5
++#define SSL_ENC_AES128_IDX      6
++#define SSL_ENC_AES256_IDX      7
++#define SSL_ENC_CAMELLIA128_IDX 8
++#define SSL_ENC_CAMELLIA256_IDX 9
++#define SSL_ENC_GOST89_IDX      10
++#define SSL_ENC_SEED_IDX        11
++#define SSL_ENC_AES128GCM_IDX   12
++#define SSL_ENC_AES256GCM_IDX   13
++#define SSL_ENC_AES128CCM_IDX   14
++#define SSL_ENC_AES256CCM_IDX   15
++#define SSL_ENC_AES128CCM8_IDX  16
++#define SSL_ENC_AES256CCM8_IDX  17
++#define SSL_ENC_GOST8912_IDX    18
++#define SSL_ENC_CHACHA_IDX      19
++#define SSL_ENC_ARIA128GCM_IDX  20
++#define SSL_ENC_ARIA256GCM_IDX  21
++#define SSL_ENC_NUM_IDX         22
++
+ /* NB: make sure indices in these tables match values above */
+ 
+ typedef struct {
+@@ -55,6 +79,8 @@ static const ssl_cipher_table ssl_cipher_table_cipher[SSL_ENC_NUM_IDX] = {
+     {SSL_ARIA256GCM, NID_aria_256_gcm}, /* SSL_ENC_ARIA256GCM_IDX 21 */
+ };
+ 
++static const EVP_CIPHER *ssl_cipher_methods[SSL_ENC_NUM_IDX];
++
+ #define SSL_COMP_NULL_IDX       0
+ #define SSL_COMP_ZLIB_IDX       1
+ #define SSL_COMP_NUM_IDX        2
+@@ -65,6 +91,13 @@ static STACK_OF(SSL_COMP) *ssl_comp_methods = NULL;
+ static CRYPTO_ONCE ssl_load_builtin_comp_once = CRYPTO_ONCE_STATIC_INIT;
+ #endif
+ 
++/*
++ * Constant SSL_MAX_DIGEST equal to size of digests array should be defined
++ * in the ssl_local.h
++ */
++
++#define SSL_MD_NUM_IDX  SSL_MAX_DIGEST
++
+ /* NB: make sure indices in this table matches values above */
+ static const ssl_cipher_table ssl_cipher_table_mac[SSL_MD_NUM_IDX] = {
+     {SSL_MD5, NID_md5},         /* SSL_MD_MD5_IDX 0 */
+@@ -81,6 +114,10 @@ static const ssl_cipher_table ssl_cipher_table_mac[SSL_MD_NUM_IDX] = {
+     {0, NID_sha512}             /* SSL_MD_SHA512_IDX 11 */
+ };
+ 
++static const EVP_MD *ssl_digest_methods[SSL_MD_NUM_IDX] = {
++    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
++};
++
+ /* *INDENT-OFF* */
+ static const ssl_cipher_table ssl_cipher_table_kx[] = {
+     {SSL_kRSA,      NID_kx_rsa},
+@@ -139,6 +176,8 @@ static int ssl_mac_pkey_id[SSL_MD_NUM_IDX] = {
+     NID_undef, NID_undef, NID_undef
+ };
+ 
++static size_t ssl_mac_secret_size[SSL_MD_NUM_IDX];
++
+ #define CIPHER_ADD      1
+ #define CIPHER_KILL     2
+ #define CIPHER_DEL      3
+@@ -317,37 +356,41 @@ static uint32_t disabled_mac_mask;
+ static uint32_t disabled_mkey_mask;
+ static uint32_t disabled_auth_mask;
+ 
+-int ssl_load_ciphers(SSL_CTX *ctx)
++int ssl_load_ciphers(void)
+ {
+     size_t i;
+     const ssl_cipher_table *t;
+ 
+     disabled_enc_mask = 0;
++    ssl_sort_cipher_list();
+     for (i = 0, t = ssl_cipher_table_cipher; i < SSL_ENC_NUM_IDX; i++, t++) {
+-        if (t->nid != NID_undef) {
+-            const EVP_CIPHER *cipher
+-                = ssl_evp_cipher_fetch(ctx->libctx, t->nid, ctx->propq);
+-
+-            ctx->ssl_cipher_methods[i] = cipher;
++        if (t->nid == NID_undef) {
++            ssl_cipher_methods[i] = NULL;
++        } else {
++            const EVP_CIPHER *cipher = EVP_get_cipherbynid(t->nid);
++            ssl_cipher_methods[i] = cipher;
+             if (cipher == NULL)
+                 disabled_enc_mask |= t->mask;
+         }
+     }
+     disabled_mac_mask = 0;
+     for (i = 0, t = ssl_cipher_table_mac; i < SSL_MD_NUM_IDX; i++, t++) {
+-        const EVP_MD *md
+-            = ssl_evp_md_fetch(ctx->libctx, t->nid, ctx->propq);
+-
+-        ctx->ssl_digest_methods[i] = md;
++        const EVP_MD *md = EVP_get_digestbynid(t->nid);
++        ssl_digest_methods[i] = md;
+         if (md == NULL) {
+             disabled_mac_mask |= t->mask;
+         } else {
+             int tmpsize = EVP_MD_size(md);
+             if (!ossl_assert(tmpsize >= 0))
+                 return 0;
+-            ctx->ssl_mac_secret_size[i] = tmpsize;
++            ssl_mac_secret_size[i] = tmpsize;
+         }
+     }
++    /* Make sure we can access MD5 and SHA1 */
++    if (!ossl_assert(ssl_digest_methods[SSL_MD_MD5_IDX] != NULL))
++        return 0;
++    if (!ossl_assert(ssl_digest_methods[SSL_MD_SHA1_IDX] != NULL))
++        return 0;
+ 
+     disabled_mkey_mask = 0;
+     disabled_auth_mask = 0;
+@@ -380,14 +423,14 @@ int ssl_load_ciphers(SSL_CTX *ctx)
+      */
+     ssl_mac_pkey_id[SSL_MD_GOST89MAC_IDX] = get_optional_pkey_id("gost-mac");
+     if (ssl_mac_pkey_id[SSL_MD_GOST89MAC_IDX])
+-        ctx->ssl_mac_secret_size[SSL_MD_GOST89MAC_IDX] = 32;
++        ssl_mac_secret_size[SSL_MD_GOST89MAC_IDX] = 32;
+     else
+         disabled_mac_mask |= SSL_GOST89MAC;
+ 
+     ssl_mac_pkey_id[SSL_MD_GOST89MAC12_IDX] =
+         get_optional_pkey_id("gost-mac-12");
+     if (ssl_mac_pkey_id[SSL_MD_GOST89MAC12_IDX])
+-        ctx->ssl_mac_secret_size[SSL_MD_GOST89MAC12_IDX] = 32;
++        ssl_mac_secret_size[SSL_MD_GOST89MAC12_IDX] = 32;
+     else
+         disabled_mac_mask |= SSL_GOST89MAC12;
+ 
+@@ -440,39 +483,9 @@ static int load_builtin_compressions(void)
+ }
+ #endif
+ 
+-int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
+-                              const EVP_CIPHER **enc)
+-{
+-    int i = ssl_cipher_info_lookup(ssl_cipher_table_cipher, sslc->algorithm_enc);
+-
+-    if (i == -1) {
+-        *enc = NULL;
+-    } else {
+-        if (i == SSL_ENC_NULL_IDX) {
+-            /*
+-             * We assume we don't care about this coming from an ENGINE so
+-             * just do a normal EVP_CIPHER_fetch instead of
+-             * ssl_evp_cipher_fetch()
+-             */
+-            *enc = EVP_CIPHER_fetch(ctx->libctx, "NULL", ctx->propq);
+-            if (*enc == NULL)
+-                return 0;
+-        } else {
+-            const EVP_CIPHER *cipher = ctx->ssl_cipher_methods[i];
+-
+-            if (cipher == NULL
+-                    || !ssl_evp_cipher_up_ref(cipher))
+-                return 0;
+-            *enc = ctx->ssl_cipher_methods[i];
+-        }
+-    }
+-    return 1;
+-}
+-
+-int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
+-                       const EVP_CIPHER **enc, const EVP_MD **md,
+-                       int *mac_pkey_type, size_t *mac_secret_size,
+-                       SSL_COMP **comp, int use_etm)
++int ssl_cipher_get_evp(const SSL_SESSION *s, const EVP_CIPHER **enc,
++                       const EVP_MD **md, int *mac_pkey_type,
++                       size_t *mac_secret_size, SSL_COMP **comp, int use_etm)
+ {
+     int i;
+     const SSL_CIPHER *c;
+@@ -504,8 +517,16 @@ int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
+     if ((enc == NULL) || (md == NULL))
+         return 0;
+ 
+-    if (!ssl_cipher_get_evp_cipher(ctx, c, enc))
+-        return 0;
++    i = ssl_cipher_info_lookup(ssl_cipher_table_cipher, c->algorithm_enc);
++
++    if (i == -1) {
++        *enc = NULL;
++    } else {
++        if (i == SSL_ENC_NULL_IDX)
++            *enc = EVP_enc_null();
++        else
++            *enc = ssl_cipher_methods[i];
++    }
+ 
+     i = ssl_cipher_info_lookup(ssl_cipher_table_mac, c->algorithm_mac);
+     if (i == -1) {
+@@ -517,80 +538,67 @@ int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
+         if (c->algorithm_mac == SSL_AEAD)
+             mac_pkey_type = NULL;
+     } else {
+-        if (!ssl_evp_md_up_ref(ctx->ssl_digest_methods[i])) {
+-            ssl_evp_cipher_free(*enc);
+-            return 0;
+-        }
+-        *md = ctx->ssl_digest_methods[i];
++        *md = ssl_digest_methods[i];
+         if (mac_pkey_type != NULL)
+             *mac_pkey_type = ssl_mac_pkey_id[i];
+         if (mac_secret_size != NULL)
+-            *mac_secret_size = ctx->ssl_mac_secret_size[i];
++            *mac_secret_size = ssl_mac_secret_size[i];
+     }
+ 
+     if ((*enc != NULL) &&
+         (*md != NULL || (EVP_CIPHER_flags(*enc) & EVP_CIPH_FLAG_AEAD_CIPHER))
+         && (!mac_pkey_type || *mac_pkey_type != NID_undef)) {
+-        const EVP_CIPHER *evp = NULL;
++        const EVP_CIPHER *evp;
+ 
+-        if (use_etm
+-                || s->ssl_version >> 8 != TLS1_VERSION_MAJOR
+-                || s->ssl_version < TLS1_VERSION)
++        if (use_etm)
+             return 1;
+ 
+-        if (c->algorithm_enc == SSL_RC4
+-                && c->algorithm_mac == SSL_MD5)
+-            evp = ssl_evp_cipher_fetch(ctx->libctx, NID_rc4_hmac_md5,
+-                                       ctx->propq);
+-        else if (c->algorithm_enc == SSL_AES128
+-                    && c->algorithm_mac == SSL_SHA1)
+-            evp = ssl_evp_cipher_fetch(ctx->libctx,
+-                                       NID_aes_128_cbc_hmac_sha1,
+-                                       ctx->propq);
+-        else if (c->algorithm_enc == SSL_AES256
+-                    && c->algorithm_mac == SSL_SHA1)
+-             evp = ssl_evp_cipher_fetch(ctx->libctx,
+-                                        NID_aes_256_cbc_hmac_sha1,
+-                                        ctx->propq);
+-        else if (c->algorithm_enc == SSL_AES128
+-                    && c->algorithm_mac == SSL_SHA256)
+-            evp = ssl_evp_cipher_fetch(ctx->libctx,
+-                                       NID_aes_128_cbc_hmac_sha256,
+-                                       ctx->propq);
+-        else if (c->algorithm_enc == SSL_AES256
+-                    && c->algorithm_mac == SSL_SHA256)
+-            evp = ssl_evp_cipher_fetch(ctx->libctx,
+-                                       NID_aes_256_cbc_hmac_sha256,
+-                                       ctx->propq);
+-
+-        if (evp != NULL) {
+-            ssl_evp_cipher_free(*enc);
+-            ssl_evp_md_free(*md);
+-            *enc = evp;
+-            *md = NULL;
+-        }
++        if (s->ssl_version >> 8 != TLS1_VERSION_MAJOR ||
++            s->ssl_version < TLS1_VERSION)
++            return 1;
++
++        if (c->algorithm_enc == SSL_RC4 &&
++            c->algorithm_mac == SSL_MD5 &&
++            (evp = EVP_get_cipherbyname("RC4-HMAC-MD5")))
++            *enc = evp, *md = NULL;
++        else if (c->algorithm_enc == SSL_AES128 &&
++                 c->algorithm_mac == SSL_SHA1 &&
++                 (evp = EVP_get_cipherbyname("AES-128-CBC-HMAC-SHA1")))
++            *enc = evp, *md = NULL;
++        else if (c->algorithm_enc == SSL_AES256 &&
++                 c->algorithm_mac == SSL_SHA1 &&
++                 (evp = EVP_get_cipherbyname("AES-256-CBC-HMAC-SHA1")))
++            *enc = evp, *md = NULL;
++        else if (c->algorithm_enc == SSL_AES128 &&
++                 c->algorithm_mac == SSL_SHA256 &&
++                 (evp = EVP_get_cipherbyname("AES-128-CBC-HMAC-SHA256")))
++            *enc = evp, *md = NULL;
++        else if (c->algorithm_enc == SSL_AES256 &&
++                 c->algorithm_mac == SSL_SHA256 &&
++                 (evp = EVP_get_cipherbyname("AES-256-CBC-HMAC-SHA256")))
++            *enc = evp, *md = NULL;
+         return 1;
++    } else {
++        return 0;
+     }
+-
+-    return 0;
+ }
+ 
+-const EVP_MD *ssl_md(SSL_CTX *ctx, int idx)
++const EVP_MD *ssl_md(int idx)
+ {
+     idx &= SSL_HANDSHAKE_MAC_MASK;
+     if (idx < 0 || idx >= SSL_MD_NUM_IDX)
+         return NULL;
+-    return ctx->ssl_digest_methods[idx];
++    return ssl_digest_methods[idx];
+ }
+ 
+ const EVP_MD *ssl_handshake_md(SSL *s)
+ {
+-    return ssl_md(s->ctx, ssl_get_algorithm2(s));
++    return ssl_md(ssl_get_algorithm2(s));
+ }
+ 
+ const EVP_MD *ssl_prf_md(SSL *s)
+ {
+-    return ssl_md(s->ctx, ssl_get_algorithm2(s) >> TLS1_PRF_DGST_SHIFT);
++    return ssl_md(ssl_get_algorithm2(s) >> TLS1_PRF_DGST_SHIFT);
+ }
+ 
+ #define ITEM_SEP(a) \
+@@ -2087,7 +2095,7 @@ const EVP_MD *SSL_CIPHER_get_handshake_digest(const SSL_CIPHER *c)
+ 
+     if (idx < 0 || idx >= SSL_MD_NUM_IDX)
+         return NULL;
+-    return EVP_get_digestbynid(ssl_cipher_table_mac[idx].nid);
++    return ssl_digest_methods[idx];
+ }
+ 
+ int SSL_CIPHER_is_aead(const SSL_CIPHER *c)
+diff --git a/ssl/ssl_init.c b/ssl/ssl_init.c
+index 2ccbda7fa3..3e85426112 100644
+--- a/ssl/ssl_init.c
++++ b/ssl/ssl_init.c
+@@ -94,7 +94,10 @@ DEFINE_RUN_ONCE_STATIC(ossl_init_ssl_base)
+      */
+     SSL_COMP_get_compression_methods();
+ #endif
+-    ssl_sort_cipher_list();
++    /* initialize cipher/digest methods table */
++    if (!ssl_load_ciphers())
++        return 0;
++
+     OSSL_TRACE(INIT,"ossl_init_ssl_base: SSL_add_ssl_module()\n");
+     /*
+      * We ignore an error return here. Not much we can do - but not that bad
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index a08ddb138b..b5239d6eb2 100644
+--- a/ssl/ssl_lib.c
++++ b/ssl/ssl_lib.c
+@@ -3146,10 +3146,6 @@ SSL_CTX *SSL_CTX_new_with_libctx(OPENSSL_CTX *libctx, const char *propq,
+         goto err;
+ #endif
+ 
+-    /* initialize cipher/digest methods table */
+-    if (!ssl_load_ciphers(ret))
+-        goto err2;
+-
+     if (!SSL_CTX_set_ciphersuites(ret, OSSL_default_ciphersuites()))
+         goto err;
+ 
+@@ -3166,12 +3162,14 @@ SSL_CTX *SSL_CTX_new_with_libctx(OPENSSL_CTX *libctx, const char *propq,
+     if (ret->param == NULL)
+         goto err;
+ 
+-    /*
+-     * If these aren't available from the provider we'll get NULL returns.
+-     * That's fine but will cause errors later if SSLv3 is negotiated
+-     */
+-    ret->md5 = ssl_evp_md_fetch(libctx, NID_md5, propq);
+-    ret->sha1 = ssl_evp_md_fetch(libctx, NID_sha1, propq);
++    if ((ret->md5 = EVP_get_digestbyname("ssl3-md5")) == NULL) {
++        SSLerr(0, SSL_R_UNABLE_TO_LOAD_SSL3_MD5_ROUTINES);
++        goto err2;
++    }
++    if ((ret->sha1 = EVP_get_digestbyname("ssl3-sha1")) == NULL) {
++        SSLerr(0, SSL_R_UNABLE_TO_LOAD_SSL3_SHA1_ROUTINES);
++        goto err2;
++    }
+ 
+     if ((ret->ca_names = sk_X509_NAME_new_null()) == NULL)
+         goto err;
+@@ -3361,14 +3359,6 @@ void SSL_CTX_free(SSL_CTX *a)
+     OPENSSL_free(a->ext.alpn);
+     OPENSSL_secure_free(a->ext.secure);
+ 
+-    ssl_evp_md_free(a->md5);
+-    ssl_evp_md_free(a->sha1);
+-
+-    for (i = 0; i < SSL_ENC_NUM_IDX; i++)
+-        ssl_evp_cipher_free(a->ssl_cipher_methods[i]);
+-    for (i = 0; i < SSL_MD_NUM_IDX; i++)
+-        ssl_evp_md_free(a->ssl_digest_methods[i]);
+-
+     CRYPTO_THREAD_lock_free(a->lock);
+ 
+     OPENSSL_free(a->propq);
+@@ -5843,112 +5833,3 @@ void SSL_set_allow_early_data_cb(SSL *s,
+     s->allow_early_data_cb = cb;
+     s->allow_early_data_cb_data = arg;
+ }
+-
+-const EVP_CIPHER *ssl_evp_cipher_fetch(OPENSSL_CTX *libctx,
+-                                       int nid,
+-                                       const char *properties)
+-{
+-    EVP_CIPHER *ciph;
+-
+-#ifndef OPENSSL_NO_ENGINE
+-    ENGINE *eng;
+-
+-    /*
+-     * If there is an Engine available for this cipher we use the "implicit"
+-     * form to ensure we use that engine later.
+-     */
+-    eng = ENGINE_get_cipher_engine(nid);
+-    if (eng != NULL) {
+-        ENGINE_finish(eng);
+-        return EVP_get_cipherbynid(nid);
+-    }
+-#endif
+-
+-    /* Otherwise we do an explicit fetch. This may fail and that could be ok */
+-    ERR_set_mark();
+-    ciph = EVP_CIPHER_fetch(libctx, OBJ_nid2sn(nid), properties);
+-    ERR_pop_to_mark();
+-    return ciph;
+-}
+-
+-
+-int ssl_evp_cipher_up_ref(const EVP_CIPHER *cipher)
+-{
+-    /* Don't up-ref an implicit EVP_CIPHER */
+-    if (EVP_CIPHER_provider(cipher) == NULL)
+-        return 1;
+-
+-    /*
+-     * The cipher was explicitly fetched and therefore it is safe to cast
+-     * away the const
+-     */
+-    return EVP_CIPHER_up_ref((EVP_CIPHER *)cipher);
+-}
+-
+-void ssl_evp_cipher_free(const EVP_CIPHER *cipher)
+-{
+-    if (cipher == NULL)
+-        return;
+-
+-    if (EVP_CIPHER_provider(cipher) != NULL) {
+-        /*
+-         * The cipher was explicitly fetched and therefore it is safe to cast
+-         * away the const
+-         */
+-        EVP_CIPHER_free((EVP_CIPHER *)cipher);
+-    }
+-}
+-
+-const EVP_MD *ssl_evp_md_fetch(OPENSSL_CTX *libctx,
+-                               int nid,
+-                               const char *properties)
+-{
+-    EVP_MD *md;
+-
+-#ifndef OPENSSL_NO_ENGINE
+-    ENGINE *eng;
+-
+-    /*
+-     * If there is an Engine available for this digest we use the "implicit"
+-     * form to ensure we use that engine later.
+-     */
+-    eng = ENGINE_get_digest_engine(nid);
+-    if (eng != NULL) {
+-        ENGINE_finish(eng);
+-        return EVP_get_digestbynid(nid);
+-    }
+-#endif
+-
+-    /* Otherwise we do an explicit fetch */
+-    ERR_set_mark();
+-    md = EVP_MD_fetch(libctx, OBJ_nid2sn(nid), properties);
+-    ERR_pop_to_mark();
+-    return md;
+-}
+-
+-int ssl_evp_md_up_ref(const EVP_MD *md)
+-{
+-    /* Don't up-ref an implicit EVP_MD */
+-    if (EVP_MD_provider(md) == NULL)
+-        return 1;
+-
+-    /*
+-     * The digest was explicitly fetched and therefore it is safe to cast
+-     * away the const
+-     */
+-    return EVP_MD_up_ref((EVP_MD *)md);
+-}
+-
+-void ssl_evp_md_free(const EVP_MD *md)
+-{
+-    if (md == NULL)
+-        return;
+-
+-    if (EVP_MD_provider(md) != NULL) {
+-        /*
+-         * The digest was explicitly fetched and therefore it is safe to cast
+-         * away the const
+-         */
+-        EVP_MD_free((EVP_MD *)md);
+-    }
+-}
+diff --git a/ssl/ssl_local.h b/ssl/ssl_local.h
+index c48bcb9a9a..f0f0a53ecf 100644
+--- a/ssl/ssl_local.h
++++ b/ssl/ssl_local.h
+@@ -276,8 +276,6 @@
+ # define SSL_MD_SHA512_IDX 11
+ # define SSL_MAX_DIGEST 12
+ 
+-#define SSL_MD_NUM_IDX  SSL_MAX_DIGEST
+-
+ /* Bits for algorithm2 (handshake digests and other extra flags) */
+ 
+ /* Bits 0-7 are handshake MAC */
+@@ -391,30 +389,6 @@
+ # define SSL_PKEY_ED448          8
+ # define SSL_PKEY_NUM            9
+ 
+-# define SSL_ENC_DES_IDX         0
+-# define SSL_ENC_3DES_IDX        1
+-# define SSL_ENC_RC4_IDX         2
+-# define SSL_ENC_RC2_IDX         3
+-# define SSL_ENC_IDEA_IDX        4
+-# define SSL_ENC_NULL_IDX        5
+-# define SSL_ENC_AES128_IDX      6
+-# define SSL_ENC_AES256_IDX      7
+-# define SSL_ENC_CAMELLIA128_IDX 8
+-# define SSL_ENC_CAMELLIA256_IDX 9
+-# define SSL_ENC_GOST89_IDX      10
+-# define SSL_ENC_SEED_IDX        11
+-# define SSL_ENC_AES128GCM_IDX   12
+-# define SSL_ENC_AES256GCM_IDX   13
+-# define SSL_ENC_AES128CCM_IDX   14
+-# define SSL_ENC_AES256CCM_IDX   15
+-# define SSL_ENC_AES128CCM8_IDX  16
+-# define SSL_ENC_AES256CCM8_IDX  17
+-# define SSL_ENC_GOST8912_IDX    18
+-# define SSL_ENC_CHACHA_IDX      19
+-# define SSL_ENC_ARIA128GCM_IDX  20
+-# define SSL_ENC_ARIA256GCM_IDX  21
+-# define SSL_ENC_NUM_IDX         22
+-
+ /*-
+  * SSL_kRSA <- RSA_ENC
+  * SSL_kDH  <- DH_ENC & (RSA_ENC | RSA_SIGN | DSA_SIGN)
+@@ -891,7 +865,7 @@ struct ssl_ctx_st {
+     CRYPTO_EX_DATA ex_data;
+ 
+     const EVP_MD *md5;          /* For SSLv3/TLSv1 'ssl3-md5' */
+-    const EVP_MD *sha1;         /* For SSLv3/TLSv1 'ssl3-sha1' */
++    const EVP_MD *sha1;         /* For SSLv3/TLSv1 'ssl3->sha1' */
+ 
+     STACK_OF(X509) *extra_certs;
+     STACK_OF(SSL_COMP) *comp_methods; /* stack of SSL_COMP, SSLv3/TLSv1 */
+@@ -1135,10 +1109,6 @@ struct ssl_ctx_st {
+     void *async_cb_arg;
+ 
+     char *propq;
+-
+-    const EVP_CIPHER *ssl_cipher_methods[SSL_ENC_NUM_IDX];
+-    const EVP_MD *ssl_digest_methods[SSL_MD_NUM_IDX];
+-    size_t ssl_mac_secret_size[SSL_MD_NUM_IDX];
+ };
+ 
+ typedef struct cert_pkey_st CERT_PKEY;
+@@ -2363,12 +2333,10 @@ __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
+                                 STACK_OF(SSL_CIPHER) **scsvs, int sslv2format,
+                                 int fatal);
+ void ssl_update_cache(SSL *s, int mode);
+-__owur int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
+-                                     const EVP_CIPHER **enc);
+-__owur int ssl_cipher_get_evp(SSL_CTX *ctxc, const SSL_SESSION *s,
+-                              const EVP_CIPHER **enc, const EVP_MD **md,
+-                              int *mac_pkey_type, size_t *mac_secret_size,
+-                              SSL_COMP **comp, int use_etm);
++__owur int ssl_cipher_get_evp(const SSL_SESSION *s, const EVP_CIPHER **enc,
++                              const EVP_MD **md, int *mac_pkey_type,
++                              size_t *mac_secret_size, SSL_COMP **comp,
++                              int use_etm);
+ __owur int ssl_cipher_get_overhead(const SSL_CIPHER *c, size_t *mac_overhead,
+                                    size_t *int_overhead, size_t *blocksize,
+                                    size_t *ext_overhead);
+@@ -2408,7 +2376,7 @@ void ssl_set_masks(SSL *s);
+ __owur STACK_OF(SSL_CIPHER) *ssl_get_ciphers_by_id(SSL *s);
+ __owur int ssl_x509err2alert(int type);
+ void ssl_sort_cipher_list(void);
+-int ssl_load_ciphers(SSL_CTX *ctx);
++int ssl_load_ciphers(void);
+ __owur int ssl_fill_hello_random(SSL *s, int server, unsigned char *field,
+                                  size_t len, DOWNGRADE dgrd);
+ __owur int ssl_generate_master_secret(SSL *s, unsigned char *pms, size_t pmslen,
+@@ -2663,8 +2631,7 @@ __owur int tls1_save_u16(PACKET *pkt, uint16_t **pdest, size_t *pdestlen);
+ __owur int tls1_save_sigalgs(SSL *s, PACKET *pkt, int cert);
+ __owur int tls1_process_sigalgs(SSL *s);
+ __owur int tls1_set_peer_legacy_sigalg(SSL *s, const EVP_PKEY *pkey);
+-__owur int tls1_lookup_md(SSL_CTX *ctx, const SIGALG_LOOKUP *lu,
+-                          const EVP_MD **pmd);
++__owur int tls1_lookup_md(const SIGALG_LOOKUP *lu, const EVP_MD **pmd);
+ __owur size_t tls12_get_psigalgs(SSL *s, int sent, const uint16_t **psigs);
+ #  ifndef OPENSSL_NO_EC
+ __owur int tls_check_sigalg_curve(const SSL *s, int curve);
+@@ -2675,7 +2642,7 @@ __owur int ssl_cipher_disabled(const SSL *s, const SSL_CIPHER *c, int op, int ec
+ 
+ __owur int ssl_handshake_hash(SSL *s, unsigned char *out, size_t outlen,
+                                  size_t *hashlen);
+-__owur const EVP_MD *ssl_md(SSL_CTX *ctx, int idx);
++__owur const EVP_MD *ssl_md(int idx);
+ __owur const EVP_MD *ssl_handshake_md(SSL *s);
+ __owur const EVP_MD *ssl_prf_md(SSL *s);
+ 
+@@ -2753,18 +2720,6 @@ void ssl_comp_free_compression_methods_int(void);
+ /* ssl_mcnf.c */
+ void ssl_ctx_system_config(SSL_CTX *ctx);
+ 
+-const EVP_CIPHER *ssl_evp_cipher_fetch(OPENSSL_CTX *libctx,
+-                                       int nid,
+-                                       const char *properties);
+-int ssl_evp_cipher_up_ref(const EVP_CIPHER *cipher);
+-void ssl_evp_cipher_free(const EVP_CIPHER *cipher);
+-const EVP_MD *ssl_evp_md_fetch(OPENSSL_CTX *libctx,
+-                               int nid,
+-                               const char *properties);
+-int ssl_evp_md_up_ref(const EVP_MD *md);
+-void ssl_evp_md_free(const EVP_MD *md);
+-
+-
+ # else /* OPENSSL_UNIT_TEST */
+ 
+ #  define ssl_init_wbio_buffer SSL_test_functions()->p_ssl_init_wbio_buffer
+diff --git a/ssl/ssl_txt.c b/ssl/ssl_txt.c
+index 09d00bacbe..bc3fcfbd1d 100644
+--- a/ssl/ssl_txt.c
++++ b/ssl/ssl_txt.c
+@@ -117,7 +117,7 @@ int SSL_SESSION_print(BIO *bp, const SSL_SESSION *x)
+     if (x->compress_meth != 0) {
+         SSL_COMP *comp = NULL;
+ 
+-        if (!ssl_cipher_get_evp(NULL, x, NULL, NULL, NULL, NULL, &comp, 0))
++        if (!ssl_cipher_get_evp(x, NULL, NULL, NULL, NULL, &comp, 0))
+             goto err;
+         if (comp == NULL) {
+             if (BIO_printf(bp, "\n    Compression: %d", x->compress_meth) <= 0)
+diff --git a/ssl/statem/extensions_clnt.c b/ssl/statem/extensions_clnt.c
+index 776473e659..75fecdeaa6 100644
+--- a/ssl/statem/extensions_clnt.c
++++ b/ssl/statem/extensions_clnt.c
+@@ -981,7 +981,7 @@ EXT_RETURN tls_construct_ctos_padding(SSL *s, WPACKET *pkt,
+     if (s->session->ssl_version == TLS1_3_VERSION
+             && s->session->ext.ticklen != 0
+             && s->session->cipher != NULL) {
+-        const EVP_MD *md = ssl_md(s->ctx, s->session->cipher->algorithm2);
++        const EVP_MD *md = ssl_md(s->session->cipher->algorithm2);
+ 
+         if (md != NULL) {
+             /*
+@@ -1059,7 +1059,7 @@ EXT_RETURN tls_construct_ctos_psk(SSL *s, WPACKET *pkt, unsigned int context,
+                      ERR_R_INTERNAL_ERROR);
+             return EXT_RETURN_FAIL;
+         }
+-        mdres = ssl_md(s->ctx, s->session->cipher->algorithm2);
++        mdres = ssl_md(s->session->cipher->algorithm2);
+         if (mdres == NULL) {
+             /*
+              * Don't recognize this cipher so we can't use the session.
+@@ -1132,7 +1132,7 @@ EXT_RETURN tls_construct_ctos_psk(SSL *s, WPACKET *pkt, unsigned int context,
+         return EXT_RETURN_NOT_SENT;
+ 
+     if (s->psksession != NULL) {
+-        mdpsk = ssl_md(s->ctx, s->psksession->cipher->algorithm2);
++        mdpsk = ssl_md(s->psksession->cipher->algorithm2);
+         if (mdpsk == NULL) {
+             /*
+              * Don't recognize this cipher so we can't use the session.
+diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
+index 549a207430..756ceafb50 100644
+--- a/ssl/statem/extensions_srvr.c
++++ b/ssl/statem/extensions_srvr.c
+@@ -1239,9 +1239,8 @@ int tls_parse_ctos_psk(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
+             }
+         }
+ 
+-        md = ssl_md(s->ctx, sess->cipher->algorithm2);
+-        if (!EVP_MD_is_a(md,
+-                EVP_MD_name(ssl_md(s->ctx, s->s3.tmp.new_cipher->algorithm2)))) {
++        md = ssl_md(sess->cipher->algorithm2);
++        if (md != ssl_md(s->s3.tmp.new_cipher->algorithm2)) {
+             /* The ciphersuite is not compatible with this session. */
+             SSL_SESSION_free(sess);
+             sess = NULL;
+diff --git a/ssl/statem/statem_clnt.c b/ssl/statem/statem_clnt.c
+index cdd413d1ef..8d843099f9 100644
+--- a/ssl/statem/statem_clnt.c
++++ b/ssl/statem/statem_clnt.c
+@@ -1376,8 +1376,8 @@ static int set_client_ciphersuite(SSL *s, const unsigned char *cipherchars)
+              * In TLSv1.3 it is valid for the server to select a different
+              * ciphersuite as long as the hash is the same.
+              */
+-            if (ssl_md(s->ctx, c->algorithm2)
+-                    != ssl_md(s->ctx, s->session->cipher->algorithm2)) {
++            if (ssl_md(c->algorithm2)
++                    != ssl_md(s->session->cipher->algorithm2)) {
+                 SSLfatal(s, SSL_AD_ILLEGAL_PARAMETER,
+                          SSL_F_SET_CLIENT_CIPHERSUITE,
+                          SSL_R_CIPHERSUITE_DIGEST_HAS_CHANGED);
+@@ -2339,7 +2339,7 @@ MSG_PROCESS_RETURN tls_process_key_exchange(SSL *s, PACKET *pkt)
+             goto err;
+         }
+ 
+-        if (!tls1_lookup_md(s->ctx, s->s3.tmp.peer_sigalg, &md)) {
++        if (!tls1_lookup_md(s->s3.tmp.peer_sigalg, &md)) {
+             SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PROCESS_KEY_EXCHANGE,
+                      ERR_R_INTERNAL_ERROR);
+             goto err;
+diff --git a/ssl/statem/statem_lib.c b/ssl/statem/statem_lib.c
+index e9cfee027e..b89566d840 100644
+--- a/ssl/statem/statem_lib.c
++++ b/ssl/statem/statem_lib.c
+@@ -247,7 +247,7 @@ int tls_construct_cert_verify(SSL *s, WPACKET *pkt)
+     }
+     pkey = s->s3.tmp.cert->privatekey;
+ 
+-    if (pkey == NULL || !tls1_lookup_md(s->ctx, lu, &md)) {
++    if (pkey == NULL || !tls1_lookup_md(lu, &md)) {
+         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CERT_VERIFY,
+                  ERR_R_INTERNAL_ERROR);
+         goto err;
+@@ -422,7 +422,7 @@ MSG_PROCESS_RETURN tls_process_cert_verify(SSL *s, PACKET *pkt)
+             goto err;
+     }
+ 
+-    if (!tls1_lookup_md(s->ctx, s->s3.tmp.peer_sigalg, &md)) {
++    if (!tls1_lookup_md(s->s3.tmp.peer_sigalg, &md)) {
+         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PROCESS_CERT_VERIFY,
+                  ERR_R_INTERNAL_ERROR);
+         goto err;
+diff --git a/ssl/statem/statem_srvr.c b/ssl/statem/statem_srvr.c
+index 43f9811163..a23187290e 100644
+--- a/ssl/statem/statem_srvr.c
++++ b/ssl/statem/statem_srvr.c
+@@ -2773,7 +2773,7 @@ int tls_construct_server_key_exchange(SSL *s, WPACKET *pkt)
+         unsigned char *sigbytes1, *sigbytes2, *tbs;
+         size_t siglen = 0, tbslen;
+ 
+-        if (pkey == NULL || !tls1_lookup_md(s->ctx, lu, &md)) {
++        if (pkey == NULL || !tls1_lookup_md(lu, &md)) {
+             /* Should never happen */
+             SSLfatal(s, SSL_AD_INTERNAL_ERROR,
+                      SSL_F_TLS_CONSTRUCT_SERVER_KEY_EXCHANGE,
+diff --git a/ssl/t1_enc.c b/ssl/t1_enc.c
+index c50905589b..0a5c770a84 100644
+--- a/ssl/t1_enc.c
++++ b/ssl/t1_enc.c
+@@ -540,16 +540,14 @@ int tls1_setup_key_block(SSL *s)
+     if (s->s3.tmp.key_block_length != 0)
+         return 1;
+ 
+-    if (!ssl_cipher_get_evp(s->ctx, s->session, &c, &hash, &mac_type,
+-                            &mac_secret_size, &comp, s->ext.use_etm)) {
++    if (!ssl_cipher_get_evp(s->session, &c, &hash, &mac_type, &mac_secret_size,
++                            &comp, s->ext.use_etm)) {
+         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS1_SETUP_KEY_BLOCK,
+                  SSL_R_CIPHER_OR_HASH_UNAVAILABLE);
+         return 0;
+     }
+ 
+-    ssl_evp_cipher_free(s->s3.tmp.new_sym_enc);
+     s->s3.tmp.new_sym_enc = c;
+-    ssl_evp_md_free(s->s3.tmp.new_hash);
+     s->s3.tmp.new_hash = hash;
+     s->s3.tmp.new_mac_pkey_type = mac_type;
+     s->s3.tmp.new_mac_secret_size = mac_secret_size;
+diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
+index 624add64a8..235f5661ad 100644
+--- a/ssl/t1_lib.c
++++ b/ssl/t1_lib.c
+@@ -893,7 +893,7 @@ static const SIGALG_LOOKUP *tls1_lookup_sigalg(uint16_t sigalg)
+     return NULL;
+ }
+ /* Lookup hash: return 0 if invalid or not enabled */
+-int tls1_lookup_md(SSL_CTX *ctx, const SIGALG_LOOKUP *lu, const EVP_MD **pmd)
++int tls1_lookup_md(const SIGALG_LOOKUP *lu, const EVP_MD **pmd)
+ {
+     const EVP_MD *md;
+     if (lu == NULL)
+@@ -902,7 +902,7 @@ int tls1_lookup_md(SSL_CTX *ctx, const SIGALG_LOOKUP *lu, const EVP_MD **pmd)
+     if (lu->hash == NID_undef) {
+         md = NULL;
+     } else {
+-        md = ssl_md(ctx, lu->hash_idx);
++        md = ssl_md(lu->hash_idx);
+         if (md == NULL)
+             return 0;
+     }
+@@ -919,16 +919,15 @@ int tls1_lookup_md(SSL_CTX *ctx, const SIGALG_LOOKUP *lu, const EVP_MD **pmd)
+  * with a 128 byte (1024 bit) key.
+  */
+ #define RSA_PSS_MINIMUM_KEY_SIZE(md) (2 * EVP_MD_size(md) + 2)
+-static int rsa_pss_check_min_key_size(SSL_CTX *ctx, const EVP_PKEY *pkey,
+-                                      const SIGALG_LOOKUP *lu)
++static int rsa_pss_check_min_key_size(const RSA *rsa, const SIGALG_LOOKUP *lu)
+ {
+     const EVP_MD *md;
+ 
+-    if (pkey == NULL)
++    if (rsa == NULL)
+         return 0;
+-    if (!tls1_lookup_md(ctx, lu, &md) || md == NULL)
++    if (!tls1_lookup_md(lu, &md) || md == NULL)
+         return 0;
+-    if (EVP_PKEY_size(pkey) < RSA_PSS_MINIMUM_KEY_SIZE(md))
++    if (RSA_size(rsa) < RSA_PSS_MINIMUM_KEY_SIZE(md))
+         return 0;
+     return 1;
+ }
+@@ -979,7 +978,7 @@ static const SIGALG_LOOKUP *tls1_get_legacy_sigalg(const SSL *s, int idx)
+     if (SSL_USE_SIGALGS(s) || idx != SSL_PKEY_RSA) {
+         const SIGALG_LOOKUP *lu = tls1_lookup_sigalg(tls_default_sigalg[idx]);
+ 
+-        if (!tls1_lookup_md(s->ctx, lu, NULL))
++        if (!tls1_lookup_md(lu, NULL))
+             return NULL;
+         if (!tls12_sigalg_allowed(s, SSL_SECOP_SIGALG_SUPPORTED, lu))
+             return NULL;
+@@ -1075,31 +1074,6 @@ int tls_check_sigalg_curve(const SSL *s, int curve)
+ }
+ #endif
+ 
+-/*
+- * Return the number of security bits for the signature algorithm, or 0 on
+- * error.
+- */
+-static int sigalg_security_bits(SSL_CTX *ctx, const SIGALG_LOOKUP *lu)
+-{
+-    const EVP_MD *md = NULL;
+-    int secbits = 0;
+-
+-    if (!tls1_lookup_md(ctx, lu, &md))
+-        return 0;
+-    if (md != NULL)
+-    {
+-        /* Security bits: half digest bits */
+-        secbits = EVP_MD_size(md) * 4;
+-    } else {
+-        /* Values from https://tools.ietf.org/html/rfc8032#section-8.5 */
+-        if (lu->sigalg == TLSEXT_SIGALG_ed25519)
+-            secbits = 128;
+-        else if (lu->sigalg == TLSEXT_SIGALG_ed448)
+-            secbits = 224;
+-    }
+-    return secbits;
+-}
+-
+ /*
+  * Check signature algorithm is consistent with sent supported signature
+  * algorithms and if so set relevant digest and signature scheme in
+@@ -1113,7 +1087,6 @@ int tls12_check_peer_sigalg(SSL *s, uint16_t sig, EVP_PKEY *pkey)
+     size_t sent_sigslen, i, cidx;
+     int pkeyid = EVP_PKEY_id(pkey);
+     const SIGALG_LOOKUP *lu;
+-    int secbits = 0;
+ 
+     /* Should never happen */
+     if (pkeyid == -1)
+@@ -1210,25 +1183,25 @@ int tls12_check_peer_sigalg(SSL *s, uint16_t sig, EVP_PKEY *pkey)
+                  SSL_R_WRONG_SIGNATURE_TYPE);
+         return 0;
+     }
+-    if (!tls1_lookup_md(s->ctx, lu, &md)) {
++    if (!tls1_lookup_md(lu, &md)) {
+         SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_F_TLS12_CHECK_PEER_SIGALG,
+                  SSL_R_UNKNOWN_DIGEST);
+         return 0;
+     }
+-    /*
+-     * Make sure security callback allows algorithm. For historical
+-     * reasons we have to pass the sigalg as a two byte char array.
+-     */
+-    sigalgstr[0] = (sig >> 8) & 0xff;
+-    sigalgstr[1] = sig & 0xff;
+-    secbits = sigalg_security_bits(s->ctx, lu);
+-    if (secbits == 0 ||
+-        !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits,
+-                      md != NULL ? EVP_MD_type(md) : NID_undef,
+-                      (void *)sigalgstr)) {
+-        SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_F_TLS12_CHECK_PEER_SIGALG,
+-                 SSL_R_WRONG_SIGNATURE_TYPE);
+-        return 0;
++    if (md != NULL) {
++        /*
++         * Make sure security callback allows algorithm. For historical
++         * reasons we have to pass the sigalg as a two byte char array.
++         */
++        sigalgstr[0] = (sig >> 8) & 0xff;
++        sigalgstr[1] = sig & 0xff;
++        if (!ssl_security(s, SSL_SECOP_SIGALG_CHECK,
++                    EVP_MD_size(md) * 4, EVP_MD_type(md),
++                    (void *)sigalgstr)) {
++            SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_F_TLS12_CHECK_PEER_SIGALG,
++                     SSL_R_WRONG_SIGNATURE_TYPE);
++            return 0;
++        }
+     }
+     /* Store the sigalg the peer uses */
+     s->s3.tmp.peer_sigalg = lu;
+@@ -1705,7 +1678,7 @@ static int tls12_sigalg_allowed(const SSL *s, int op, const SIGALG_LOOKUP *lu)
+     int secbits;
+ 
+     /* See if sigalgs is recognised and if hash is enabled */
+-    if (!tls1_lookup_md(s->ctx, lu, NULL))
++    if (!tls1_lookup_md(lu, NULL))
+         return 0;
+     /* DSA is not allowed in TLS 1.3 */
+     if (SSL_IS_TLS13(s) && lu->sig == EVP_PKEY_DSA)
+@@ -1760,8 +1733,11 @@ static int tls12_sigalg_allowed(const SSL *s, int op, const SIGALG_LOOKUP *lu)
+         }
+     }
+ 
++    if (lu->hash == NID_undef)
++        return 1;
++    /* Security bits: half digest bits */
++    secbits = EVP_MD_size(ssl_md(lu->hash_idx)) * 4;
+     /* Finally see if security callback allows it */
+-    secbits = sigalg_security_bits(s->ctx, lu);
+     sigalgstr[0] = (lu->sigalg >> 8) & 0xff;
+     sigalgstr[1] = lu->sigalg & 0xff;
+     return ssl_security(s, op, secbits, lu->hash, (void *)sigalgstr);
+@@ -2809,7 +2785,7 @@ static const SIGALG_LOOKUP *find_sig_alg(SSL *s, X509 *x, EVP_PKEY *pkey)
+             || lu->sig == EVP_PKEY_RSA)
+             continue;
+         /* Check that we have a cert, and signature_algorithms_cert */
+-        if (!tls1_lookup_md(s->ctx, lu, NULL))
++        if (!tls1_lookup_md(lu, NULL))
+             continue;
+         if ((pkey == NULL && !has_usable_cert(s, lu, -1))
+                 || (pkey != NULL && !is_cert_usable(s, lu, x, pkey)))
+@@ -2831,7 +2807,7 @@ static const SIGALG_LOOKUP *find_sig_alg(SSL *s, X509 *x, EVP_PKEY *pkey)
+ #endif
+         } else if (lu->sig == EVP_PKEY_RSA_PSS) {
+             /* validate that key is large enough for the signature algorithm */
+-            if (!rsa_pss_check_min_key_size(s->ctx, tmppkey, lu))
++            if (!rsa_pss_check_min_key_size(EVP_PKEY_get0(tmppkey), lu))
+                 continue;
+         }
+         break;
+@@ -2917,7 +2893,7 @@ int tls_choose_sigalg(SSL *s, int fatalerrs)
+                         /* validate that key is large enough for the signature algorithm */
+                         EVP_PKEY *pkey = s->cert->pkeys[sig_idx].privatekey;
+ 
+-                        if (!rsa_pss_check_min_key_size(s->ctx, pkey, lu))
++                        if (!rsa_pss_check_min_key_size(EVP_PKEY_get0(pkey), lu))
+                             continue;
+                     }
+ #ifndef OPENSSL_NO_EC
+diff --git a/ssl/tls13_enc.c b/ssl/tls13_enc.c
+index fba12fe5e4..181f3920a1 100644
+--- a/ssl/tls13_enc.c
++++ b/ssl/tls13_enc.c
+@@ -36,8 +36,7 @@ int tls13_hkdf_expand(SSL *s, const EVP_MD *md, const unsigned char *secret,
+ #else
+     static const unsigned char label_prefix[] = "tls13 ";
+ #endif
+-    EVP_KDF *kdf = EVP_KDF_fetch(s->ctx->libctx, OSSL_KDF_NAME_HKDF,
+-                                 s->ctx->propq);
++    EVP_KDF *kdf = EVP_KDF_fetch(NULL, OSSL_KDF_NAME_HKDF, NULL);
+     EVP_KDF_CTX *kctx;
+     OSSL_PARAM params[5], *p = params;
+     int mode = EVP_PKEY_HKDEF_MODE_EXPAND_ONLY;
+@@ -195,7 +194,7 @@ int tls13_generate_secret(SSL *s, const EVP_MD *md,
+ #endif
+     unsigned char preextractsec[EVP_MAX_MD_SIZE];
+ 
+-    kdf = EVP_KDF_fetch(s->ctx->libctx, OSSL_KDF_NAME_HKDF, s->ctx->propq);
++    kdf = EVP_KDF_fetch(NULL, OSSL_KDF_NAME_HKDF, NULL);
+     kctx = EVP_KDF_CTX_new(kdf);
+     EVP_KDF_free(kdf);
+     if (kctx == NULL) {
+@@ -312,27 +311,11 @@ int tls13_generate_master_secret(SSL *s, unsigned char *out,
+ size_t tls13_final_finish_mac(SSL *s, const char *str, size_t slen,
+                              unsigned char *out)
+ {
+-    const char *mdname = EVP_MD_name(ssl_handshake_md(s));
+-    EVP_MAC *hmac = EVP_MAC_fetch(s->ctx->libctx, "HMAC", s->ctx->propq);
++    const EVP_MD *md = ssl_handshake_md(s);
+     unsigned char hash[EVP_MAX_MD_SIZE];
+-    unsigned char finsecret[EVP_MAX_MD_SIZE];
+     size_t hashlen, ret = 0;
+-    EVP_MAC_CTX *ctx = NULL;
+-    OSSL_PARAM params[4], *p = params;
+-
+-    if (hmac == NULL) {
+-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS13_FINAL_FINISH_MAC,
+-                 ERR_R_INTERNAL_ERROR);
+-        goto err;
+-    }
+-
+-    /* Safe to cast away const here since we're not "getting" any data */
+-    *p++ = OSSL_PARAM_construct_utf8_string(OSSL_ALG_PARAM_DIGEST,
+-                                            (char *)mdname, 0);
+-    if (s->ctx->propq != NULL)
+-        *p++ = OSSL_PARAM_construct_utf8_string(OSSL_ALG_PARAM_PROPERTIES,
+-                                                (char *)s->ctx->propq,
+-                                                0);
++    EVP_PKEY *key = NULL;
++    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+ 
+     if (!ssl_handshake_hash(s, hash, sizeof(hash), &hashlen)) {
+         /* SSLfatal() already called */
+@@ -340,31 +323,29 @@ size_t tls13_final_finish_mac(SSL *s, const char *str, size_t slen,
+     }
+ 
+     if (str == s->method->ssl3_enc->server_finished_label) {
+-        *p++ = OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY,
+-                                                 s->server_finished_secret,
+-                                                 hashlen);
++        key = EVP_PKEY_new_raw_private_key(EVP_PKEY_HMAC, NULL,
++                                           s->server_finished_secret, hashlen);
+     } else if (SSL_IS_FIRST_HANDSHAKE(s)) {
+-        *p++ = OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY,
+-                                                 s->client_finished_secret,
+-                                                 hashlen);
++        key = EVP_PKEY_new_raw_private_key(EVP_PKEY_HMAC, NULL,
++                                           s->client_finished_secret, hashlen);
+     } else {
++        unsigned char finsecret[EVP_MAX_MD_SIZE];
++
+         if (!tls13_derive_finishedkey(s, ssl_handshake_md(s),
+                                       s->client_app_traffic_secret,
+                                       finsecret, hashlen))
+             goto err;
+ 
+-        *p++ = OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY, finsecret,
+-                                                 hashlen);
++        key = EVP_PKEY_new_raw_private_key(EVP_PKEY_HMAC, NULL, finsecret,
++                                           hashlen);
++        OPENSSL_cleanse(finsecret, sizeof(finsecret));
+     }
+-    *p++ = OSSL_PARAM_construct_end();
+ 
+-    ctx = EVP_MAC_CTX_new(hmac);
+-    if (ctx == NULL
+-            || !EVP_MAC_CTX_set_params(ctx, params)
+-            || !EVP_MAC_init(ctx)
+-            || !EVP_MAC_update(ctx, hash, hashlen)
+-               /* outsize as per sizeof(peer_finish_md) */
+-            || !EVP_MAC_final(ctx, out, &hashlen, EVP_MAX_MD_SIZE * 2)) {
++    if (key == NULL
++            || ctx == NULL
++            || EVP_DigestSignInit(ctx, NULL, md, NULL, key) <= 0
++            || EVP_DigestSignUpdate(ctx, hash, hashlen) <= 0
++            || EVP_DigestSignFinal(ctx, out, &hashlen) <= 0) {
+         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS13_FINAL_FINISH_MAC,
+                  ERR_R_INTERNAL_ERROR);
+         goto err;
+@@ -372,9 +353,8 @@ size_t tls13_final_finish_mac(SSL *s, const char *str, size_t slen,
+ 
+     ret = hashlen;
+  err:
+-    OPENSSL_cleanse(finsecret, sizeof(finsecret));
+-    EVP_MAC_CTX_free(ctx);
+-    EVP_MAC_free(hmac);
++    EVP_PKEY_free(key);
++    EVP_MD_CTX_free(ctx);
+     return ret;
+ }
+ 
+@@ -388,16 +368,13 @@ int tls13_setup_key_block(SSL *s)
+     const EVP_MD *hash;
+ 
+     s->session->cipher = s->s3.tmp.new_cipher;
+-    if (!ssl_cipher_get_evp(s->ctx, s->session, &c, &hash, NULL, NULL, NULL,
+-                            0)) {
++    if (!ssl_cipher_get_evp(s->session, &c, &hash, NULL, NULL, NULL, 0)) {
+         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS13_SETUP_KEY_BLOCK,
+                  SSL_R_CIPHER_OR_HASH_UNAVAILABLE);
+         return 0;
+     }
+ 
+-    ssl_evp_cipher_free(s->s3.tmp.new_sym_enc);
+     s->s3.tmp.new_sym_enc = c;
+-    ssl_evp_md_free(s->s3.tmp.new_hash);
+     s->s3.tmp.new_hash = hash;
+ 
+     return 1;
+@@ -599,19 +576,8 @@ int tls13_change_cipher_state(SSL *s, int which)
+                          SSL_F_TLS13_CHANGE_CIPHER_STATE, ERR_R_MALLOC_FAILURE);
+                 goto err;
+             }
+-
+-            /*
+-             * This ups the ref count on cipher so we better make sure we free
+-             * it again
+-             */
+-            if (!ssl_cipher_get_evp_cipher(s->ctx, sslcipher, &cipher)) {
+-                SSLfatal(s, SSL_AD_INTERNAL_ERROR,
+-                         SSL_F_TLS13_CHANGE_CIPHER_STATE,
+-                         SSL_R_ALGORITHM_FETCH_FAILED);
+-                goto err;
+-            }
+-
+-            md = ssl_md(s->ctx, sslcipher->algorithm2);
++            cipher = EVP_get_cipherbynid(SSL_CIPHER_get_cipher_nid(sslcipher));
++            md = ssl_md(sslcipher->algorithm2);
+             if (md == NULL || !EVP_DigestInit_ex(mdctx, md, NULL)
+                     || !EVP_DigestUpdate(mdctx, hdata, handlen)
+                     || !EVP_DigestFinal_ex(mdctx, hashval, &hashlenui)) {
+@@ -766,10 +732,6 @@ int tls13_change_cipher_state(SSL *s, int which)
+         s->statem.enc_write_state = ENC_WRITE_STATE_VALID;
+     ret = 1;
+  err:
+-    if ((which & SSL3_CC_EARLY) != 0) {
+-        /* We up-refed this so now we need to down ref */
+-        ssl_evp_cipher_free(cipher);
+-    }
+     OPENSSL_cleanse(secret, sizeof(secret));
+     return ret;
+ }
+@@ -900,7 +862,7 @@ int tls13_export_keying_material_early(SSL *s, unsigned char *out, size_t olen,
+     else
+         sslcipher = SSL_SESSION_get0_cipher(s->session);
+ 
+-    md = ssl_md(s->ctx, sslcipher->algorithm2);
++    md = ssl_md(sslcipher->algorithm2);
+ 
+     /*
+      * Calculate the hash value and store it in |data|. The reason why
+diff --git a/test/build.info b/test/build.info
+index 6d670ea175..f7ccdd5d9c 100644
+--- a/test/build.info
++++ b/test/build.info
+@@ -35,6 +35,7 @@ IF[{- !$disabled{tests} -}]
+           ectest ecstresstest gmdifftest pbelutest \
+           destest mdc2test \
+           enginetest exptest \
++          ssltest_old exptest rsa_test \
+           evp_pkey_provided_test evp_test evp_extra_test evp_fetch_prov_test \
+           v3nametest v3ext \
+           crltest danetest bad_dtls_test lhash_test sparse_array_test \
+@@ -115,6 +116,14 @@ IF[{- !$disabled{tests} -}]
+   INCLUDE[exptest]=../include ../apps/include
+   DEPEND[exptest]=../libcrypto libtestutil.a
+ 
++  SOURCE[rsa_test]=rsa_test.c
++  INCLUDE[rsa_test]=../include ../apps/include
++  DEPEND[rsa_test]=../libcrypto libtestutil.a
++
++  SOURCE[rsa_mp_test]=rsa_mp_test.c
++  INCLUDE[rsa_mp_test]=../include ../apps/include
++  DEPEND[rsa_mp_test]=../libcrypto.a libtestutil.a
++
+   SOURCE[fatalerrtest]=fatalerrtest.c ssltestlib.c
+   INCLUDE[fatalerrtest]=../include ../apps/include
+   DEPEND[fatalerrtest]=../libcrypto ../libssl libtestutil.a
+@@ -494,8 +503,8 @@ IF[{- !$disabled{tests} -}]
+   IF[1]
+     PROGRAMS{noinst}=asn1_internal_test modes_internal_test x509_internal_test \
+                      tls13encryptiontest wpackettest ctype_internal_test \
+-                     rdrand_sanitytest property_test ideatest rsa_mp_test \
+-                     rsa_sp800_56b_test bn_internal_test ecdsatest rsa_test \
++                     rdrand_sanitytest property_test ideatest \
++                     rsa_sp800_56b_test bn_internal_test ecdsatest \
+                      rc2test rc4test rc5test hmactest ffc_internal_test \
+                      asn1_dsa_internal_test dsatest dsa_no_digest_size_test \
+                      dhtest ssltest_old
+@@ -539,13 +548,6 @@ IF[{- !$disabled{tests} -}]
+     INCLUDE[x509_internal_test]=.. ../include ../apps/include
+     DEPEND[x509_internal_test]=../libcrypto.a libtestutil.a
+ 
+-    SOURCE[rsa_test]=rsa_test.c
+-    INCLUDE[rsa_test]=../include ../apps/include
+-    DEPEND[rsa_test]=../libcrypto.a libtestutil.a
+-
+-    SOURCE[rsa_mp_test]=rsa_mp_test.c
+-    INCLUDE[rsa_mp_test]=../include ../apps/include
+-    DEPEND[rsa_mp_test]=../libcrypto.a libtestutil.a
+ 
+     SOURCE[ecdsatest]=ecdsatest.c
+     INCLUDE[ecdsatest]=../include ../apps/include
+diff --git a/test/recipes/15-test_genrsa.t b/test/recipes/15-test_genrsa.t
+index 0ec0e65f18..d7d146a1d9 100644
+--- a/test/recipes/15-test_genrsa.t
++++ b/test/recipes/15-test_genrsa.t
+@@ -16,18 +16,10 @@ use OpenSSL::Test::Utils;
+ 
+ setup("test_genrsa");
+ 
+-plan tests => 9;
++plan tests => 5;
+ 
+ # We want to know that an absurdly small number of bits isn't support
+-if (disabled("deprecated-3.0")) {
+-    is(run(app([ 'openssl', 'genpkey', '-out', 'genrsatest.pem',
+-                 '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:8',
+-                 '-pkeyopt', 'rsa_keygen_pubexp:3'])),
+-               0, "genrsa -3 8");
+-} else {
+-    is(run(app([ 'openssl', 'genrsa', '-3', '-out', 'genrsatest.pem', '8'])),
+-               0, "genrsa -3 8");
+-}
++is(run(app([ 'openssl', 'genrsa', '-3', '-out', 'genrsatest.pem', '8'])), 0, "genrsa -3 8");
+ 
+ # Depending on the shared library, we might have different lower limits.
+ # Let's find it!  This is a simple binary search
+@@ -37,21 +29,10 @@ if (disabled("deprecated-3.0")) {
+ note "Looking for lowest amount of bits";
+ my $bad = 3;                    # Log2 of number of bits (2 << 3  == 8)
+ my $good = 11;                  # Log2 of number of bits (2 << 11 == 2048)
+-my $fin;
+ while ($good > $bad + 1) {
+     my $checked = int(($good + $bad + 1) / 2);
+-    my $bits = 2 ** $checked;
+-    if (disabled("deprecated-3.0")) {
+-        $fin = run(app([ 'openssl', 'genpkey', '-out', 'genrsatest.pem',
+-                         '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_pubexp:3',
+-                         '-pkeyopt', "rsa_keygen_bits:$bits",
+-                       ], stderr => undef));
+-    } else {
+-        $fin = run(app([ 'openssl', 'genrsa', '-3', '-out', 'genrsatest.pem',
+-                         $bits
+-                       ], stderr => undef));
+-    }
+-    if ($fin) {
++    if (run(app([ 'openssl', 'genrsa', '-3', '-out', 'genrsatest.pem',
++                  2 ** $checked ], stderr => undef))) {
+         note 2 ** $checked, " bits is good";
+         $good = $checked;
+     } else {
+@@ -63,30 +44,11 @@ $good++ if $good == $bad;
+ $good = 2 ** $good;
+ note "Found lowest allowed amount of bits to be $good";
+ 
+-ok(run(app([ 'openssl', 'genpkey', '-algorithm', 'RSA',
+-             '-pkeyopt', 'rsa_keygen_pubexp:3',
+-             '-pkeyopt', "rsa_keygen_bits:$good",
+-             '-out', 'genrsatest.pem' ])),
+-   "genpkey -3 $good");
+-ok(run(app([ 'openssl', 'pkey', '-check', '-in', 'genrsatest.pem', '-noout' ])),
+-   "pkey -check");
+-ok(run(app([ 'openssl', 'genpkey', '-algorithm', 'RSA',
+-             '-pkeyopt', 'rsa_keygen_pubexp:65537',
+-             '-pkeyopt', "rsa_keygen_bits:$good",
+-             '-out', 'genrsatest.pem' ])),
+-   "genpkey -f4 $good");
+-ok(run(app([ 'openssl', 'pkey', '-check', '-in', 'genrsatest.pem', '-noout' ])),
+-   "pkey -check");
+-
+- SKIP: {
+-    skip "Skipping rsa command line test", 4 if disabled("deprecated-3.0");
+-
+-    ok(run(app([ 'openssl', 'genrsa', '-3', '-out', 'genrsatest.pem', $good ])),
+-       "genrsa -3 $good");
+-    ok(run(app([ 'openssl', 'rsa', '-check', '-in', 'genrsatest.pem', '-noout' ])),
+-       "rsa -check");
+-    ok(run(app([ 'openssl', 'genrsa', '-f4', '-out', 'genrsatest.pem', $good ])),
+-       "genrsa -f4 $good");
+-    ok(run(app([ 'openssl', 'rsa', '-check', '-in', 'genrsatest.pem', '-noout' ])),
+-       "rsa -check");
+-}
++ok(run(app([ 'openssl', 'genrsa', '-3', '-out', 'genrsatest.pem', $good ])),
++   "genrsa -3 $good");
++ok(run(app([ 'openssl', 'rsa', '-check', '-in', 'genrsatest.pem', '-noout' ])),
++   "rsa -check");
++ok(run(app([ 'openssl', 'genrsa', '-f4', '-out', 'genrsatest.pem', $good ])),
++   "genrsa -f4 $good");
++ok(run(app([ 'openssl', 'rsa', '-check', '-in', 'genrsatest.pem', '-noout' ])),
++   "rsa -check");
+diff --git a/test/recipes/15-test_mp_rsa.t b/test/recipes/15-test_mp_rsa.t
+index 6ecf80c4e2..4a4ac3569d 100644
+--- a/test/recipes/15-test_mp_rsa.t
++++ b/test/recipes/15-test_mp_rsa.t
+@@ -17,6 +17,12 @@ use OpenSSL::Test::Utils;
+ 
+ setup("test_mp_rsa");
+ 
++plan tests => 31;
++
++ok(run(test(["rsa_mp_test"])), "running rsa multi prime test");
++
++my $cleartext = data_file("plain_text");
++
+ my @test_param = (
+     # 3 primes, 2048-bit
+     {
+@@ -35,14 +41,8 @@ my @test_param = (
+     },
+ );
+ 
+-plan tests => 1 + scalar(@test_param) * 5 * (disabled('deprecated-3.0') ? 1 : 2);
+-
+-ok(run(test(["rsa_mp_test"])), "running rsa multi prime test");
+-
+-my $cleartext = data_file("plain_text");
+-
+ # genrsa
+-run_mp_tests(0) if !disabled('deprecated-3.0');
++run_mp_tests(0);
+ # evp
+ run_mp_tests(1);
+ 
+@@ -60,9 +60,17 @@ sub run_mp_tests {
+                          '-pkeyopt', "rsa_keygen_primes:$primes",
+                          '-pkeyopt', "rsa_keygen_bits:$bits"])),
+                "genrsa $name");
+-            ok(run(app([ 'openssl', 'pkey', '-check',
+-                         '-in', "rsamptest-$name.pem", '-noout'])),
+-               "rsa -check $name");
++        } else {
++            ok(run(app([ 'openssl', 'genrsa', '-out', "rsamptest-$name.pem",
++                         '-primes', $primes, $bits])),
++               "genrsa $name");
++        }
++
++        ok(run(app([ 'openssl', 'rsa', '-check', '-in', "rsamptest-$name.pem",
++                     '-noout'])),
++           "rsa -check $name");
++
++        if ($evp) {
+             ok(run(app([ 'openssl', 'pkeyutl', '-inkey', "rsamptest-$name.pem",
+                          '-encrypt', '-in', $cleartext,
+                          '-out', "rsamptest-$name.enc" ])),
+@@ -72,11 +80,6 @@ sub run_mp_tests {
+                          '-out', "rsamptest-$name.dec" ])),
+                "rsa $name decrypt");
+         } else {
+-            ok(run(app([ 'openssl', 'genrsa', '-out', "rsamptest-$name.pem",
+-                         '-primes', $primes, $bits])), "genrsa $name");
+-            ok(run(app([ 'openssl', 'rsa', '-check',
+-                         '-in', "rsamptest-$name.pem", '-noout'])),
+-               "rsa -check $name");
+             ok(run(app([ 'openssl', 'rsautl', '-inkey', "rsamptest-$name.pem",
+                          '-encrypt', '-in', $cleartext,
+                          '-out', "rsamptest-$name.enc" ])),
+@@ -86,6 +89,7 @@ sub run_mp_tests {
+                          '-out', "rsamptest-$name.dec" ])),
+                "rsa $name decrypt");
+         }
++
+         ok(check_msg("rsamptest-$name.dec"), "rsa $name check result");
+     }
+ }
+diff --git a/test/recipes/15-test_rsa.t b/test/recipes/15-test_rsa.t
+index 2e8afa8213..3b1a0fcd5d 100644
+--- a/test/recipes/15-test_rsa.t
++++ b/test/recipes/15-test_rsa.t
+@@ -16,48 +16,32 @@ use OpenSSL::Test::Utils;
+ 
+ setup("test_rsa");
+ 
+-#plan skip_all => "RSA command line tool not built"
+-#    if disabled("deprecated-3.0");
++plan tests => 6;
+ 
+-plan tests => 10;
+-
+-require_ok(srctop_file('test', 'recipes', 'tconversion.pl'));
++require_ok(srctop_file('test','recipes','tconversion.pl'));
+ 
+ ok(run(test(["rsa_test"])), "running rsatest");
+ 
+-run_rsa_tests("pkey");
++ok(run(app([ 'openssl', 'rsa', '-check', '-in', srctop_file('test', 'testrsa.pem'), '-noout'])), "rsa -check");
+ 
+  SKIP: {
+-    skip "Skipping rsa command line tests", 4 if disabled('deprecated-3.0');
+-
+-    run_rsa_tests("rsa");
++     skip "Skipping rsa conversion test", 3
++	 if disabled("rsa");
++
++     subtest 'rsa conversions -- private key' => sub {
++	 tconversion("rsa", srctop_file("test","testrsa.pem"));
++     };
++     subtest 'rsa conversions -- private key PKCS#8' => sub {
++	 tconversion("rsa", srctop_file("test","testrsa.pem"), "pkey");
++     };
+ }
+ 
+-sub run_rsa_tests {
+-    my $cmd = shift;
+-
+-    ok(run(app([ 'openssl', $cmd, '-check', '-in', srctop_file('test', 'testrsa.pem'), '-noout'])),
+-           "$cmd -check" );
+-
+-     SKIP: {
+-         skip "Skipping $cmd conversion test", 3
+-	     if disabled("rsa");
+-
+-         subtest "$cmd conversions -- private key" => sub {
+-	     tconversion($cmd, srctop_file("test", "testrsa.pem"));
+-         };
+-         subtest "$cmd conversions -- private key PKCS#8" => sub {
+-	     tconversion($cmd, srctop_file("test", "testrsa.pem"), "pkey");
+-         };
+-    }
+-
+-     SKIP: {
+-         skip "Skipping msblob conversion test", 1
+-	     if disabled($cmd) || disabled("dsa") || $cmd == 'pkey';
+-
+-         subtest "$cmd conversions -- public key" => sub {
+-	     tconversion("msb", srctop_file("test", "testrsapub.pem"), "rsa",
+-		         "-pubin", "-pubout");
+-         };
+-    }
++ SKIP: {
++     skip "Skipping msblob conversion test", 1
++	 if disabled("rsa") || disabled("dsa");
++
++     subtest 'rsa conversions -- public key' => sub {
++	 tconversion("msb", srctop_file("test","testrsapub.pem"), "rsa",
++		     "-pubin", "-pubout");
++     };
+ }
+diff --git a/test/rsa_mp_test.c b/test/rsa_mp_test.c
+index 53e2966997..baa9dd2272 100644
+--- a/test/rsa_mp_test.c
++++ b/test/rsa_mp_test.c
+@@ -10,12 +10,6 @@
+ 
+ /* This aims to test the setting functions, including internal ones */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include <string.h>
+ 
+diff --git a/test/rsa_test.c b/test/rsa_test.c
+index 1fbfe821cb..084f533ac1 100644
+--- a/test/rsa_test.c
++++ b/test/rsa_test.c
+@@ -9,12 +9,6 @@
+ 
+ /* test vectors from p1ovect1.txt */
+ 
+-/*
+- * RSA low level APIs are deprecated for public use, but still ok for
+- * internal use.
+- */
+-#include "internal/deprecated.h"
+-
+ #include <stdio.h>
+ #include <string.h>
+ 
+diff --git a/test/tls13secretstest.c b/test/tls13secretstest.c
+index c6f65eaded..def78b9920 100644
+--- a/test/tls13secretstest.c
++++ b/test/tls13secretstest.c
+@@ -165,16 +165,9 @@ void RECORD_LAYER_reset_write_sequence(RECORD_LAYER *rl)
+ {
+ }
+ 
+-int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
+-                                     const EVP_CIPHER **enc)
+-{
+-    return 0;
+-}
+-
+-int ssl_cipher_get_evp(SSL_CTX *ctx, const SSL_SESSION *s,
+-                       const EVP_CIPHER **enc, const EVP_MD **md,
+-                       int *mac_pkey_type, size_t *mac_secret_size,
+-                       SSL_COMP **comp, int use_etm)
++int ssl_cipher_get_evp(const SSL_SESSION *s, const EVP_CIPHER **enc,
++                       const EVP_MD **md, int *mac_pkey_type,
++                       size_t *mac_secret_size, SSL_COMP **comp, int use_etm)
+ 
+ {
+     return 0;
+@@ -193,7 +186,7 @@ int ssl_log_secret(SSL *ssl,
+     return 1;
+ }
+ 
+-const EVP_MD *ssl_md(SSL_CTX *ctx, int idx)
++const EVP_MD *ssl_md(int idx)
+ {
+     return EVP_sha256();
+ }
+@@ -213,14 +206,6 @@ int ossl_statem_export_early_allowed(SSL *s)
+     return 1;
+ }
+ 
+-void ssl_evp_cipher_free(const EVP_CIPHER *cipher)
+-{
+-}
+-
+-void ssl_evp_md_free(const EVP_MD *md)
+-{
+-}
+-
+ /* End of mocked out code */
+ 
+ static int test_secret(SSL *s, unsigned char *prk,
+diff --git a/util/libcrypto.num b/util/libcrypto.num
+index 12761e4adc..f81fefb9b2 100644
+--- a/util/libcrypto.num
++++ b/util/libcrypto.num
+@@ -205,7 +205,7 @@ d2i_CRL_DIST_POINTS                     208	3_0_0	EXIST::FUNCTION:
+ X509_CRL_INFO_free                      209	3_0_0	EXIST::FUNCTION:
+ ERR_load_UI_strings                     210	3_0_0	EXIST::FUNCTION:
+ ERR_load_strings                        211	3_0_0	EXIST::FUNCTION:
+-RSA_X931_hash_id                        212	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_X931_hash_id                        212	3_0_0	EXIST::FUNCTION:RSA
+ EC_KEY_set_method                       213	3_0_0	EXIST::FUNCTION:EC
+ PEM_write_PKCS8_PRIV_KEY_INFO           214	3_0_0	EXIST::FUNCTION:STDIO
+ X509at_get0_data_by_OBJ                 215	3_0_0	EXIST::FUNCTION:
+@@ -241,7 +241,7 @@ MDC2                                    245	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3
+ BN_clear_free                           246	3_0_0	EXIST::FUNCTION:
+ ENGINE_get_pkey_asn1_meths              247	3_0_0	EXIST::FUNCTION:ENGINE
+ DSO_merge                               248	3_0_0	EXIST::FUNCTION:
+-RSA_get_ex_data                         249	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_get_ex_data                         249	3_0_0	EXIST::FUNCTION:RSA
+ EVP_PKEY_meth_get_decrypt               250	3_0_0	EXIST::FUNCTION:
+ DES_cfb_encrypt                         251	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,DES
+ CMS_SignerInfo_set1_signer_cert         252	3_0_0	EXIST::FUNCTION:CMS
+@@ -275,7 +275,7 @@ d2i_PKCS7_ENC_CONTENT                   280	3_0_0	EXIST::FUNCTION:
+ BUF_MEM_grow                            281	3_0_0	EXIST::FUNCTION:
+ TS_REQ_free                             282	3_0_0	EXIST::FUNCTION:TS
+ PEM_read_DHparams                       283	3_0_0	EXIST::FUNCTION:DH,STDIO
+-RSA_private_decrypt                     284	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_private_decrypt                     284	3_0_0	EXIST::FUNCTION:RSA
+ X509V3_EXT_get_nid                      285	3_0_0	EXIST::FUNCTION:
+ BIO_s_log                               286	3_0_0	EXIST::FUNCTION:
+ EC_POINT_set_to_infinity                287	3_0_0	EXIST::FUNCTION:EC
+@@ -345,7 +345,7 @@ RC4                                     350	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3
+ PKCS7_stream                            352	3_0_0	EXIST::FUNCTION:
+ i2t_ASN1_OBJECT                         353	3_0_0	EXIST::FUNCTION:
+ EC_GROUP_get0_generator                 354	3_0_0	EXIST::FUNCTION:EC
+-RSA_padding_add_PKCS1_PSS_mgf1          355	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_PKCS1_PSS_mgf1          355	3_0_0	EXIST::FUNCTION:RSA
+ EVP_MD_meth_set_init                    356	3_0_0	EXIST::FUNCTION:
+ X509_get_issuer_name                    357	3_0_0	EXIST::FUNCTION:
+ EVP_SignFinal                           358	3_0_0	EXIST::FUNCTION:
+@@ -367,7 +367,7 @@ BIO_new_mem_buf                         373	3_0_0	EXIST::FUNCTION:
+ UI_get_input_flags                      374	3_0_0	EXIST::FUNCTION:
+ X509V3_EXT_REQ_add_nconf                375	3_0_0	EXIST::FUNCTION:
+ X509v3_asid_subset                      376	3_0_0	EXIST::FUNCTION:RFC3779
+-RSA_check_key_ex                        377	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_check_key_ex                        377	3_0_0	EXIST::FUNCTION:RSA
+ d2i_TS_MSG_IMPRINT_bio                  378	3_0_0	EXIST::FUNCTION:TS
+ i2d_ASN1_TYPE                           379	3_0_0	EXIST::FUNCTION:
+ EVP_aes_256_wrap_pad                    380	3_0_0	EXIST::FUNCTION:
+@@ -440,7 +440,7 @@ X509_get_default_private_dir            447	3_0_0	EXIST::FUNCTION:
+ X509_STORE_CTX_set0_dane                448	3_0_0	EXIST::FUNCTION:
+ EVP_des_ecb                             449	3_0_0	EXIST::FUNCTION:DES
+ OCSP_resp_get0                          450	3_0_0	EXIST::FUNCTION:OCSP
+-RSA_X931_generate_key_ex                452	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_X931_generate_key_ex                452	3_0_0	EXIST::FUNCTION:RSA
+ X509_get_serialNumber                   453	3_0_0	EXIST::FUNCTION:
+ BIO_sock_should_retry                   454	3_0_0	EXIST::FUNCTION:SOCK
+ ENGINE_get_digests                      455	3_0_0	EXIST::FUNCTION:ENGINE
+@@ -533,7 +533,7 @@ CONF_get_number                         544	3_0_0	EXIST::FUNCTION:
+ X509_EXTENSION_get_object               545	3_0_0	EXIST::FUNCTION:
+ X509_EXTENSIONS_it                      546	3_0_0	EXIST::FUNCTION:
+ EC_POINT_set_compressed_coordinates_GF2m 547	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,EC,EC2M
+-RSA_sign_ASN1_OCTET_STRING              548	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_sign_ASN1_OCTET_STRING              548	3_0_0	EXIST::FUNCTION:RSA
+ d2i_X509_CRL_fp                         549	3_0_0	EXIST::FUNCTION:STDIO
+ i2d_RSA_PUBKEY                          550	3_0_0	EXIST::FUNCTION:RSA
+ EVP_aes_128_ccm                         551	3_0_0	EXIST::FUNCTION:
+@@ -553,7 +553,7 @@ X509_EXTENSION_free                     564	3_0_0	EXIST::FUNCTION:
+ EVP_DigestSignInit                      565	3_0_0	EXIST::FUNCTION:
+ CT_POLICY_EVAL_CTX_get0_issuer          566	3_0_0	EXIST::FUNCTION:CT
+ TLS_FEATURE_new                         567	3_0_0	EXIST::FUNCTION:
+-RSA_get_default_method                  568	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_get_default_method                  568	3_0_0	EXIST::FUNCTION:RSA
+ CRYPTO_cts128_encrypt_block             569	3_0_0	EXIST::FUNCTION:
+ ASN1_digest                             570	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0
+ ERR_load_X509V3_strings                 571	3_0_0	EXIST::FUNCTION:
+@@ -726,7 +726,7 @@ BN_set_params                           744	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_0
+ BN_add                                  745	3_0_0	EXIST::FUNCTION:
+ OPENSSL_sk_free                         746	3_0_0	EXIST::FUNCTION:
+ TS_TST_INFO_get_ext_d2i                 747	3_0_0	EXIST::FUNCTION:TS
+-RSA_check_key                           748	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_check_key                           748	3_0_0	EXIST::FUNCTION:RSA
+ TS_MSG_IMPRINT_set_algo                 749	3_0_0	EXIST::FUNCTION:TS
+ BN_nist_mod_521                         750	3_0_0	EXIST::FUNCTION:
+ CRYPTO_THREAD_get_local                 751	3_0_0	EXIST::FUNCTION:
+@@ -838,18 +838,18 @@ X509_STORE_free                         858	3_0_0	EXIST::FUNCTION:
+ ECDSA_sign_ex                           859	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,EC
+ TXT_DB_insert                           860	3_0_0	EXIST::FUNCTION:
+ EC_POINTs_make_affine                   861	3_0_0	EXIST::FUNCTION:EC
+-RSA_padding_add_PKCS1_PSS               862	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_PKCS1_PSS               862	3_0_0	EXIST::FUNCTION:RSA
+ BF_options                              863	3_0_0	EXIST::FUNCTION:BF,DEPRECATEDIN_3_0
+ OCSP_BASICRESP_it                       864	3_0_0	EXIST::FUNCTION:OCSP
+ X509_VERIFY_PARAM_get0_name             865	3_0_0	EXIST::FUNCTION:
+ TS_RESP_CTX_set_signer_digest           866	3_0_0	EXIST::FUNCTION:TS
+ X509_VERIFY_PARAM_set1_email            867	3_0_0	EXIST::FUNCTION:
+ BIO_sock_error                          868	3_0_0	EXIST::FUNCTION:SOCK
+-RSA_set_default_method                  869	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_set_default_method                  869	3_0_0	EXIST::FUNCTION:RSA
+ BN_GF2m_mod_sqrt_arr                    870	3_0_0	EXIST::FUNCTION:EC2M
+ X509_get0_extensions                    871	3_0_0	EXIST::FUNCTION:
+ TS_STATUS_INFO_set_status               872	3_0_0	EXIST::FUNCTION:TS
+-RSA_verify                              873	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_verify                              873	3_0_0	EXIST::FUNCTION:RSA
+ ASN1_FBOOLEAN_it                        874	3_0_0	EXIST::FUNCTION:
+ d2i_ASN1_TIME                           875	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_meth_get_signctx               876	3_0_0	EXIST::FUNCTION:
+@@ -899,7 +899,7 @@ CONF_set_default_method                 920	3_0_0	EXIST::FUNCTION:
+ ASN1_PCTX_get_nm_flags                  921	3_0_0	EXIST::FUNCTION:
+ X509_add1_ext_i2d                       922	3_0_0	EXIST::FUNCTION:
+ i2d_PKCS7_RECIP_INFO                    924	3_0_0	EXIST::FUNCTION:
+-PKCS1_MGF1                              925	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++PKCS1_MGF1                              925	3_0_0	EXIST::FUNCTION:RSA
+ BIO_vsnprintf                           926	3_0_0	EXIST::FUNCTION:
+ X509_STORE_CTX_get0_current_issuer      927	3_0_0	EXIST::FUNCTION:
+ CRYPTO_secure_malloc_initialized        928	3_0_0	EXIST::FUNCTION:
+@@ -936,7 +936,7 @@ PKEY_USAGE_PERIOD_new                   959	3_0_0	EXIST::FUNCTION:
+ OBJ_NAME_init                           960	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_meth_set_keygen                961	3_0_0	EXIST::FUNCTION:
+ RSA_PSS_PARAMS_new                      962	3_0_0	EXIST::FUNCTION:RSA
+-RSA_sign                                963	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_sign                                963	3_0_0	EXIST::FUNCTION:RSA
+ EVP_DigestVerifyFinal                   964	3_0_0	EXIST::FUNCTION:
+ d2i_RSA_PUBKEY_bio                      965	3_0_0	EXIST::FUNCTION:RSA
+ TS_RESP_dup                             966	3_0_0	EXIST::FUNCTION:TS
+@@ -1078,7 +1078,7 @@ PEM_read_bio_EC_PUBKEY                  1104	3_0_0	EXIST::FUNCTION:EC
+ BN_MONT_CTX_set                         1105	3_0_0	EXIST::FUNCTION:
+ TS_CONF_set_serial                      1106	3_0_0	EXIST::FUNCTION:TS
+ X509_NAME_ENTRY_new                     1107	3_0_0	EXIST::FUNCTION:
+-RSA_security_bits                       1108	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_security_bits                       1108	3_0_0	EXIST::FUNCTION:RSA
+ X509v3_addr_add_prefix                  1109	3_0_0	EXIST::FUNCTION:RFC3779
+ X509_REQ_print_fp                       1110	3_0_0	EXIST::FUNCTION:STDIO
+ ASN1_item_ex_new                        1111	3_0_0	EXIST::FUNCTION:
+@@ -1089,7 +1089,7 @@ ASN1_TYPE_get                           1115	3_0_0	EXIST::FUNCTION:
+ i2d_X509_EXTENSIONS                     1116	3_0_0	EXIST::FUNCTION:
+ X509_STORE_CTX_get0_store               1117	3_0_0	EXIST::FUNCTION:
+ PKCS12_pack_p7data                      1118	3_0_0	EXIST::FUNCTION:
+-RSA_print_fp                            1119	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA,STDIO
++RSA_print_fp                            1119	3_0_0	EXIST::FUNCTION:RSA,STDIO
+ OPENSSL_INIT_set_config_appname         1120	3_0_0	EXIST::FUNCTION:STDIO
+ EC_KEY_print_fp                         1121	3_0_0	EXIST::FUNCTION:EC,STDIO
+ BIO_dup_chain                           1122	3_0_0	EXIST::FUNCTION:
+@@ -1192,7 +1192,7 @@ OCSP_CERTSTATUS_it                      1218	3_0_0	EXIST::FUNCTION:OCSP
+ BIO_f_reliable                          1219	3_0_0	EXIST::FUNCTION:
+ OCSP_resp_count                         1220	3_0_0	EXIST::FUNCTION:OCSP
+ i2d_X509_AUX                            1221	3_0_0	EXIST::FUNCTION:
+-RSA_verify_PKCS1_PSS_mgf1               1222	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_verify_PKCS1_PSS_mgf1               1222	3_0_0	EXIST::FUNCTION:RSA
+ X509_time_adj                           1223	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_asn1_find_str                  1224	3_0_0	EXIST::FUNCTION:
+ X509_VERIFY_PARAM_get_flags             1225	3_0_0	EXIST::FUNCTION:
+@@ -1209,7 +1209,7 @@ X509_NAME_hash_old                      1235	3_0_0	EXIST::FUNCTION:
+ PBKDF2PARAM_free                        1236	3_0_0	EXIST::FUNCTION:
+ i2d_CMS_ContentInfo                     1237	3_0_0	EXIST::FUNCTION:CMS
+ EVP_CIPHER_meth_set_ctrl                1238	3_0_0	EXIST::FUNCTION:
+-RSA_public_decrypt                      1239	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_public_decrypt                      1239	3_0_0	EXIST::FUNCTION:RSA
+ ENGINE_get_id                           1240	3_0_0	EXIST::FUNCTION:ENGINE
+ PKCS12_item_decrypt_d2i                 1241	3_0_0	EXIST::FUNCTION:
+ PEM_read_bio_DSAparams                  1242	3_0_0	EXIST::FUNCTION:DSA
+@@ -1299,7 +1299,7 @@ EVP_CIPHER_do_all                       1327	3_0_0	EXIST::FUNCTION:
+ POLICY_MAPPINGS_it                      1328	3_0_0	EXIST::FUNCTION:
+ SCT_set0_log_id                         1329	3_0_0	EXIST::FUNCTION:CT
+ CRYPTO_cfb128_encrypt                   1330	3_0_0	EXIST::FUNCTION:
+-RSA_padding_add_PKCS1_type_2            1331	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_PKCS1_type_2            1331	3_0_0	EXIST::FUNCTION:RSA
+ TS_CONF_set_signer_cert                 1332	3_0_0	EXIST::FUNCTION:TS
+ i2d_ASN1_OBJECT                         1333	3_0_0	EXIST::FUNCTION:
+ d2i_PKCS8_PRIV_KEY_INFO_bio             1334	3_0_0	EXIST::FUNCTION:
+@@ -1392,7 +1392,7 @@ EVP_PBE_get                             1424	3_0_0	EXIST::FUNCTION:
+ CRYPTO_nistcts128_encrypt               1425	3_0_0	EXIST::FUNCTION:
+ CONF_modules_finish                     1426	3_0_0	EXIST::FUNCTION:
+ BN_value_one                            1427	3_0_0	EXIST::FUNCTION:
+-RSA_padding_add_SSLv23                  1428	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_SSLv23                  1428	3_0_0	EXIST::FUNCTION:RSA
+ OCSP_RESPBYTES_it                       1429	3_0_0	EXIST::FUNCTION:OCSP
+ EVP_aes_192_wrap                        1430	3_0_0	EXIST::FUNCTION:
+ OCSP_CERTID_it                          1431	3_0_0	EXIST::FUNCTION:OCSP
+@@ -1559,7 +1559,7 @@ CTLOG_get0_name                         1593	3_0_0	EXIST::FUNCTION:CT
+ ASN1_TBOOLEAN_it                        1594	3_0_0	EXIST::FUNCTION:
+ RC2_set_key                             1595	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RC2
+ X509_REVOKED_get_ext_by_NID             1596	3_0_0	EXIST::FUNCTION:
+-RSA_padding_add_none                    1597	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_none                    1597	3_0_0	EXIST::FUNCTION:RSA
+ EVP_rc5_32_12_16_cbc                    1599	3_0_0	EXIST::FUNCTION:RC5
+ PEM_dek_info                            1600	3_0_0	EXIST::FUNCTION:
+ ASN1_SCTX_get_template                  1601	3_0_0	EXIST::FUNCTION:
+@@ -1613,7 +1613,7 @@ i2d_EDIPARTYNAME                        1649	3_0_0	EXIST::FUNCTION:
+ X509_policy_tree_get0_policies          1650	3_0_0	EXIST::FUNCTION:
+ X509at_add1_attr                        1651	3_0_0	EXIST::FUNCTION:
+ X509_get_ex_data                        1653	3_0_0	EXIST::FUNCTION:
+-RSA_set_method                          1654	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_set_method                          1654	3_0_0	EXIST::FUNCTION:RSA
+ X509_REVOKED_dup                        1655	3_0_0	EXIST::FUNCTION:
+ ASN1_TIME_new                           1656	3_0_0	EXIST::FUNCTION:
+ PEM_write_NETSCAPE_CERT_SEQUENCE        1657	3_0_0	EXIST::FUNCTION:STDIO
+@@ -1664,7 +1664,7 @@ ESS_SIGNING_CERT_dup                    1701	3_0_0	EXIST::FUNCTION:
+ ENGINE_set_default_DSA                  1702	3_0_0	EXIST::FUNCTION:ENGINE
+ X509_REVOKED_new                        1703	3_0_0	EXIST::FUNCTION:
+ NCONF_WIN32                             1704	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0
+-RSA_padding_check_PKCS1_OAEP_mgf1       1705	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_check_PKCS1_OAEP_mgf1       1705	3_0_0	EXIST::FUNCTION:RSA
+ X509_policy_tree_get0_level             1706	3_0_0	EXIST::FUNCTION:
+ ASN1_parse_dump                         1708	3_0_0	EXIST::FUNCTION:
+ BIO_vfree                               1709	3_0_0	EXIST::FUNCTION:
+@@ -1831,7 +1831,7 @@ OCSP_single_get0_status                 1873	3_0_0	EXIST::FUNCTION:OCSP
+ d2i_AUTHORITY_INFO_ACCESS               1874	3_0_0	EXIST::FUNCTION:
+ PEM_read_RSAPrivateKey                  1875	3_0_0	EXIST::FUNCTION:RSA,STDIO
+ BIO_closesocket                         1876	3_0_0	EXIST::FUNCTION:SOCK
+-RSA_verify_ASN1_OCTET_STRING            1877	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_verify_ASN1_OCTET_STRING            1877	3_0_0	EXIST::FUNCTION:RSA
+ SCT_set_log_entry_type                  1878	3_0_0	EXIST::FUNCTION:CT
+ BN_new                                  1879	3_0_0	EXIST::FUNCTION:
+ X509_OBJECT_retrieve_by_subject         1880	3_0_0	EXIST::FUNCTION:
+@@ -2070,7 +2070,7 @@ i2d_ASIdentifiers                       2115	3_0_0	EXIST::FUNCTION:RFC3779
+ X509V3_EXT_cleanup                      2116	3_0_0	EXIST::FUNCTION:
+ CAST_ecb_encrypt                        2117	3_0_0	EXIST::FUNCTION:CAST,DEPRECATEDIN_3_0
+ BIO_s_file                              2118	3_0_0	EXIST::FUNCTION:
+-RSA_X931_derive_ex                      2119	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_X931_derive_ex                      2119	3_0_0	EXIST::FUNCTION:RSA
+ EVP_PKEY_decrypt_init                   2120	3_0_0	EXIST::FUNCTION:
+ ENGINE_get_destroy_function             2121	3_0_0	EXIST::FUNCTION:ENGINE
+ SHA224_Init                             2122	3_0_0	EXIST::FUNCTION:
+@@ -2252,7 +2252,7 @@ ESS_ISSUER_SERIAL_free                  2299	3_0_0	EXIST::FUNCTION:
+ BN_mod_exp_mont_word                    2300	3_0_0	EXIST::FUNCTION:
+ X509V3_EXT_nconf_nid                    2301	3_0_0	EXIST::FUNCTION:
+ UTF8_putc                               2302	3_0_0	EXIST::FUNCTION:
+-RSA_private_encrypt                     2303	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_private_encrypt                     2303	3_0_0	EXIST::FUNCTION:RSA
+ X509_LOOKUP_shutdown                    2304	3_0_0	EXIST::FUNCTION:
+ TS_TST_INFO_set_accuracy                2305	3_0_0	EXIST::FUNCTION:TS
+ OCSP_basic_verify                       2306	3_0_0	EXIST::FUNCTION:OCSP
+@@ -2348,7 +2348,7 @@ X509_LOOKUP_by_alias                    2396	3_0_0	EXIST::FUNCTION:
+ EC_KEY_set_conv_form                    2397	3_0_0	EXIST::FUNCTION:EC
+ X509_TRUST_get_count                    2399	3_0_0	EXIST::FUNCTION:
+ IPAddressOrRange_free                   2400	3_0_0	EXIST::FUNCTION:RFC3779
+-RSA_padding_add_PKCS1_OAEP              2401	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_PKCS1_OAEP              2401	3_0_0	EXIST::FUNCTION:RSA
+ EC_KEY_set_ex_data                      2402	3_0_0	EXIST::FUNCTION:EC
+ SRP_VBASE_new                           2403	3_0_0	EXIST::FUNCTION:SRP
+ i2d_ECDSA_SIG                           2404	3_0_0	EXIST::FUNCTION:EC
+@@ -2375,7 +2375,7 @@ ASN1_GENERALIZEDTIME_it                 2425	3_0_0	EXIST::FUNCTION:
+ PKCS8_pkey_get0                         2426	3_0_0	EXIST::FUNCTION:
+ OCSP_sendreq_new                        2427	3_0_0	EXIST::FUNCTION:OCSP
+ EVP_aes_256_cfb128                      2428	3_0_0	EXIST::FUNCTION:
+-RSA_set_ex_data                         2429	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_set_ex_data                         2429	3_0_0	EXIST::FUNCTION:RSA
+ BN_GENCB_call                           2430	3_0_0	EXIST::FUNCTION:
+ X509V3_EXT_add_nconf_sk                 2431	3_0_0	EXIST::FUNCTION:
+ i2d_TS_MSG_IMPRINT_fp                   2432	3_0_0	EXIST::FUNCTION:STDIO,TS
+@@ -2521,7 +2521,7 @@ EVP_CIPHER_meth_get_cleanup             2574	3_0_0	EXIST::FUNCTION:
+ ASN1_item_ex_d2i                        2575	3_0_0	EXIST::FUNCTION:
+ EVP_MD_meth_free                        2576	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_meth_new                       2577	3_0_0	EXIST::FUNCTION:
+-RSA_padding_check_PKCS1_OAEP            2578	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_check_PKCS1_OAEP            2578	3_0_0	EXIST::FUNCTION:RSA
+ OCSP_SERVICELOC_it                      2579	3_0_0	EXIST::FUNCTION:OCSP
+ PKCS12_SAFEBAG_get_nid                  2580	3_0_0	EXIST::FUNCTION:
+ EVP_MD_CTX_set_update_fn                2581	3_0_0	EXIST::FUNCTION:
+@@ -2586,7 +2586,7 @@ d2i_PBKDF2PARAM                         2640	3_0_0	EXIST::FUNCTION:
+ ERR_load_COMP_strings                   2641	3_0_0	EXIST::FUNCTION:COMP
+ EVP_PKEY_meth_add0                      2642	3_0_0	EXIST::FUNCTION:
+ EVP_rc4_40                              2643	3_0_0	EXIST::FUNCTION:RC4
+-RSA_bits                                2645	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_bits                                2645	3_0_0	EXIST::FUNCTION:RSA
+ ASN1_item_dup                           2646	3_0_0	EXIST::FUNCTION:
+ GENERAL_NAMES_it                        2647	3_0_0	EXIST::FUNCTION:
+ X509_issuer_name_hash                   2648	3_0_0	EXIST::FUNCTION:
+@@ -2610,7 +2610,7 @@ X509_load_cert_file                     2665	3_0_0	EXIST::FUNCTION:
+ EC_GFp_nistp521_method                  2667	3_0_0	EXIST::FUNCTION:EC,EC_NISTP_64_GCC_128
+ ECDSA_SIG_free                          2668	3_0_0	EXIST::FUNCTION:EC
+ d2i_PKCS12_BAGS                         2669	3_0_0	EXIST::FUNCTION:
+-RSA_public_encrypt                      2670	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_public_encrypt                      2670	3_0_0	EXIST::FUNCTION:RSA
+ X509_CRL_get0_extensions                2671	3_0_0	EXIST::FUNCTION:
+ CMS_digest_verify                       2672	3_0_0	EXIST::FUNCTION:CMS
+ ASN1_GENERALIZEDTIME_set                2673	3_0_0	EXIST::FUNCTION:
+@@ -2839,7 +2839,7 @@ ENGINE_get_last                         2900	3_0_0	EXIST::FUNCTION:ENGINE
+ EVP_PKEY_encrypt_init                   2901	3_0_0	EXIST::FUNCTION:
+ i2d_RSAPrivateKey_fp                    2902	3_0_0	EXIST::FUNCTION:RSA,STDIO
+ X509_REQ_print                          2903	3_0_0	EXIST::FUNCTION:
+-RSA_size                                2904	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_size                                2904	3_0_0	EXIST::FUNCTION:RSA
+ EVP_CIPHER_CTX_iv_noconst               2905	3_0_0	EXIST::FUNCTION:
+ DH_set_default_method                   2906	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,DH
+ X509_ALGOR_new                          2907	3_0_0	EXIST::FUNCTION:
+@@ -2933,7 +2933,7 @@ SHA384                                  2995	3_0_0	EXIST::FUNCTION:
+ NCONF_get_string                        2996	3_0_0	EXIST::FUNCTION:
+ d2i_PROXY_CERT_INFO_EXTENSION           2997	3_0_0	EXIST::FUNCTION:
+ EC_POINT_point2buf                      2998	3_0_0	EXIST::FUNCTION:EC
+-RSA_padding_add_PKCS1_OAEP_mgf1         2999	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_PKCS1_OAEP_mgf1         2999	3_0_0	EXIST::FUNCTION:RSA
+ COMP_CTX_get_type                       3000	3_0_0	EXIST::FUNCTION:COMP
+ TS_RESP_CTX_set_status_info             3001	3_0_0	EXIST::FUNCTION:TS
+ BIO_f_nbio_test                         3002	3_0_0	EXIST::FUNCTION:
+@@ -3014,7 +3014,7 @@ ENGINE_load_private_key                 3078	3_0_0	EXIST::FUNCTION:ENGINE
+ GENERAL_NAMES_new                       3079	3_0_0	EXIST::FUNCTION:
+ i2d_POLICYQUALINFO                      3080	3_0_0	EXIST::FUNCTION:
+ EC_GF2m_simple_method                   3081	3_0_0	EXIST::FUNCTION:EC,EC2M
+-RSA_get_method                          3082	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_get_method                          3082	3_0_0	EXIST::FUNCTION:RSA
+ d2i_ASRange                             3083	3_0_0	EXIST::FUNCTION:RFC3779
+ CMS_ContentInfo_new                     3084	3_0_0	EXIST::FUNCTION:CMS
+ OPENSSL_init_crypto                     3085	3_0_0	EXIST::FUNCTION:
+@@ -3053,7 +3053,7 @@ i2d_RSA_PSS_PARAMS                      3117	3_0_0	EXIST::FUNCTION:RSA
+ EVP_aes_128_wrap_pad                    3118	3_0_0	EXIST::FUNCTION:
+ ASN1_BIT_STRING_set                     3119	3_0_0	EXIST::FUNCTION:
+ PKCS5_PBKDF2_HMAC_SHA1                  3120	3_0_0	EXIST::FUNCTION:
+-RSA_padding_check_PKCS1_type_2          3121	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_check_PKCS1_type_2          3121	3_0_0	EXIST::FUNCTION:RSA
+ EVP_des_ede3_ecb                        3122	3_0_0	EXIST::FUNCTION:DES
+ CBIGNUM_it                              3123	3_0_0	EXIST::FUNCTION:
+ BIO_new_NDEF                            3124	3_0_0	EXIST::FUNCTION:
+@@ -3124,7 +3124,7 @@ BN_mod_add                              3189	3_0_0	EXIST::FUNCTION:
+ EC_POINT_set_affine_coordinates_GFp     3190	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,EC
+ X509_get_default_cert_file              3191	3_0_0	EXIST::FUNCTION:
+ UI_method_set_flusher                   3192	3_0_0	EXIST::FUNCTION:
+-RSA_new_method                          3193	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_new_method                          3193	3_0_0	EXIST::FUNCTION:RSA
+ OCSP_request_verify                     3194	3_0_0	EXIST::FUNCTION:OCSP
+ CRYPTO_THREAD_run_once                  3195	3_0_0	EXIST::FUNCTION:
+ TS_REQ_print_bio                        3196	3_0_0	EXIST::FUNCTION:TS
+@@ -3211,7 +3211,7 @@ POLICY_CONSTRAINTS_free                 3277	3_0_0	EXIST::FUNCTION:
+ EVP_aes_256_cfb8                        3278	3_0_0	EXIST::FUNCTION:
+ d2i_DSA_PUBKEY_bio                      3279	3_0_0	EXIST::FUNCTION:DSA
+ X509_NAME_get_text_by_OBJ               3280	3_0_0	EXIST::FUNCTION:
+-RSA_padding_check_none                  3281	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_check_none                  3281	3_0_0	EXIST::FUNCTION:RSA
+ CRYPTO_set_mem_debug                    3282	3_0_0	EXIST::FUNCTION:CRYPTO_MDEBUG,DEPRECATEDIN_3_0
+ TS_VERIFY_CTX_init                      3283	3_0_0	EXIST::FUNCTION:TS
+ OCSP_cert_id_new                        3284	3_0_0	EXIST::FUNCTION:OCSP
+@@ -3265,7 +3265,7 @@ X509_PKEY_free                          3332	3_0_0	EXIST::FUNCTION:
+ OCSP_CRLID_new                          3333	3_0_0	EXIST::FUNCTION:OCSP
+ CONF_dump_bio                           3334	3_0_0	EXIST::FUNCTION:
+ d2i_PKCS8PrivateKey_fp                  3335	3_0_0	EXIST::FUNCTION:STDIO
+-RSA_setup_blinding                      3336	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_setup_blinding                      3336	3_0_0	EXIST::FUNCTION:RSA
+ ERR_peek_error_line                     3337	3_0_0	EXIST::FUNCTION:
+ d2i_PKCS7                               3338	3_0_0	EXIST::FUNCTION:
+ ERR_reason_error_string                 3339	3_0_0	EXIST::FUNCTION:
+@@ -3286,7 +3286,7 @@ OPENSSL_sk_is_sorted                    3353	3_0_0	EXIST::FUNCTION:
+ OCSP_SIGNATURE_new                      3354	3_0_0	EXIST::FUNCTION:OCSP
+ EVP_PKEY_meth_get_paramgen              3355	3_0_0	EXIST::FUNCTION:
+ X509_ATTRIBUTE_create_by_OBJ            3356	3_0_0	EXIST::FUNCTION:
+-RSA_generate_key_ex                     3357	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_generate_key_ex                     3357	3_0_0	EXIST::FUNCTION:RSA
+ CMS_SignerInfo_get0_algs                3358	3_0_0	EXIST::FUNCTION:CMS
+ DIST_POINT_free                         3359	3_0_0	EXIST::FUNCTION:
+ ESS_SIGNING_CERT_free                   3360	3_0_0	EXIST::FUNCTION:
+@@ -3302,7 +3302,7 @@ PKCS7_ENVELOPE_new                      3369	3_0_0	EXIST::FUNCTION:
+ EDIPARTYNAME_new                        3370	3_0_0	EXIST::FUNCTION:
+ CMS_add1_cert                           3371	3_0_0	EXIST::FUNCTION:CMS
+ DSO_convert_filename                    3372	3_0_0	EXIST::FUNCTION:
+-RSA_padding_check_SSLv23                3373	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_check_SSLv23                3373	3_0_0	EXIST::FUNCTION:RSA
+ CRYPTO_gcm128_finish                    3374	3_0_0	EXIST::FUNCTION:
+ PKCS12_SAFEBAGS_it                      3375	3_0_0	EXIST::FUNCTION:
+ PKCS12_PBE_add                          3376	3_0_0	EXIST::FUNCTION:
+@@ -3393,7 +3393,7 @@ BIO_number_written                      3463	3_0_0	EXIST::FUNCTION:
+ TS_TST_INFO_set_msg_imprint             3464	3_0_0	EXIST::FUNCTION:TS
+ CRYPTO_get_ex_data                      3465	3_0_0	EXIST::FUNCTION:
+ X509_PURPOSE_get0_sname                 3466	3_0_0	EXIST::FUNCTION:
+-RSA_verify_PKCS1_PSS                    3467	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_verify_PKCS1_PSS                    3467	3_0_0	EXIST::FUNCTION:RSA
+ HMAC_CTX_reset                          3468	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0
+ EVP_PKEY_meth_set_init                  3469	3_0_0	EXIST::FUNCTION:
+ X509_REQ_extension_nid                  3470	3_0_0	EXIST::FUNCTION:
+@@ -3558,7 +3558,7 @@ SHA384_Update                           3635	3_0_0	EXIST::FUNCTION:
+ CRYPTO_cfb128_1_encrypt                 3636	3_0_0	EXIST::FUNCTION:
+ BIO_set_cipher                          3637	3_0_0	EXIST::FUNCTION:
+ PEM_read_PUBKEY                         3638	3_0_0	EXIST::FUNCTION:STDIO
+-RSA_PKCS1_OpenSSL                       3639	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_PKCS1_OpenSSL                       3639	3_0_0	EXIST::FUNCTION:RSA
+ AUTHORITY_INFO_ACCESS_free              3640	3_0_0	EXIST::FUNCTION:
+ SCT_get0_signature                      3641	3_0_0	EXIST::FUNCTION:CT
+ DISPLAYTEXT_it                          3643	3_0_0	EXIST::FUNCTION:
+@@ -3569,7 +3569,7 @@ X509_REQ_set_extension_nids             3647	3_0_0	EXIST::FUNCTION:
+ X509_free                               3648	3_0_0	EXIST::FUNCTION:
+ ERR_load_ERR_strings                    3649	3_0_0	EXIST::FUNCTION:
+ ASN1_const_check_infinite_end           3650	3_0_0	EXIST::FUNCTION:
+-RSA_null_method                         3651	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_null_method                         3651	3_0_0	EXIST::FUNCTION:RSA
+ TS_REQ_ext_free                         3652	3_0_0	EXIST::FUNCTION:TS
+ EVP_PKEY_meth_get_encrypt               3653	3_0_0	EXIST::FUNCTION:
+ Camellia_ecb_encrypt                    3654	3_0_0	EXIST::FUNCTION:CAMELLIA,DEPRECATEDIN_3_0
+@@ -3604,7 +3604,7 @@ BIO_ADDR_free                           3683	3_0_0	EXIST::FUNCTION:SOCK
+ ASN1_STRING_free                        3684	3_0_0	EXIST::FUNCTION:
+ X509_VERIFY_PARAM_inherit               3685	3_0_0	EXIST::FUNCTION:
+ EC_GROUP_get_curve_name                 3686	3_0_0	EXIST::FUNCTION:EC
+-RSA_print                               3687	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_print                               3687	3_0_0	EXIST::FUNCTION:RSA
+ i2d_ASN1_BMPSTRING                      3688	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_decrypt_old                    3689	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0
+ ASN1_UTCTIME_cmp_time_t                 3690	3_0_0	EXIST::FUNCTION:
+@@ -3678,7 +3678,7 @@ BIO_set_callback                        3757	3_0_0	EXIST::FUNCTION:
+ BN_GF2m_poly2arr                        3758	3_0_0	EXIST::FUNCTION:EC2M
+ CMS_unsigned_get_attr_count             3759	3_0_0	EXIST::FUNCTION:CMS
+ EVP_aes_256_gcm                         3760	3_0_0	EXIST::FUNCTION:
+-RSA_padding_check_X931                  3761	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_check_X931                  3761	3_0_0	EXIST::FUNCTION:RSA
+ ECDH_compute_key                        3762	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,EC
+ ASN1_TIME_print                         3763	3_0_0	EXIST::FUNCTION:
+ EVP_PKEY_CTX_get0_peerkey               3764	3_0_0	EXIST::FUNCTION:
+@@ -3759,7 +3759,7 @@ i2d_ASN1_INTEGER                        3840	3_0_0	EXIST::FUNCTION:
+ OCSP_SINGLERESP_add1_ext_i2d            3841	3_0_0	EXIST::FUNCTION:OCSP
+ PKCS7_add_signed_attribute              3842	3_0_0	EXIST::FUNCTION:
+ i2d_PrivateKey_bio                      3843	3_0_0	EXIST::FUNCTION:
+-RSA_padding_add_PKCS1_type_1            3844	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_padding_add_PKCS1_type_1            3844	3_0_0	EXIST::FUNCTION:RSA
+ i2d_re_X509_tbs                         3845	3_0_0	EXIST::FUNCTION:
+ EVP_CIPHER_iv_length                    3846	3_0_0	EXIST::FUNCTION:
+ OCSP_REQ_CTX_get0_mem_bio               3847	3_0_0	EXIST::FUNCTION:
+@@ -3908,44 +3908,44 @@ X509_VERIFY_PARAM_set_auth_level        3991	3_0_0	EXIST::FUNCTION:
+ X509_VERIFY_PARAM_get_auth_level        3992	3_0_0	EXIST::FUNCTION:
+ X509_REQ_get0_pubkey                    3993	3_0_0	EXIST::FUNCTION:
+ RSA_set0_key                            3994	3_0_0	EXIST::FUNCTION:RSA
+-RSA_meth_get_flags                      3995	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_finish                     3996	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_priv_dec                   3997	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_sign                       3998	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_bn_mod_exp                 3999	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_meth_get_flags                      3995	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_finish                     3996	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_priv_dec                   3997	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_sign                       3998	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_bn_mod_exp                 3999	3_0_0	EXIST::FUNCTION:RSA
+ RSA_test_flags                          4000	3_0_0	EXIST::FUNCTION:RSA
+-RSA_meth_new                            4001	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get0_app_data                  4002	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_dup                            4003	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set1_name                      4004	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set0_app_data                  4005	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_meth_new                            4001	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get0_app_data                  4002	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_dup                            4003	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set1_name                      4004	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set0_app_data                  4005	3_0_0	EXIST::FUNCTION:RSA
+ RSA_set_flags                           4006	3_0_0	EXIST::FUNCTION:RSA
+-RSA_meth_set_sign                       4007	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_meth_set_sign                       4007	3_0_0	EXIST::FUNCTION:RSA
+ RSA_clear_flags                         4008	3_0_0	EXIST::FUNCTION:RSA
+-RSA_meth_get_keygen                     4009	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_keygen                     4010	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_pub_dec                    4011	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_finish                     4012	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_meth_get_keygen                     4009	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_keygen                     4010	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_pub_dec                    4011	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_finish                     4012	3_0_0	EXIST::FUNCTION:RSA
+ RSA_get0_key                            4013	3_0_0	EXIST::FUNCTION:RSA
+-RSA_get0_engine                         4014	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_priv_enc                   4015	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_verify                     4016	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_get0_engine                         4014	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_priv_enc                   4015	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_verify                     4016	3_0_0	EXIST::FUNCTION:RSA
+ RSA_get0_factors                        4017	3_0_0	EXIST::FUNCTION:RSA
+-RSA_meth_get0_name                      4018	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_mod_exp                    4019	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_flags                      4020	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_pub_dec                    4021	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_bn_mod_exp                 4022	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_init                       4023	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_free                           4024	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_pub_enc                    4025	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_mod_exp                    4026	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_meth_get0_name                      4018	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_mod_exp                    4019	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_flags                      4020	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_pub_dec                    4021	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_bn_mod_exp                 4022	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_init                       4023	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_free                           4024	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_pub_enc                    4025	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_mod_exp                    4026	3_0_0	EXIST::FUNCTION:RSA
+ RSA_set0_factors                        4027	3_0_0	EXIST::FUNCTION:RSA
+-RSA_meth_set_pub_enc                    4028	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_priv_dec                   4029	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_verify                     4030	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_set_init                       4031	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
+-RSA_meth_get_priv_enc                   4032	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_meth_set_pub_enc                    4028	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_priv_dec                   4029	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_verify                     4030	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_set_init                       4031	3_0_0	EXIST::FUNCTION:RSA
++RSA_meth_get_priv_enc                   4032	3_0_0	EXIST::FUNCTION:RSA
+ RSA_set0_crt_params                     4037	3_0_0	EXIST::FUNCTION:RSA
+ RSA_get0_crt_params                     4038	3_0_0	EXIST::FUNCTION:RSA
+ DH_set0_pqg                             4039	3_0_0	EXIST::FUNCTION:DH
+@@ -4899,7 +4899,7 @@ d2i_X509_PUBKEY_fp                      ?	3_0_0	EXIST::FUNCTION:STDIO
+ i2d_X509_PUBKEY_fp                      ?	3_0_0	EXIST::FUNCTION:STDIO
+ d2i_X509_PUBKEY_bio                     ?	3_0_0	EXIST::FUNCTION:
+ i2d_X509_PUBKEY_bio                     ?	3_0_0	EXIST::FUNCTION:
+-RSA_get0_pss_params                     ?	3_0_0	EXIST::FUNCTION:DEPRECATEDIN_3_0,RSA
++RSA_get0_pss_params                     ?	3_0_0	EXIST::FUNCTION:RSA
+ X509_cmp_timeframe                      ?	3_0_0	EXIST::FUNCTION:
+ OSSL_CMP_MSG_get0_header                ?	3_0_0	EXIST::FUNCTION:CMP
+ BIO_f_prefix                            ?	3_0_0	EXIST::FUNCTION:
