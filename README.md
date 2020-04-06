@@ -33,6 +33,8 @@ Default support is in bold type.
 
 [Compatible OpenSSL-3.0.0-dev (OpenSSL, 25375 commits)](https://github.com/openssl/openssl/tree/7fa8bcfe4342df41919f5564b315f9c85d0a02d6)
 
+[Compatible OpenSSL-3.0.0-dev-**revert** (OpenSSL, 25746 commits)](https://github.com/openssl/openssl/tree/3cb55fe47c3398b81956e4fe20c4004524d47519)
+
 ## Patch files
 
 ### The equal preference patch(openssl-equal-x) already includes the tls13_draft patch and the tls13_nginx_config(_ciphers file only) patch. Therefore, you do not need to patch it together.
