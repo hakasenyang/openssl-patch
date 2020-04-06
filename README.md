@@ -54,6 +54,7 @@ Here is the basic patch content.
 | openssl-3.0.0-session_tls13.patch | For TLS 1.2 and below, the existing session timeout value is written. For TLS 1.3, 172800 (2 days) is fixed. |
 | openssl-3.0.0-dev_version_error.patch | **TEST** This is a way to fix nginx when the following errors occur during the build:<br>Error: missing binary operator before token "("<br>Maybe patched: [https://github.com/openssl/openssl/pull/7839](https://github.com/openssl/openssl/pull/7839)<br>Patched : [https://github.com/openssl/openssl/commit/5d609f22d28615c45685d9da871d432e9cb81127](https://github.com/openssl/openssl/commit/5d609f22d28615c45685d9da871d432e9cb81127) |
 | openssl-3.0.0-dev_revert.patch | **TEST** This file will revert the patch to use the old OpenSSL API. (This is an unsafe temporary measure.) |
+| openssl-3.0.0-dev-chacha_draft_revert.patch<br>openssl-equal-3.0.0-dev_ciphers_revert.patch<br>openssl-equal-3.0.0-dev_revert.patch | **TEST** These patches should be used after patching the **openssl-3.0.0-dev_revert.patch** file **first.** |
 
 **The "_ciphers" patch file is a temporary change to the TLS 1.3 configuration.**
 
